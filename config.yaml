@@ -1,0 +1,36 @@
+categories:
+  auto_categorize: true
+  custom_categories: {}
+  enabled: false
+data:
+  content_fields: []
+  exclude_fields: []
+  file_path: data.json
+  flatten_nested: true
+  key_field: null
+  structure_type: auto
+embeddings:
+  api_key_env: OPENAI_API_KEY
+  model: text-embedding-ada-002
+  provider: openai
+llm:
+  model: llama3.1
+  provider: ollama
+  temperature: 0
+processing:
+  batch_size: 15
+  chunk_overlap: 30
+  chunk_size: 300
+  separators:
+  - '
+
+
+    '
+  - '
+
+    '
+  - ': '
+  - ' - '
+retrieval:
+  k: 6
+  similarity_threshold: 0.7
