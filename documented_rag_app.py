@@ -18,7 +18,7 @@ Architecture Overview:
 4. Setup LLM chain for generating responses
 5. Retrieve relevant context and generate answers
 
-Author: SENG 499 Project Team
+Author: SENG 499 AI & NLP Team
 Purpose: Foundation for ONC Ocean Data Assistant
 """
 
