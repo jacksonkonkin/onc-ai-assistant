@@ -107,19 +107,19 @@ for ddl in df_ddl['sql'].to_list():
 # Add some domain knowledge or documentation
 vn.train(documentation="This database contains sales data by year, region, and revenue.")
 
-# Add example query training (adjust as you want)
+# Query training
 vn.train(sql="SELECT * FROM sales WHERE region='North'")
 
-# Inspect training data if you want
+# Inspect training data
 training_data = vn.get_training_data()
 print("Training data:", training_data)
 
-# Ask a sample question
+# Sample question
 response = vn.ask(question="What is the total revenue for the North region?")
 print("Vanna answer:", response)
 
 
-# --- Optional: Run Flask app (if you want to expose as API) ---
+# --- Run Flask app ---
 
 from vanna.flask import VannaFlaskApp
 
