@@ -24,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={rajdhaniSans.variable}
-      >
+      <body className={rajdhaniSans.variable}>
         <Navbar />
         {children}
       </body>

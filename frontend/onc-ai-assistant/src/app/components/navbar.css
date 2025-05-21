@@ -5,7 +5,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #129DC0;
+  background-color: #129dc0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   padding-right: 100px;
 }
@@ -26,7 +26,7 @@
 }
 
 .navBar a:hover {
-  color: #003C82;
+  color: #003c82;
 }
 
 .navBar .sign-in-btn {
