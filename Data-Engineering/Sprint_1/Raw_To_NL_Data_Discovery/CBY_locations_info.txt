@@ -1,0 +1,338 @@
+This is the data for the location 'Cambridge Bay' with location code CBY:
+- Coordinates: Latitude 69.1147, Longitude -105.0197
+- Depth: N/A meters
+- Number of deployments: 1
+- Device data available: Yes
+- Property data available: No
+- Description:  Cambridge Bay is located on Victoria Island in the Kitikmeot Region of Nunavut, Canada.
+- Bounding box coordinates:
+  * Latitude range: 69.1147 to 69.1147
+  * Longitude range: -105.0197 to -105.0197
+  * Depth range: N/A to N/A
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBY
+
+This is the data for the location 'Diver Data' with location code CBYDS:
+- Coordinates: Latitude 69.117115, Longitude -105.04964
+- Depth: 0.0 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.117115 to 69.117115
+  * Longitude range: -105.04964 to -105.04964
+  * Depth range: 0.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYDS
+
+This is the data for the location 'Junction Box - Daisy Chained' with location code CBYIJ.J1:
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Number of deployments: 1
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.113183 to 69.113183
+  * Longitude range: -105.0644 to -105.0644
+  * Depth range: 8.0 to 8.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIJ.J1
+
+This is the data for the location 'Junction Box - Primary' with location code CBYIJ.J2:
+- Coordinates: Latitude 69.113039, Longitude -105.064133
+- Depth: 8.0 meters
+- Number of deployments: 3
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.112967 to 69.113183
+  * Longitude range: -105.0644 to -105.064
+  * Depth range: 8.0 to 8.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIJ.J2
+
+This is the data for the location 'Underwater Network' with location code CBYIP:
+- Coordinates: Latitude 69.113068, Longitude -105.06356
+- Depth: 8.49697 meters
+- Number of deployments: 99
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11224 to 69.11386
+  * Longitude range: -105.065322 to -105.06058
+  * Depth range: 6.0 to 15.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP
+
+This is the data for the location 'CO2 - Pro-Oceanus' with location code CBYIP.D1:
+- Coordinates: Latitude 69.112984, Longitude -105.064207
+- Depth: 8.666667 meters
+- Number of deployments: 9
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.064517 to -105.06385
+  * Depth range: 8.0 to 10.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.D1
+
+This is the data for the location 'CO2 - Aanderaa' with location code CBYIP.D2:
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Number of deployments: 1
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.113117 to 69.113117
+  * Longitude range: -105.064083 to -105.064083
+  * Depth range: 9.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.D2
+
+This is the data for the location 'CO2 - Pro-Oceanus Secondary Device' with location code CBYIP.D3:
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Number of deployments: 1
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.113183 to 69.113183
+  * Longitude range: -105.0644 to -105.0644
+  * Depth range: 8.0 to 8.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.D3
+
+This is the data for the location 'Secondary CTD' with location code CBYIP.D4:
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Number of deployments: 2
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.113 to 69.113
+  * Longitude range: -105.0645 to -105.0645
+  * Depth range: 9.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.D4
+
+This is the data for the location 'Light - 1' with location code CBYIP.K1:
+- Coordinates: Latitude 69.113022, Longitude -105.064106
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113183
+  * Longitude range: -105.0644 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.K1
+
+This is the data for the location 'Light - 2' with location code CBYIP.K2:
+- Coordinates: Latitude 69.113022, Longitude -105.064106
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113183
+  * Longitude range: -105.0644 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.K2
+
+This is the data for the location 'Light - 3' with location code CBYIP.K3:
+- Coordinates: Latitude 69.112969, Longitude -105.064008
+- Depth: 8.666667 meters
+- Number of deployments: 3
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.064083 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIP.K3
+
+This is the data for the location 'Signal Combiner Unit' with location code CBYIU:
+- Coordinates: Latitude 69.112992, Longitude -105.064046
+- Depth: 8.5 meters
+- Number of deployments: 8
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.06416 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIU
+
+This is the data for the location 'MOXA ioLogik E1242 1' with location code CBYIU.AC1:
+- Coordinates: Latitude 69.112992, Longitude -105.064046
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.06416 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIU.AC1
+
+This is the data for the location 'MOXA Relay 1' with location code CBYIU.AC2:
+- Coordinates: Latitude 69.112992, Longitude -105.064046
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.06416 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIU.AC2
+
+This is the data for the location 'MOXA Relay 2' with location code CBYIU.AC3:
+- Coordinates: Latitude 69.112992, Longitude -105.064046
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.06416 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIU.AC3
+
+This is the data for the location 'MOXA ioLogik E1242 2' with location code CBYIU.AC4:
+- Coordinates: Latitude 69.112992, Longitude -105.064046
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.06416 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIU.AC4
+
+This is the data for the location 'MOXA Relay 3' with location code CBYIU.AC5:
+- Coordinates: Latitude 69.112992, Longitude -105.064046
+- Depth: 8.5 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11289 to 69.113117
+  * Longitude range: -105.06416 to -105.06391
+  * Depth range: 8.0 to 9.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYIU.AC5
+
+This is the data for the location 'Safe Passage Buoy' with location code CBYSP:
+- Coordinates: Latitude 69.108783, Longitude -105.070314
+- Depth: 1.25 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.098783 to 69.121226
+  * Longitude range: -105.116183 to -105.045706
+  * Depth range: 0.0 to 5.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSP
+
+This is the data for the location 'Shore Station' with location code CBYSS:
+- Coordinates: Latitude 69.114928, Longitude -105.057859
+- Depth: -6.25 meters
+- Number of deployments: 4
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11392 to 69.11764
+  * Longitude range: -105.0596 to -105.05327
+  * Depth range: -25.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSS
+
+This is the data for the location 'Meteorological Station - Davis' with location code CBYSS.M1:
+- Coordinates: Latitude 69.114024, Longitude -105.059389
+- Depth: 0.0 meters
+- Number of deployments: 3
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11392 to 69.114233
+  * Longitude range: -105.0596 to -105.058967
+  * Depth range: 0.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSS.M1
+
+This is the data for the location 'Meteorological Station - Lufft' with location code CBYSS.M2:
+- Coordinates: Latitude 69.114077, Longitude -105.059283
+- Depth: 0.0 meters
+- Number of deployments: 2
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11392 to 69.114233
+  * Longitude range: -105.0596 to -105.058967
+  * Depth range: 0.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSS.M2
+
+This is the data for the location 'Signal Combiner Unit' with location code CBYSU:
+- Coordinates: Latitude 69.114045, Longitude -105.059347
+- Depth: 0.0 meters
+- Number of deployments: 5
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11392 to 69.114233
+  * Longitude range: -105.0596 to -105.058967
+  * Depth range: 0.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSU
+
+This is the data for the location 'MOXA Relay' with location code CBYSU.AC1:
+- Coordinates: Latitude 69.114024, Longitude -105.059389
+- Depth: 0.0 meters
+- Number of deployments: 3
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11392 to 69.114233
+  * Longitude range: -105.0596 to -105.058967
+  * Depth range: 0.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSU.AC1
+
+This is the data for the location 'MOXA ioLogik 1242' with location code CBYSU.AC2:
+- Coordinates: Latitude 69.114024, Longitude -105.059389
+- Depth: 0.0 meters
+- Number of deployments: 3
+- Device data available: Yes
+- Property data available: No
+- Description: N/A
+- Bounding box coordinates:
+  * Latitude range: 69.11392 to 69.114233
+  * Longitude range: -105.0596 to -105.058967
+  * Depth range: 0.0 to 0.0
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CBYSU.AC2
+
+This is the data for the location 'CF240 (CBO-1)' with location code CF240:
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Number of deployments: 3
+- Device data available: Yes
+- Property data available: No
+- Description:  Station Name Alias: CBO-1.  Description: Cast sampling station with 200m radius.  
+- Bounding box coordinates:
+  * Latitude range: 69.11139 to 69.114976
+  * Longitude range: -105.069425 to -105.059375
+  * Depth range: N/A to N/A
+- Raw data URL: https://data.oceannetworks.ca/DataSearch?location=CF240
+
