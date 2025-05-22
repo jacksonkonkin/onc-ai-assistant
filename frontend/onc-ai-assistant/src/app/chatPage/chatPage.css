@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  height: 100vh;
+  padding-top: 2rem;
+  background-color: white;
+  font-family: "Arial", sans-serif;
+}
+
+.chat-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.chat-header h2 {
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.chat-body {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.messages {
+  width: 100%;
+  padding: 0 1rem;
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; 
+}
+
+.message {
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: inline-block; 
+  max-width: 80%;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: #d4d4d4;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 50px;
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  outline: none;
+  font-size: 1rem;
+}
+
+.send-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-left: 0.5rem;
+}
+
+.send-icon {
+  fill: #007acc;
+  transition: fill 0.3s ease;
+}
+
+.send-button:hover .send-icon {
+  fill: #005b99; 
+}
+
+.fish-logo {
+  align-items: center;
+  justify-content: center;
+  display: inline-flex;
+}
