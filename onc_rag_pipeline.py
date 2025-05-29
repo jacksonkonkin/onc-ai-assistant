@@ -1,30 +1,21 @@
 #!/usr/bin/env python3
 """
-ONC-Specific RAG Pipeline for Ocean Networks Canada
-==================================================
+Simplified ONC RAG Pipeline
+==========================
 
-This pipeline integrates Groq and Llama APIs with OpenAI embeddings to create
-a specialized RAG system for Ocean Networks Canada documents and data.
-
-Features:
-- Pre-download and process ONC documents
-- Support for multiple LLM providers (Groq, Ollama, OpenAI)
-- OpenAI embeddings for semantic search
-- ONC-specific prompt templates and oceanographic knowledge
-- Document categorization by type (instruments, data, research papers)
+Core RAG functionality for Ocean Networks Canada documents:
+- Local document processing (PDF, HTML, text files)
+- OpenAI embeddings for semantic search  
+- Chroma vector database storage
+- Groq LLM for question answering
 
 Author: SENG 499 AI & NLP Team
-Purpose: ONC Ocean Data Assistant with enhanced LLM support
 """
 
 import os
-import json
-import yaml
-import requests
 import logging
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Optional
 from pathlib import Path
-from datetime import datetime
 import argparse
 
 # Load environment variables from .env file
@@ -34,10 +25,9 @@ load_dotenv()
 # LangChain imports
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 
 # LLM providers
 from groq import Groq
@@ -45,262 +35,54 @@ from groq import Groq
 # Document processing
 import PyPDF2
 from bs4 import BeautifulSoup
-import tiktoken
 
-# Configure logging with environment variable override
-log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+# Configure logging
 logging.basicConfig(
-    level=getattr(logging, log_level, logging.INFO),
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
 
 def validate_environment():
-    """
-    Validate that required environment variables are set.
-    
-    Returns:
-        bool: True if all required variables are set, False otherwise
-    """
-    required_vars = []
-    warnings = []
-    
-    # Check for at least one LLM API key
+    """Validate that required environment variables are set."""
     groq_key = os.getenv('GROQ_API_KEY')
     openai_key = os.getenv('OPENAI_API_KEY')
     
-    if not groq_key and not openai_key:
-        required_vars.append("At least one of GROQ_API_KEY or OPENAI_API_KEY must be set")
-    
-    # Check for OpenAI key if using OpenAI embeddings (default)
-    if not openai_key:
-        warnings.append("OPENAI_API_KEY not set - OpenAI embeddings will not work")
-    
-    # Log validation results
-    if required_vars:
-        logger.error("Missing required environment variables:")
-        for var in required_vars:
-            logger.error(f"  - {var}")
+    if not groq_key:
+        logger.error("GROQ_API_KEY is required")
         return False
     
-    if warnings:
-        logger.warning("Environment warnings:")
-        for warning in warnings:
-            logger.warning(f"  - {warning}")
+    if not openai_key:
+        logger.error("OPENAI_API_KEY is required for embeddings")
+        return False
     
     logger.info("Environment validation passed")
     return True
 
 
-def load_env_with_fallback():
-    """
-    Load environment variables with fallback to .env file.
-    """
-    # Try to load from .env file in current directory
-    env_path = Path('.env')
-    if env_path.exists():
-        load_dotenv(env_path)
-        logger.info("Loaded environment variables from .env file")
-    else:
-        logger.info("No .env file found, using system environment variables")
+def load_local_documents(doc_dir: str = 'onc_documents') -> List[str]:
+    """Load documents from local directory."""
+    doc_path = Path(doc_dir)
+    if not doc_path.exists():
+        logger.warning(f"Document directory {doc_dir} does not exist")
+        return []
     
-    # Validate environment
-    if not validate_environment():
-        logger.error("Environment validation failed. Please check your .env file or environment variables.")
-        logger.info("You can copy .env.template to .env and fill in your API keys")
-        return False
+    files = []
+    for file_path in doc_path.rglob('*'):
+        if file_path.is_file() and file_path.suffix.lower() in ['.pdf', '.txt', '.html', '.md']:
+            files.append(str(file_path))
     
-    return True
+    logger.info(f"Found {len(files)} documents in {doc_dir}")
+    return files
 
 
-class ONCDocumentDownloader:
-    """
-    Downloads and preprocesses ONC documents from various sources.
+class DocumentProcessor:
+    """Processes documents into LangChain Document objects."""
     
-    Supports:
-    - ONC API endpoints
-    - Direct PDF downloads
-    - Web scraping of ONC documentation
-    - Local document processing
-    """
-    
-    def __init__(self, download_dir: str = None):
-        """
-        Initialize the document downloader.
-        
-        Args:
-            download_dir (str): Directory to store downloaded documents
-        """
-        # Use environment variable or default
-        if download_dir is None:
-            download_dir = os.getenv('ONC_DOCUMENT_DIR', 'onc_documents')
-        
-        self.download_dir = Path(download_dir)
-        self.download_dir.mkdir(exist_ok=True)
-        
-        # ONC document sources (simplified for Sprint 1)
-        self.document_sources = {
-            "instrument_docs": [
-                "https://wiki.oceannetworks.ca/display/O2A/CTD",
-                "https://wiki.oceannetworks.ca/display/O2A/Hydrophone"
-            ],
-            "observatory_info": [
-                "https://wiki.oceannetworks.ca/display/O2A/Cambridge+Bay"
-            ]
-        }
-    
-    def process_links_file(self, links_file: str = "links.txt") -> List[str]:
-        """
-        Process URLs from a links file and download their content.
-        
-        Args:
-            links_file (str): Path to file containing URLs
-            
-        Returns:
-            List[str]: List of downloaded file paths
-        """
-        links_path = self.download_dir / links_file
-        if not links_path.exists():
-            logger.warning(f"Links file {links_path} not found")
-            return []
-        
-        downloaded_files = []
-        
-        with open(links_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Extract URLs from the content
-        import re
-        urls = re.findall(r'https?://[^\s]+', content)
-        
-        logger.info(f"Found {len(urls)} URLs in {links_file}")
-        
-        for url in urls:
-            try:
-                file_path = self._download_document(url, "links_file")
-                if file_path:
-                    downloaded_files.append(file_path)
-                    logger.info(f"✓ Downloaded from links: {url}")
-            except Exception as e:
-                logger.error(f"✗ Failed to download {url}: {e}")
-                continue
-        
-        return downloaded_files
-    
-    def download_all_documents(self) -> Dict[str, List[str]]:
-        """
-        Download all configured ONC documents.
-        
-        Returns:
-            Dict[str, List[str]]: Mapping of document types to downloaded file paths
-        """
-        downloaded_files = {}
-        
-        for doc_type, urls in self.document_sources.items():
-            logger.info(f"Downloading {doc_type} documents...")
-            downloaded_files[doc_type] = []
-            
-            for url in urls:
-                try:
-                    file_path = self._download_document(url, doc_type)
-                    if file_path:
-                        downloaded_files[doc_type].append(file_path)
-                        logger.info(f"✓ Downloaded: {file_path}")
-                except Exception as e:
-                    logger.error(f"✗ Failed to download {url}: {e}")
-                    continue
-        
-        # Process links.txt file if it exists
-        links_files = self.process_links_file()
-        if links_files:
-            downloaded_files["links_file"] = links_files
-        
-        return downloaded_files
-    
-    def _download_document(self, url: str, doc_type: str) -> Optional[str]:
-        """
-        Download a single document from URL.
-        
-        Args:
-            url (str): Document URL
-            doc_type (str): Document category
-            
-        Returns:
-            Optional[str]: Path to downloaded file or None if failed
-        """
-        try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-            
-            # Determine file type and name
-            if url.endswith('.pdf'):
-                filename = f"{doc_type}_{url.split('/')[-1]}"
-                file_path = self.download_dir / filename
-                
-                with open(file_path, 'wb') as f:
-                    f.write(response.content)
-            else:
-                # HTML content - sanitize filename
-                url_part = url.split('/')[-1].replace('/', '_').replace('?', '_').replace('#', '_')
-                if not url_part or url_part == '_':
-                    url_part = f"page_{hash(url) % 10000}"
-                filename = f"{doc_type}_{url_part}.html"
-                file_path = self.download_dir / filename
-                
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(response.text)
-            
-            return str(file_path)
-            
-        except Exception as e:
-            logger.error(f"Error downloading {url}: {e}")
-            return None
-    
-    def process_local_documents(self, local_dir: str) -> List[str]:
-        """
-        Process documents from a local directory.
-        
-        Args:
-            local_dir (str): Path to directory containing ONC documents
-            
-        Returns:
-            List[str]: List of processed document paths
-        """
-        local_path = Path(local_dir)
-        if not local_path.exists():
-            logger.warning(f"Local directory {local_dir} does not exist")
-            return []
-        
-        processed_files = []
-        for file_path in local_path.rglob('*'):
-            if file_path.is_file() and file_path.suffix.lower() in ['.pdf', '.txt', '.html', '.md']:
-                processed_files.append(str(file_path))
-        
-        # Also look for links.txt in the local directory
-        links_file = local_path / 'links.txt'
-        if links_file.exists():
-            logger.info(f"Found links.txt in {local_dir}")
-            # This will be processed by the downloader's process_links_file method
-        
-        logger.info(f"Found {len(processed_files)} local documents")
-        return processed_files
-
-
-class ONCDocumentProcessor:
-    """
-    Processes ONC documents into LangChain Document objects with ONC-specific metadata.
-    """
-    
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize document processor.
-        
-        Args:
-            config (Dict[str, Any]): Configuration dictionary
-        """
-        self.config = config
-        self.encoding = tiktoken.get_encoding("cl100k_base")
+    def __init__(self):
+        """Initialize document processor."""
+        pass
     
     def process_documents(self, file_paths: List[str]) -> List[Document]:
         """
@@ -391,37 +173,16 @@ class ONCDocumentProcessor:
             return []
     
     def _create_documents(self, text: str, file_path: Path, doc_type: str) -> List[Document]:
-        """
-        Create Document objects with ONC-specific metadata.
-        
-        Args:
-            text (str): Document text content
-            file_path (Path): Original file path
-            doc_type (str): Document type
-            
-        Returns:
-            List[Document]: List of document chunks
-        """
+        """Create Document objects with basic metadata."""
         # Clean and normalize text
         text = self._clean_text(text)
         
-        # Determine ONC document category
-        onc_category = self._categorize_onc_document(file_path.name, text)
-        
-        # Extract ONC-specific metadata
+        # Basic metadata
         metadata = {
             "source": str(file_path),
-            "doc_type": doc_type,
-            "onc_category": onc_category,
             "filename": file_path.name,
-            "file_size": len(text),
-            "processed_at": datetime.now().isoformat(),
-            "token_count": len(self.encoding.encode(text))
+            "doc_type": doc_type
         }
-        
-        # Add instrument-specific metadata if applicable
-        if onc_category == "instrument":
-            metadata.update(self._extract_instrument_metadata(text))
         
         return [Document(page_content=text, metadata=metadata)]
     
@@ -436,128 +197,45 @@ class ONCDocumentProcessor:
         
         return cleaned_text
     
-    def _categorize_onc_document(self, filename: str, text: str) -> str:
-        """
-        Categorize ONC document based on filename and content.
-        
-        Args:
-            filename (str): Document filename
-            text (str): Document content
-            
-        Returns:
-            str: Document category
-        """
-        filename_lower = filename.lower()
-        text_lower = text.lower()
-        
-        # Instrument documentation
-        instruments = ['ctd', 'hydrophone', 'adcp', 'camera', 'seismometer', 'accelerometer']
-        if any(inst in filename_lower or inst in text_lower for inst in instruments):
-            return "instrument"
-        
-        # Observatory information
-        observatories = ['cambridge bay', 'folger passage', 'strait of georgia', 'barkley canyon']
-        if any(obs in filename_lower or obs in text_lower for obs in observatories):
-            return "observatory"
-        
-        # Data products
-        data_keywords = ['data product', 'data quality', 'calibration', 'processing']
-        if any(kw in filename_lower or kw in text_lower for kw in data_keywords):
-            return "data_product"
-        
-        # Research papers/publications
-        research_keywords = ['research', 'publication', 'paper', 'study', 'analysis']
-        if any(kw in filename_lower or kw in text_lower for kw in research_keywords):
-            return "research"
-        
-        return "general"
-    
-    def _extract_instrument_metadata(self, text: str) -> Dict[str, Any]:
-        """
-        Extract basic instrument metadata from text (simplified for Sprint 1).
-        """
-        metadata = {}
-        text_lower = text.lower()
-        
-        # Basic instrument detection
-        if any(term in text_lower for term in ['temperature', 'salinity', 'pressure']):
-            metadata['oceanographic_instrument'] = True
-        if any(term in text_lower for term in ['acoustic', 'sound', 'hydrophone']):
-            metadata['acoustic_instrument'] = True
-        
-        return metadata
 
 
 class GroqLLMWrapper:
-    """
-    Wrapper for Groq API to work with LangChain-style interfaces.
-    """
+    """Simple Groq API wrapper."""
     
-    def __init__(self, api_key: str, model: str = "llama3-70b-8192", temperature: float = 0.1):
-        """
-        Initialize Groq LLM wrapper.
-        
-        Args:
-            api_key (str): Groq API key
-            model (str): Model name
-            temperature (float): Generation temperature
-        """
+    def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
         self.client = Groq(api_key=api_key)
         self.model = model
-        self.temperature = temperature
     
-    def invoke(self, prompt_dict: Dict[str, str]) -> str:
-        """
-        Invoke the Groq model with a prompt.
-        
-        Args:
-            prompt_dict (Dict[str, str]): Dictionary containing prompt components
-            
-        Returns:
-            str: Generated response
-        """
+    def invoke(self, prompt: str) -> str:
+        """Generate response from prompt."""
         try:
-            # Format the prompt
-            if isinstance(prompt_dict, dict) and 'text' in prompt_dict:
-                messages = [{"role": "user", "content": prompt_dict['text']}]
-            else:
-                # Assume it's a formatted prompt string
-                messages = [{"role": "user", "content": str(prompt_dict)}]
-            
             response = self.client.chat.completions.create(
-                messages=messages,
+                messages=[{"role": "user", "content": prompt}],
                 model=self.model,
-                temperature=self.temperature,
+                temperature=0.1,
                 max_tokens=1000
             )
-            
             return response.choices[0].message.content
-            
         except Exception as e:
-            logger.error(f"Error with Groq API: {e}")
-            return f"Error generating response: {str(e)}"
+            logger.error(f"Groq API error: {e}")
+            return f"Error: {str(e)}"
 
 
-class ONCRAGPipeline:
-    """
-    Main ONC RAG Pipeline integrating multiple LLM providers with OpenAI embeddings.
-    """
+class SimpleRAGPipeline:
+    """Simple RAG pipeline for ONC documents."""
     
-    def __init__(self, config_path: str = "onc_config.yaml"):
-        """
-        Initialize the ONC RAG pipeline.
+    def __init__(self, doc_dir: str = 'onc_documents'):
+        self.doc_dir = doc_dir
+        self.document_processor = DocumentProcessor()
         
-        Args:
-            config_path (str): Path to configuration file
-        """
-        self.config_path = config_path
-        self.config = self._load_config()
-        
-        # Initialize components
-        self.document_downloader = ONCDocumentDownloader(
-            self.config.get('document_dir', 'onc_documents')
-        )
-        self.document_processor = ONCDocumentProcessor(self.config)
+        # Simple config
+        self.config = {
+            'processing': {'chunk_size': 500, 'chunk_overlap': 50, 'batch_size': 20},
+            'embeddings': {'provider': 'openai', 'model': 'text-embedding-ada-002', 'api_key_env': 'OPENAI_API_KEY'},
+            'vector_store': {'provider': 'chroma', 'persist_directory': 'onc_vectorstore', 'force_rebuild': False, 'collection_name': 'onc_documents'},
+            'retrieval': {'k': 8, 'similarity_threshold': 0.75},
+            'llm': {'provider': 'groq', 'groq': {'model': 'llama-3.3-70b-versatile', 'temperature': 0.1, 'api_key_env': 'GROQ_API_KEY'}}
+        }
         
         # Initialize empty attributes
         self.documents = None
@@ -565,72 +243,7 @@ class ONCRAGPipeline:
         self.vectorstore = None
         self.retriever = None
         self.llm = None
-        self.rag_chain = None
     
-    def _load_config(self) -> Dict[str, Any]:
-        """Load configuration with ONC-specific defaults and environment variable overrides."""
-        default_config = {
-            "document_dir": os.getenv('ONC_DOCUMENT_DIR', 'onc_documents'),
-            "llm": {
-                "provider": "groq",
-                "groq": {
-                    "model": os.getenv('GROQ_MODEL', 'llama-3.1-70b-versatile'),
-                    "temperature": 0.1,
-                    "api_key_env": "GROQ_API_KEY"
-                }
-            },
-            "embeddings": {
-                "provider": "openai",
-                "model": os.getenv('OPENAI_EMBEDDING_MODEL', 'text-embedding-ada-002'),
-                "api_key_env": "OPENAI_API_KEY"
-            },
-            "processing": {
-                "chunk_size": 500,
-                "chunk_overlap": 50,
-                "batch_size": 20
-            },
-            "retrieval": {
-                "k": 8,
-                "similarity_threshold": 0.75
-            },
-            "vector_store": {
-                "provider": "chroma",
-                "persist_directory": os.getenv('ONC_VECTOR_STORE_DIR', 'onc_vectorstore'),
-                "force_rebuild": False,
-                "collection_name": "onc_documents"
-            },
-            "onc_specific": {
-                "cambridge_bay_focus": True,
-                "instrument_priority": ["CTD", "hydrophone", "ADCP"],
-                "data_types": ["temperature", "salinity", "pressure", "acoustic"]
-            }
-        }
-        
-        if Path(self.config_path).exists():
-            try:
-                with open(self.config_path, 'r') as f:
-                    user_config = yaml.safe_load(f) or {}
-                    # Deep merge configurations
-                    self._deep_update(default_config, user_config)
-                    logger.info(f"Loaded configuration from {self.config_path}")
-            except Exception as e:
-                logger.error(f"Error loading config: {e}")
-                logger.info("Using default configuration")
-        else:
-            # Create default config file
-            with open(self.config_path, 'w') as f:
-                yaml.dump(default_config, f, default_flow_style=False)
-            logger.info(f"Created default config file: {self.config_path}")
-        
-        return default_config
-    
-    def _deep_update(self, base_dict: Dict, update_dict: Dict):
-        """Deep update of nested dictionaries."""
-        for key, value in update_dict.items():
-            if isinstance(value, dict) and key in base_dict and isinstance(base_dict[key], dict):
-                self._deep_update(base_dict[key], value)
-            else:
-                base_dict[key] = value
     
     def setup(self, download_new: bool = True, local_docs_dir: Optional[str] = None):
         """
@@ -645,22 +258,16 @@ class ONCRAGPipeline:
         # Step 1: Get documents
         document_files = []
         
-        if download_new:
-            logger.info("Downloading ONC documents...")
-            downloaded = self.document_downloader.download_all_documents()
-            for doc_type, files in downloaded.items():
-                document_files.extend(files)
-        
         # Auto-detect local documents if none specified but directory exists
         if not local_docs_dir:
-            default_doc_dir = self.config.get('document_dir', 'onc_documents')
+            default_doc_dir = self.doc_dir
             if Path(default_doc_dir).exists():
                 local_docs_dir = default_doc_dir
                 logger.info(f"Auto-detected local documents directory: {local_docs_dir}")
         
         if local_docs_dir:
             logger.info(f"Processing local documents from {local_docs_dir}")
-            local_files = self.document_downloader.process_local_documents(local_docs_dir)
+            local_files = load_local_documents(local_docs_dir)
             document_files.extend(local_files)
         
         if not document_files:
@@ -830,8 +437,7 @@ class ONCRAGPipeline:
         
         self.llm = GroqLLMWrapper(
             api_key=api_key,
-            model=llm_config['groq']['model'],
-            temperature=llm_config['groq']['temperature']
+            model=llm_config['groq']['model']
         )
         logger.info(f"Using Groq LLM: {llm_config['groq']['model']}")
     
@@ -871,7 +477,7 @@ EXPERT ONC ANALYSIS:""",
         # Create Groq processing chain
         def groq_chain(inputs):
             formatted_prompt = onc_prompt.format(**inputs)
-            response = self.llm.invoke({"text": formatted_prompt})
+            response = self.llm.invoke(formatted_prompt)
             return response
         
         self.rag_chain = groq_chain
@@ -911,7 +517,7 @@ EXPERT ONC ANALYSIS:""",
         # Create direct Groq processing chain
         def groq_direct_chain(inputs):
             formatted_prompt = onc_direct_prompt.format(**inputs)
-            response = self.llm.invoke({"text": formatted_prompt})
+            response = self.llm.invoke(formatted_prompt)
             return response
         
         self.rag_chain = groq_direct_chain
@@ -1030,75 +636,31 @@ EXPERT ONC ANALYSIS:""",
 
 
 def main():
-    """Main function with CLI interface."""
-    parser = argparse.ArgumentParser(
-        description="ONC RAG Pipeline - Ocean Networks Canada AI Assistant",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Environment Variables (can be set in .env file):
-  GROQ_API_KEY          Groq API key for LLM access
-  OPENAI_API_KEY        OpenAI API key for embeddings and LLM
-  ONC_API_TOKEN         ONC API token (optional)
-  LOG_LEVEL             Logging level (DEBUG, INFO, WARNING, ERROR)
-  ONC_DOCUMENT_DIR      Directory for storing documents
-  GROQ_MODEL            Groq model name override
-  OPENAI_EMBEDDING_MODEL OpenAI embedding model override
-
-Examples:
-  python onc_rag_pipeline.py --download
-  python onc_rag_pipeline.py --local-docs /path/to/docs
-  python onc_rag_pipeline.py --query "What is a CTD?"
-        """
-    )
-    
-    parser.add_argument("--config", default="onc_config.yaml", help="Configuration file path")
-    parser.add_argument("--download", action="store_true", help="Download new ONC documents")
-    parser.add_argument("--local-docs", help="Path to local ONC documents directory")
+    """Main function."""
+    parser = argparse.ArgumentParser(description="Simple ONC RAG Pipeline")
+    parser.add_argument("--docs", default="onc_documents", help="Documents directory")
     parser.add_argument("--query", help="Single query mode")
-    parser.add_argument("--setup-only", action="store_true", help="Setup only, no interaction")
-    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
-    parser.add_argument("--env-check", action="store_true", help="Check environment variables and exit")
-    parser.add_argument("--rebuild-vectorstore", action="store_true", help="Force rebuild vector store")
     
     args = parser.parse_args()
     
-    # Load environment variables
-    print("Loading environment variables...")
-    if not load_env_with_fallback():
-        print("Environment setup failed. Please check your API keys in .env file.")
+    # Check environment
+    if not validate_environment():
+        print("Please set GROQ_API_KEY and OPENAI_API_KEY environment variables")
         return 1
     
-    if args.env_check:
-        print("Environment variables validated successfully!")
-        return 0
-    
-    if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
-    
     try:
-        print("Initializing ONC RAG Pipeline...")
-        pipeline = ONCRAGPipeline(args.config)
-        
-        # Handle special arguments
-        if args.rebuild_vectorstore:
-            print("Forcing vector store rebuild...")
-            pipeline.config['vector_store']['force_rebuild'] = True
-        
-        print("Setting up pipeline...")
-        pipeline.setup(download_new=args.download, local_docs_dir=args.local_docs)
+        print("Initializing RAG Pipeline...")
+        pipeline = SimpleRAGPipeline(args.docs)
+        pipeline.setup()
         
         if args.query:
-            print(f"\nQuestion: {args.query}")
             answer = pipeline.query(args.query)
             print(f"Answer: {answer}")
-        elif not args.setup_only:
-            pipeline.interactive_mode()
         else:
-            print("Setup complete! ONC RAG Pipeline ready.")
+            pipeline.interactive_mode()
         
     except Exception as e:
-        logger.error(f"Pipeline error: {e}")
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         return 1
     
     return 0
