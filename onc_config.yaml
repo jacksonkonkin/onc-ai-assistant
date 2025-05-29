@@ -1,0 +1,55 @@
+document_dir: onc_documents
+
+llm:
+  provider: groq  # groq, ollama, or openai
+  groq:
+    model: llama3-70b-8192
+    temperature: 0.1
+    api_key_env: GROQ_API_KEY
+  ollama:
+    model: llama3.1
+    temperature: 0.1
+  openai:
+    model: gpt-4
+    temperature: 0.1
+    api_key_env: OPENAI_API_KEY
+
+embeddings:
+  provider: openai
+  model: text-embedding-ada-002
+  api_key_env: OPENAI_API_KEY
+
+processing:
+  chunk_size: 500
+  chunk_overlap: 50
+  batch_size: 20
+
+retrieval:
+  k: 8
+  similarity_threshold: 0.75
+
+vector_store:
+  provider: chroma  # chroma or sklearn
+  persist_directory: onc_vectorstore
+  force_rebuild: false
+  collection_name: onc_documents
+
+onc_specific:
+  cambridge_bay_focus: true
+  instrument_priority:
+    - CTD
+    - hydrophone
+    - ADCP
+    - camera
+    - seismometer
+  data_types:
+    - temperature
+    - salinity
+    - pressure
+    - acoustic
+    - ice_conditions
+  observatories:
+    - Cambridge Bay
+    - Folger Passage
+    - Strait of Georgia
+    - Barkley Canyon
