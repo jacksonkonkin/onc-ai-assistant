@@ -65,37 +65,6 @@ The pipeline automatically processes:
   - Oceanographic terminology glossaries
 - **Local Documents**: PDFs, HTML, markdown, and text files
 
-## Configuration
-
-Edit `onc_config.yaml` to customize:
-
-```yaml
-# LLM Provider (groq, openai, ollama)
-llm:
-  provider: groq
-  groq:
-    model: llama3-70b-8192
-    temperature: 0.1
-
-# Vector Store Settings
-vector_store:
-  provider: chroma          # chroma (persistent) or sklearn (temporary)
-  persist_directory: onc_vectorstore
-  force_rebuild: false      # Set to true to rebuild embeddings
-  collection_name: onc_documents
-
-# Document Processing
-processing:
-  chunk_size: 500
-  chunk_overlap: 50
-  batch_size: 20
-
-# Retrieval Settings
-retrieval:
-  k: 8                      # Number of documents to retrieve
-  similarity_threshold: 0.75
-```
-
 ## Architecture
 
 1. **Document Ingestion**: Downloads ONC documentation and processes local files
