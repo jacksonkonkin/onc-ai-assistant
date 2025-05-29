@@ -96,28 +96,6 @@ retrieval:
   similarity_threshold: 0.75
 ```
 
-## Advanced Usage
-
-### Force Vector Store Rebuild
-```bash
-python onc_rag_pipeline.py --rebuild-vectorstore
-```
-
-### Use Local Documents Only
-```bash
-python onc_rag_pipeline.py --local-docs /path/to/your/docs
-```
-
-### Disable Persistence (Temporary Mode)
-```bash
-python onc_rag_pipeline.py --no-persist
-```
-
-### Environment Check
-```bash
-python onc_rag_pipeline.py --env-check
-```
-
 ## Architecture
 
 1. **Document Ingestion**: Downloads ONC documentation and processes local files
@@ -141,36 +119,3 @@ python onc_rag_pipeline.py --env-check
 - "What are the ice conditions in the Arctic observatories?"
 - "Explain the Oceans 3.0 API for data access"
 - "What marine mammals are detected by hydrophones?"
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Missing API Keys**: Run `--env-check` to validate environment
-2. **Embedding Costs**: Use `--no-persist` for testing, enable persistence for production
-3. **Memory Issues**: Reduce `batch_size` in configuration
-4. **Network Timeouts**: Check internet connection for document downloads
-
-### Logs and Debugging
-
-```bash
-# Enable verbose logging
-python onc_rag_pipeline.py --verbose
-
-# Set log level in .env
-LOG_LEVEL=DEBUG
-```
-
-## Project Structure
-
-```
-onc-ai-assistant/
-├── onc_rag_pipeline.py      # Main RAG pipeline
-├── onc_config.yaml          # Configuration file
-├── requirements.txt         # Python dependencies
-├── .env.template           # Environment template
-├── onc_documents/          # Document storage
-│   └── links.txt          # ONC resource URLs
-├── onc_vectorstore/        # Persistent vector database
-└── README.md              # This file
-```
