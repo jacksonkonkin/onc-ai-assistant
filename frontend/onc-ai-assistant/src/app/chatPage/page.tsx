@@ -1,18 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import "./ChatPage.css";
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
     if (!input.trim()) return;
     setMessages([...messages, input]);
     setInput("");
   };
+
+  // Auto-expand textarea height
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+  }, [input]);
 
   return (
     <div className="chat-container">
@@ -35,12 +45,13 @@ export default function ChatPage() {
           ))}
         </div>
         <div className="chat-input-wrapper">
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             placeholder="Type a message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="chat-input"
+            rows={1}
           />
           <button onClick={handleSend} className="send-button">
             <svg
