@@ -4,15 +4,32 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import "./ChatPage.css";
 
+type Message = {
+  sender: "user" | "ai";
+  text: string;
+};
+
 export default function ChatPage() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSend = () => {
+  const fetchAIResponse = async (prompt: string): Promise<string> => {
+    // TODO: Replace this with actual backend call when ready
+    await new Promise((r) => setTimeout(r, 1000)); // simulate delay
+    return "This is a placeholder response.";
+  };
+
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, input]);
+
+    const userMessage: Message = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
+
+    const aiText = await fetchAIResponse(input);
+    const aiMessage: Message = { sender: "ai", text: aiText };
+    setMessages((prev) => [...prev, aiMessage]);
   };
 
   // Auto-expand textarea height
@@ -39,8 +56,11 @@ export default function ChatPage() {
       <div className="chat-body">
         <div className="messages">
           {messages.map((msg, i) => (
-            <div key={i} className="message">
-              {msg}
+            <div
+              key={i}
+              className={`message ${msg.sender === "user" ? "user-msg" : "ai-msg"}`}
+            >
+              {msg.text}
             </div>
           ))}
         </div>

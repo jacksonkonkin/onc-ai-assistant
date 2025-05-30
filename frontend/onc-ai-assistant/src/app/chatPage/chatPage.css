@@ -113,3 +113,16 @@
   justify-content: center;
   display: inline-flex;
 }
+
+.user-msg {
+  background-color: #f0f0f0;
+  align-self: flex-end;
+  color: black;
+}
+
+.ai-msg {
+  background-color: #e0f2fe; /* Tailwind's blue-100 */
+  align-self: flex-start;
+  color: #0c4a6e; /* Tailwind's blue-900 */
+}
+
