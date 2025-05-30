@@ -16,7 +16,7 @@ export default function ChatPage() {
 
   const fetchAIResponse = async (prompt: string): Promise<string> => {
     // TODO: Replace this with actual backend call when ready
-    await new Promise((r) => setTimeout(r, 1000)); // simulate delay
+    await new Promise((r) => setTimeout(r, 5000)); // simulate delay
     return "This is a placeholder response.";
   };
 
@@ -24,12 +24,15 @@ export default function ChatPage() {
     if (!input.trim()) return;
 
     const userMessage: Message = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage, { sender: "ai", text: "Thinking..." }]);
     setInput("");
 
     const aiText = await fetchAIResponse(input);
-    const aiMessage: Message = { sender: "ai", text: aiText };
-    setMessages((prev) => [...prev, aiMessage]);
+    setMessages((prev) => {
+      const updated = [...prev];
+      updated[updated.length - 1] = { sender: "ai", text: aiText };
+      return updated;
+    });
   };
 
   // Auto-expand textarea height
