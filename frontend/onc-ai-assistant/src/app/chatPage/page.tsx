@@ -24,7 +24,7 @@ export default function ChatPage() {
     if (!input.trim()) return;
 
     const userMessage: Message = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage, { sender: "ai", text: "Thinking..." }]);
+    setMessages((prev) => [...prev, userMessage, { sender: "ai", text: "thinking" }]);
     setInput("");
 
     const aiText = await fetchAIResponse(input);
@@ -43,6 +43,26 @@ export default function ChatPage() {
       textarea.style.height = textarea.scrollHeight + "px";
     }
   }, [input]);
+
+  const renderMessageText = (msg: Message) => {
+    if (msg.sender === "ai" && msg.text === "thinking") {
+      const dots = "Generating Response...".split("");
+      return (
+        <span className="thinking-animation">
+          {dots.map((char, index) => (
+            <span
+              key={index}
+              className="thinking-char"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              {char}
+            </span>
+          ))}
+        </span>
+      );
+    }
+    return msg.text;
+  };
 
   return (
     <div className="chat-container">
@@ -63,7 +83,7 @@ export default function ChatPage() {
               key={i}
               className={`message ${msg.sender === "user" ? "user-msg" : "ai-msg"}`}
             >
-              {msg.text}
+              {renderMessageText(msg)}
             </div>
           ))}
         </div>
