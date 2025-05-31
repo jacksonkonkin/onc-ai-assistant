@@ -1,17 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import "./ChatPage.css";
 
+type Message = {
+  sender: "user" | "ai";
+  text: string;
+};
+
 export default function ChatPage() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSend = () => {
+  const fetchAIResponse = async (prompt: string): Promise<string> => {
+    // TODO: Replace this with actual backend call when ready
+    await new Promise((r) => setTimeout(r, 5000)); // simulate delay
+    return "This is a placeholder response.";
+  };
+
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, input]);
+
+    const userMessage: Message = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMessage, { sender: "ai", text: "thinking" }]);
     setInput("");
+
+    const aiText = await fetchAIResponse(input);
+    setMessages((prev) => {
+      const updated = [...prev];
+      updated[updated.length - 1] = { sender: "ai", text: aiText };
+      return updated;
+    });
+  };
+
+  // Auto-expand textarea height
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+  }, [input]);
+
+  const renderMessageText = (msg: Message) => {
+    if (msg.sender === "ai" && msg.text === "thinking") {
+      const dots = "Generating Response...".split("");
+      return (
+        <span className="thinking-animation">
+          {dots.map((char, index) => (
+            <span
+              key={index}
+              className="thinking-char"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              {char}
+            </span>
+          ))}
+        </span>
+      );
+    }
+    return msg.text;
   };
 
   return (
@@ -29,18 +79,22 @@ export default function ChatPage() {
       <div className="chat-body">
         <div className="messages">
           {messages.map((msg, i) => (
-            <div key={i} className="message">
-              {msg}
+            <div
+              key={i}
+              className={`message ${msg.sender === "user" ? "user-msg" : "ai-msg"}`}
+            >
+              {renderMessageText(msg)}
             </div>
           ))}
         </div>
         <div className="chat-input-wrapper">
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             placeholder="Type a message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="chat-input"
+            rows={1}
           />
           <button onClick={handleSend} className="send-button">
             <svg
