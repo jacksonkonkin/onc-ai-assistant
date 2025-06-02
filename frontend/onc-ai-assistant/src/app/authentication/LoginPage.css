@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+.login-page {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-image {
+  z-index: -1;
+}
+
+.login-form {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 350px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.form-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  outline: none;
+}
+
+.form-footer {
+  text-align: right;
+  margin-bottom: 1rem;
+}
+
+.forgot-password {
+  font-size: 0.875rem;
+  color: #666;
+  text-decoration: none;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #129DC0, #1D428A);
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.3s ease;
+}
+
+.login-button:hover {
+  opacity: 0.9;
+}
+
+.signup-prompt p {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.signup-link {
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+.bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  object-fit: contain; /* or 'cover' with media query fallback */
+  z-index: -1;
+  pointer-events: none;
+}
+

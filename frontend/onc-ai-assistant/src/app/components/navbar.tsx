@@ -12,8 +12,7 @@ export default function Navbar() {
         <Link href="/chatPage">Chat</Link>
         <Link href="/adminPages">Admin</Link>
         <Link
-          // href="/signin"   uncomment this line when sign in page is ready
-          href="/"
+          href="/authentication"
           className="sign-in-btn"
         >
           Sign in
