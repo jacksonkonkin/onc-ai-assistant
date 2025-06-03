@@ -72,6 +72,7 @@ export default function ChatPage() {
           alt="Fish Logo"
           width={100}
           height={100}
+          quality={100}
           className="fish-logo"
         />
         <h2>Hello! How can I assist you today?</h2>
