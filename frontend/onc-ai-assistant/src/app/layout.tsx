@@ -4,6 +4,7 @@ import "./globals.css";
 
 // Components
 import Navbar from "./components/navbar";
+import { AuthProvider } from "./context/AuthContext";  // TEMP AUTH
 
 const rajdhaniSans = Rajdhani({
   subsets: ["latin"],
@@ -25,8 +26,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={rajdhaniSans.variable}>
-        <Navbar />
-        {children}
+        <AuthProvider> {/* TEMP AUTH */}
+          <Navbar />
+          {children}
+        </AuthProvider> {/* TEMP AUTH */}
       </body>
     </html>
   );
