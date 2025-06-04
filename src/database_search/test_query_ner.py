@@ -85,7 +85,7 @@ class QueryNERTester:
             # Display result
             if result["status"] == "success":
                 params = result["parameters"]
-                print(f"✅ SUCCESS")
+                print(f"SUCCESS")
                 print(f"   Parameter: {params['instrument_type']}")
                 print(f"   Location: {params['location']}")
                 print(f"   Time Range: {params['start_time']} to {params['end_time']}")
@@ -94,18 +94,18 @@ class QueryNERTester:
                     print(f"   Depth: {params['depth_meters']} meters")
                     
             elif result["status"] == "clarification_needed":
-                print(f"❓ CLARIFICATION NEEDED")
+                print(f"CLARIFICATION NEEDED")
                 print(f"   Message: {result['message']}")
                 
             elif result["status"] == "error":
-                print(f"❌ ERROR")
+                print(f"ERROR")
                 print(f"   Message: {result['message']}")
                 
             else:
-                print(f"⚠️  UNKNOWN STATUS: {result['status']}")
+                print(f"UNKNOWN STATUS: {result['status']}")
                 
         except Exception as e:
-            print(f"💥 EXCEPTION: {str(e)}")
+            print(f"EXCEPTION: {str(e)}")
             test_result = {
                 "test_number": test_number,
                 "query": query,
@@ -123,7 +123,7 @@ class QueryNERTester:
     
     def run_all_tests(self):
         """Run all test queries"""
-        print("🧪 STARTING OCEAN QUERY NER TEST SUITE")
+        print("STARTING OCEAN QUERY NER TEST SUITE")
         print(f"Running {len(self.test_queries)} test queries...")
         print(f"Timestamp: {datetime.now().isoformat()}")
         
@@ -135,7 +135,7 @@ class QueryNERTester:
     def analyze_results(self):
         """Analyze test results and provide summary"""
         print(f"\n{'='*80}")
-        print("📊 TEST RESULTS ANALYSIS")
+        print("TEST RESULTS ANALYSIS")
         print(f"{'='*80}")
         
         total_tests = len(self.results)
@@ -145,15 +145,15 @@ class QueryNERTester:
         exceptions = sum(1 for r in self.results if r.get('exception', False))
         
         print(f"Total Tests: {total_tests}")
-        print(f"✅ Successful: {successful} ({successful/total_tests*100:.1f}%)")
-        print(f"❓ Clarifications: {clarifications} ({clarifications/total_tests*100:.1f}%)")
-        print(f"❌ Errors: {errors} ({errors/total_tests*100:.1f}%)")
-        print(f"💥 Exceptions: {exceptions} ({exceptions/total_tests*100:.1f}%)")
+        print(f"Successful: {successful} ({successful/total_tests*100:.1f}%)")
+        print(f"Clarifications: {clarifications} ({clarifications/total_tests*100:.1f}%)")
+        print(f"Errors: {errors} ({errors/total_tests*100:.1f}%)")
+        print(f"Exceptions: {exceptions} ({exceptions/total_tests*100:.1f}%)")
         
         # Show failed tests
         failed_tests = [r for r in self.results if not r['success'] and not r['needs_clarification']]
         if failed_tests:
-            print(f"\n🔍 FAILED TESTS ({len(failed_tests)}):")
+            print(f"\nFAILED TESTS ({len(failed_tests)}):")
             for test in failed_tests:
                 print(f"   Test {test['test_number']}: {test['query']}")
                 if test.get('error_message'):
@@ -162,7 +162,7 @@ class QueryNERTester:
         # Show clarification requests
         clarification_tests = [r for r in self.results if r['needs_clarification']]
         if clarification_tests:
-            print(f"\n❓ CLARIFICATION REQUESTS ({len(clarification_tests)}):")
+            print(f"\nCLARIFICATION REQUESTS ({len(clarification_tests)}):")
             for test in clarification_tests:
                 print(f"   Test {test['test_number']}: {test['query']}")
                 print(f"      → {test['clarification_message']}")
@@ -190,7 +190,7 @@ class QueryNERTester:
         with open(filename, 'w') as f:
             json.dump(output_data, f, indent=2, default=str)
         
-        print(f"\n💾 Detailed results saved to: {filename}")
+        print(f"\nDetailed results saved to: {filename}")
 
 def main():
     """Main entry point"""
