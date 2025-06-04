@@ -1,0 +1,662 @@
+{
+  "timestamp": "2025-06-04T12:47:22.239426",
+  "total_tests": 23,
+  "summary": {
+    "successful": 11,
+    "clarifications": 5,
+    "errors": 7,
+    "exceptions": 0
+  },
+  "test_results": [
+    {
+      "test_number": 1,
+      "query": "What is the temperature in Cambridge Bay today?",
+      "status": "clarification_needed",
+      "success": false,
+      "needs_clarification": true,
+      "error": false,
+      "error_message": null,
+      "clarification_message": "I found your request for temperature data in Cambridge Bay on today. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+      "parameters": null,
+      "raw_result": {
+        "status": "clarification_needed",
+        "message": "I found your request for temperature data in Cambridge Bay on today. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+        "partial_parameters": {
+          "instrument_type": "temperature",
+          "location": "Cambridge Bay",
+          "temporal_reference": "today"
+        },
+        "original_query": "What is the temperature in Cambridge Bay today?"
+      }
+    },
+    {
+      "test_number": 2,
+      "query": "Show me salinity data for Saanich Inlet yesterday",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Failed to extract parameters from query",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Failed to extract parameters from query"
+      }
+    },
+    {
+      "test_number": 3,
+      "query": "How cold was it in Cambridge Bay last Monday?",
+      "status": "clarification_needed",
+      "success": false,
+      "needs_clarification": true,
+      "error": false,
+      "error_message": null,
+      "clarification_message": "I found your request for temperature data in Cambridge Bay on last Monday. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+      "parameters": null,
+      "raw_result": {
+        "status": "clarification_needed",
+        "message": "I found your request for temperature data in Cambridge Bay on last Monday. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+        "partial_parameters": {
+          "instrument_type": "temperature",
+          "location": "Cambridge Bay",
+          "temporal_reference": "last Monday"
+        },
+        "original_query": "How cold was it in Cambridge Bay last Monday?"
+      }
+    },
+    {
+      "test_number": 4,
+      "query": "What are the salinity levels in Cambridge Bay for the month of January?",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Failed to extract parameters from query",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Failed to extract parameters from query"
+      }
+    },
+    {
+      "test_number": 5,
+      "query": "Show me temperature data for Saanich Inlet in February",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "temperature",
+        "location": "Saanich Inlet",
+        "start_time": "2025-02-01T00:00:00",
+        "end_time": "2025-02-28T23:59:59",
+        "time_range_hours": 671.9997222222222,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "temperature",
+          "location": "Saanich Inlet",
+          "start_time": "2025-02-01T00:00:00",
+          "end_time": "2025-02-28T23:59:59",
+          "time_range_hours": 671.9997222222222,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Show me temperature data for Saanich Inlet in February",
+          "raw_extraction": {
+            "parameter": "temperature",
+            "location": "Saanich Inlet",
+            "temporal_reference": "February",
+            "temporal_type": "date_range",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 6,
+      "query": "Get oxygen levels for the entire month of March in Cambridge Bay",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "oxygen",
+        "location": "Cambridge Bay",
+        "start_time": "2025-03-01T00:00:00",
+        "end_time": "2025-03-31T23:59:59",
+        "time_range_hours": 743.9997222222222,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "oxygen",
+          "location": "Cambridge Bay",
+          "start_time": "2025-03-01T00:00:00",
+          "end_time": "2025-03-31T23:59:59",
+          "time_range_hours": 743.9997222222222,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Get oxygen levels for the entire month of March in Cambridge Bay",
+          "raw_extraction": {
+            "parameter": "oxygen",
+            "location": "Cambridge Bay",
+            "temporal_reference": "the entire month of March",
+            "temporal_type": "date_range",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 7,
+      "query": "What was the temperature at Cambridge Bay on January 15th at 2 PM?",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "temperature",
+        "location": "Cambridge Bay",
+        "start_time": "2025-01-02T14:00:00",
+        "end_time": "2025-01-02T15:00:00",
+        "time_range_hours": 1.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "temperature",
+          "location": "Cambridge Bay",
+          "start_time": "2025-01-02T14:00:00",
+          "end_time": "2025-01-02T15:00:00",
+          "time_range_hours": 1.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "What was the temperature at Cambridge Bay on January 15th at 2 PM?",
+          "raw_extraction": {
+            "parameter": "temperature",
+            "location": "Cambridge Bay",
+            "temporal_reference": "January 15th at 2 PM",
+            "temporal_type": "single_date",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 8,
+      "query": "Show me salinity at noon on Tuesday in Saanich Inlet",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "salinity",
+        "location": "Saanich Inlet",
+        "start_time": "2025-05-27T12:00:00",
+        "end_time": "2025-05-27T13:00:00",
+        "time_range_hours": 1.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "salinity",
+          "location": "Saanich Inlet",
+          "start_time": "2025-05-27T12:00:00",
+          "end_time": "2025-05-27T13:00:00",
+          "time_range_hours": 1.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Show me salinity at noon on Tuesday in Saanich Inlet",
+          "raw_extraction": {
+            "parameter": "salinity",
+            "location": "Saanich Inlet",
+            "temporal_reference": "noon on Tuesday",
+            "temporal_type": "single_date",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 9,
+      "query": "Get pressure data for Cambridge Bay tomorrow morning",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "pressure",
+        "location": "Cambridge Bay",
+        "start_time": "2025-06-05T09:00:00",
+        "end_time": "2025-06-05T10:00:00",
+        "time_range_hours": 1.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "pressure",
+          "location": "Cambridge Bay",
+          "start_time": "2025-06-05T09:00:00",
+          "end_time": "2025-06-05T10:00:00",
+          "time_range_hours": 1.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Get pressure data for Cambridge Bay tomorrow morning",
+          "raw_extraction": {
+            "parameter": "pressure",
+            "location": "Cambridge Bay",
+            "temporal_reference": "tomorrow morning",
+            "temporal_type": "single_date",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 10,
+      "query": "Temperature data for Cambridge Bay from January 1 to January 7",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "temperature",
+        "location": "Cambridge Bay",
+        "start_time": "2025-01-01T00:00:00",
+        "end_time": "2025-01-08T00:00:00",
+        "time_range_hours": 168.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "temperature",
+          "location": "Cambridge Bay",
+          "start_time": "2025-01-01T00:00:00",
+          "end_time": "2025-01-08T00:00:00",
+          "time_range_hours": 168.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Temperature data for Cambridge Bay from January 1 to January 7",
+          "raw_extraction": {
+            "parameter": "temperature",
+            "location": "Cambridge Bay",
+            "temporal_reference": "January 1 to January 7",
+            "temporal_type": "date_range",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 11,
+      "query": "Show me salinity trends for the past week in Saanich Inlet",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "salinity",
+        "location": "Saanich Inlet",
+        "start_time": "2025-06-04T00:00:00",
+        "end_time": "2025-06-11T00:00:00",
+        "time_range_hours": 168.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "salinity",
+          "location": "Saanich Inlet",
+          "start_time": "2025-06-04T00:00:00",
+          "end_time": "2025-06-11T00:00:00",
+          "time_range_hours": 168.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Show me salinity trends for the past week in Saanich Inlet",
+          "raw_extraction": {
+            "parameter": "salinity",
+            "location": "Saanich Inlet",
+            "temporal_reference": "the past week",
+            "temporal_type": "date_range",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 12,
+      "query": "Get oxygen levels from last Monday to this Friday",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Could not identify location. Please specify a location like Cambridge Bay.",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Could not identify location. Please specify a location like Cambridge Bay."
+      }
+    },
+    {
+      "test_number": 13,
+      "query": "How salty is the water in Cambridge Bay right now?",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "salinity",
+        "location": "Cambridge Bay",
+        "start_time": "2025-06-04T00:00:00",
+        "end_time": "2025-06-04T23:59:59",
+        "time_range_hours": 23.99972222222222,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "salinity",
+          "location": "Cambridge Bay",
+          "start_time": "2025-06-04T00:00:00",
+          "end_time": "2025-06-04T23:59:59",
+          "time_range_hours": 23.99972222222222,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "How salty is the water in Cambridge Bay right now?",
+          "raw_extraction": {
+            "parameter": "salinity",
+            "location": "Cambridge Bay",
+            "temporal_reference": "right now",
+            "temporal_type": "single_date",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 14,
+      "query": "What's the dissolved oxygen content in Saanich Inlet today?",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Failed to extract parameters from query",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Failed to extract parameters from query"
+      }
+    },
+    {
+      "test_number": 15,
+      "query": "Show me pH levels for Cambridge Bay yesterday",
+      "status": "clarification_needed",
+      "success": false,
+      "needs_clarification": true,
+      "error": false,
+      "error_message": null,
+      "clarification_message": "I found your request for ph data in Cambridge Bay on yesterday. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+      "parameters": null,
+      "raw_result": {
+        "status": "clarification_needed",
+        "message": "I found your request for ph data in Cambridge Bay on yesterday. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+        "partial_parameters": {
+          "instrument_type": "ph",
+          "location": "Cambridge Bay",
+          "temporal_reference": "yesterday"
+        },
+        "original_query": "Show me pH levels for Cambridge Bay yesterday"
+      }
+    },
+    {
+      "test_number": 16,
+      "query": "Get turbidity readings for Saanich Inlet this morning",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "turbidity",
+        "location": "Saanich Inlet",
+        "start_time": "2025-06-04T09:00:00",
+        "end_time": "2025-06-04T10:00:00",
+        "time_range_hours": 1.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "turbidity",
+          "location": "Saanich Inlet",
+          "start_time": "2025-06-04T09:00:00",
+          "end_time": "2025-06-04T10:00:00",
+          "time_range_hours": 1.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Get turbidity readings for Saanich Inlet this morning",
+          "raw_extraction": {
+            "parameter": "turbidity",
+            "location": "Saanich Inlet",
+            "temporal_reference": "this morning",
+            "temporal_type": "single_date",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 17,
+      "query": "Temperature in Strait of Georgia today",
+      "status": "clarification_needed",
+      "success": false,
+      "needs_clarification": true,
+      "error": false,
+      "error_message": null,
+      "clarification_message": "I found your request for temperature data in Strait of Georgia on today. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+      "parameters": null,
+      "raw_result": {
+        "status": "clarification_needed",
+        "message": "I found your request for temperature data in Strait of Georgia on today. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+        "partial_parameters": {
+          "instrument_type": "temperature",
+          "location": "Strait of Georgia",
+          "temporal_reference": "today"
+        },
+        "original_query": "Temperature in Strait of Georgia today"
+      }
+    },
+    {
+      "test_number": 18,
+      "query": "Salinity levels in Iqaluktuuttiaq last week",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "salinity",
+        "location": "Cambridge Bay",
+        "start_time": "2025-06-04T00:00:00",
+        "end_time": "2025-06-11T00:00:00",
+        "time_range_hours": 168.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "salinity",
+          "location": "Cambridge Bay",
+          "start_time": "2025-06-04T00:00:00",
+          "end_time": "2025-06-11T00:00:00",
+          "time_range_hours": 168.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "Salinity levels in Iqaluktuuttiaq last week",
+          "raw_extraction": {
+            "parameter": "salinity",
+            "location": "Iqaluktuuttiaq",
+            "temporal_reference": "last week",
+            "temporal_type": "date_range",
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 19,
+      "query": "What's the weather like in Cambridge Bay?",
+      "status": "success",
+      "success": true,
+      "needs_clarification": false,
+      "error": false,
+      "error_message": null,
+      "clarification_message": null,
+      "parameters": {
+        "instrument_type": "temperature",
+        "location": "Cambridge Bay",
+        "start_time": "2025-06-03T12:47:18.550256",
+        "end_time": "2025-06-04T12:47:18.550256",
+        "time_range_hours": 24.0,
+        "depth_meters": null
+      },
+      "raw_result": {
+        "status": "success",
+        "parameters": {
+          "instrument_type": "temperature",
+          "location": "Cambridge Bay",
+          "start_time": "2025-06-03T12:47:18.550256",
+          "end_time": "2025-06-04T12:47:18.550256",
+          "time_range_hours": 24.0,
+          "depth_meters": null
+        },
+        "metadata": {
+          "original_query": "What's the weather like in Cambridge Bay?",
+          "raw_extraction": {
+            "parameter": "temperature",
+            "location": "Cambridge Bay",
+            "temporal_reference": null,
+            "temporal_type": null,
+            "depth_meters": null
+          },
+          "model_used": "llama3-70b-8192"
+        }
+      }
+    },
+    {
+      "test_number": 20,
+      "query": "Temperature data for New York yesterday",
+      "status": "clarification_needed",
+      "success": false,
+      "needs_clarification": true,
+      "error": false,
+      "error_message": null,
+      "clarification_message": "I found your request for temperature data in New York on yesterday. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+      "parameters": null,
+      "raw_result": {
+        "status": "clarification_needed",
+        "message": "I found your request for temperature data in New York on yesterday. What time of day are you interested in? (e.g., morning, afternoon, evening, or a specific time like 2 PM)",
+        "partial_parameters": {
+          "instrument_type": "temperature",
+          "location": "New York",
+          "temporal_reference": "yesterday"
+        },
+        "original_query": "Temperature data for New York yesterday"
+      }
+    },
+    {
+      "test_number": 21,
+      "query": "Show me data for Cambridge Bay",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Could not identify measurement type. Please specify: temperature, salinity, pressure, etc.",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Could not identify measurement type. Please specify: temperature, salinity, pressure, etc."
+      }
+    },
+    {
+      "test_number": 22,
+      "query": "Get temperature",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Could not identify location. Please specify a location like Cambridge Bay.",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Could not identify location. Please specify a location like Cambridge Bay."
+      }
+    },
+    {
+      "test_number": 23,
+      "query": "How deep is Cambridge Bay?",
+      "status": "error",
+      "success": false,
+      "needs_clarification": false,
+      "error": true,
+      "error_message": "Could not identify measurement type. Please specify: temperature, salinity, pressure, etc.",
+      "clarification_message": null,
+      "parameters": null,
+      "raw_result": {
+        "status": "error",
+        "message": "Could not identify measurement type. Please specify: temperature, salinity, pressure, etc."
+      }
+    }
+  ]
+}
