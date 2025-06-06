@@ -20,7 +20,7 @@
   .landing-hero {
     text-align: center;
     margin-top: auto;
-    margin-bottom: 900px;
+    margin-bottom: 500px; /*May want to switch this to Auto */
     padding: 20px;
     color: #00296b;
     background-color: rgba(255, 255, 255, 0.00);
