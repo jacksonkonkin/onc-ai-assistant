@@ -1,0 +1,67 @@
+/* Background container */
+.landing-container {
+    background-image: url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    font-family: sans-serif;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  .bg-image {
+    z-index: -1;
+  }
+  
+  
+  /* Hero section */
+  .landing-hero {
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: 900px;
+    padding: 20px;
+    color: #00296b;
+    background-color: rgba(255, 255, 255, 0.00);
+    border-radius: 12px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .landing-hero h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .landing-hero p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #222;
+  }
+  
+  .landing-hero a {
+    color: #0077b6;
+    font-weight: bold;
+  }
+  
+  .landing-buttons {
+    margin-top: 1rem;
+  }
+  
+  .landing-ctaBtn {
+    padding: 12px 24px;
+    margin: 0 10px;
+    background-color: #48cae4;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .landing-ctaBtn:hover {
+    background-color: #0096c7;
+  }
+  
