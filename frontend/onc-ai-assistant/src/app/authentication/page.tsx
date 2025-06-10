@@ -47,7 +47,7 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <button type="submit" className="login-button">
+          <button type="submit" className="btn-rounded-gradient">
             Login
           </button>
         </form>
