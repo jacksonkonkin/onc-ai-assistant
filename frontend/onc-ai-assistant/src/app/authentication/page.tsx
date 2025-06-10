@@ -42,7 +42,7 @@ export default function LoginPage() {
           </div>
 
           <div className="form-footer">
-            <a href="#" className="forgot-password">
+            <a href="/authentication/forgotPassword" className="forgot-password">
               Forgot password?
             </a>
           </div>
@@ -54,7 +54,7 @@ export default function LoginPage() {
 
         <div className="signup-prompt">
           <p>Or Sign Up Using</p>
-          <a href="#" className="signup-link">
+          <a href="/authentication/signUp" className="signup-link">
             SIGN UP
           </a>
         </div>
