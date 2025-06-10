@@ -11,6 +11,14 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple
 from pathlib import Path
 
+# spaCy imports for temporal preprocessing
+try:
+    import spacy
+    from spacy import displacy
+    SPACY_AVAILABLE = True
+except ImportError:
+    SPACY_AVAILABLE = False
+
 # Load environment variables from .env file
 def load_env_file():
     """Load environment variables from .env file"""
@@ -43,9 +51,9 @@ except ImportError:
 
 
 class OceanQueryExtractorGroq:
-    """Extract parameters from ocean data queries using Groq's Llama 3 70B"""
+    """Extract parameters from ocean data queries using Groq's Llama 3 70B with optional spaCy preprocessing"""
     
-    def __init__(self):
+    def __init__(self, use_spacy_preprocessing=True):
         # Initialize Groq client with API key from environment
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
@@ -53,6 +61,16 @@ class OceanQueryExtractorGroq:
         
         self.client = Groq(api_key=api_key)
         self.model = "llama3-70b-8192"
+        
+        # spaCy configuration
+        self.use_spacy_preprocessing = use_spacy_preprocessing and SPACY_AVAILABLE
+        if self.use_spacy_preprocessing:
+            try:
+                self.nlp = spacy.load("en_core_web_sm")
+                print("✓ spaCy temporal preprocessing enabled")
+            except OSError:
+                print("⚠ spaCy model not found, falling back to LLM-only approach")
+                self.use_spacy_preprocessing = False
         
         # Conversation memory for partial queries
         self.pending_clarification = None
@@ -104,6 +122,108 @@ Rules:
             "saanich inlet": "Saanich Inlet",
             "strait of georgia": "Strait of Georgia"
         }
+    
+    def preprocess_with_spacy(self, query: str) -> Dict:
+        """Use spaCy to extract temporal and location entities as preprocessing step"""
+        if not self.use_spacy_preprocessing:
+            return {}
+        
+        doc = self.nlp(query)
+        extracted = {
+            "dates": [],
+            "times": [],
+            "locations": [],
+            "temporal_patterns": []
+        }
+        
+        # Extract named entities
+        for ent in doc.ents:
+            if ent.label_ in ["DATE", "TIME"]:
+                extracted["dates"].append({
+                    "text": ent.text,
+                    "label": ent.label_,
+                    "start": ent.start_char,
+                    "end": ent.end_char
+                })
+            elif ent.label_ in ["GPE", "LOC"]:  # Geographical/Location entities
+                extracted["locations"].append({
+                    "text": ent.text,
+                    "label": ent.label_,
+                    "start": ent.start_char,
+                    "end": ent.end_char
+                })
+        
+        # Look for temporal patterns using dependency parsing
+        for token in doc:
+            # Look for temporal indicators
+            if token.lower_ in ["today", "yesterday", "tomorrow", "now", "morning", "afternoon", "evening", "night", "noon", "midnight"]:
+                extracted["temporal_patterns"].append({
+                    "text": token.text,
+                    "lemma": token.lemma_,
+                    "pos": token.pos_,
+                    "is_temporal": True
+                })
+            # Look for day names
+            elif token.lower_ in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]:
+                extracted["temporal_patterns"].append({
+                    "text": token.text,
+                    "lemma": token.lemma_,
+                    "pos": token.pos_,
+                    "is_day": True
+                })
+            # Look for month names
+            elif token.lower_ in ["january", "february", "march", "april", "may", "june", 
+                                "july", "august", "september", "october", "november", "december"]:
+                extracted["temporal_patterns"].append({
+                    "text": token.text,
+                    "lemma": token.lemma_,
+                    "pos": token.pos_,
+                    "is_month": True
+                })
+        
+        return extracted
+    
+    def enhance_temporal_with_spacy(self, temporal_ref: str, spacy_entities: Dict) -> str:
+        """Enhance temporal reference using spaCy's findings"""
+        if not temporal_ref or not spacy_entities:
+            return temporal_ref
+        
+        # If LLM found temporal reference but spaCy found additional temporal patterns
+        temporal_patterns = spacy_entities.get("temporal_patterns", [])
+        dates = spacy_entities.get("dates", [])
+        
+        # If LLM missed temporal info but spaCy found it
+        if not temporal_ref.strip() and (temporal_patterns or dates):
+            # Build temporal reference from spaCy findings
+            spacy_temporal_parts = []
+            
+            # Add spaCy DATE entities
+            for date_ent in dates:
+                spacy_temporal_parts.append(date_ent["text"])
+            
+            # Add temporal patterns
+            for pattern in temporal_patterns:
+                spacy_temporal_parts.append(pattern["text"])
+            
+            if spacy_temporal_parts:
+                return " ".join(spacy_temporal_parts)
+        
+        # If LLM found something but it seems incomplete, try to enhance
+        elif temporal_ref.strip():
+            # Check if spaCy found additional temporal info not in LLM result
+            spacy_temporal_text = []
+            for date_ent in dates:
+                if date_ent["text"].lower() not in temporal_ref.lower():
+                    spacy_temporal_text.append(date_ent["text"])
+            
+            for pattern in temporal_patterns:
+                if pattern["text"].lower() not in temporal_ref.lower():
+                    spacy_temporal_text.append(pattern["text"])
+            
+            if spacy_temporal_text:
+                return f"{temporal_ref} {' '.join(spacy_temporal_text)}"
+        
+        return temporal_ref
     
     def extract_with_llm(self, query: str) -> Dict:
         """Call Groq API to extract parameters"""
@@ -530,7 +650,14 @@ Rules:
     def extract_parameters(self, query: str) -> Dict:
         """Main method to extract parameters from query"""
         
-        # Step 1: Call Groq API
+        # Step 1: Optional spaCy preprocessing
+        spacy_entities = {}
+        if self.use_spacy_preprocessing:
+            print("Preprocessing with spaCy...")
+            spacy_entities = self.preprocess_with_spacy(query)
+            print(f"spaCy found: {len(spacy_entities.get('dates', []))} dates, {len(spacy_entities.get('temporal_patterns', []))} temporal patterns, {len(spacy_entities.get('locations', []))} locations")
+        
+        # Step 2: Call Groq API
         print("Calling Groq Llama 3 70B...")
         raw_params = self.extract_with_llm(query)
         
@@ -556,9 +683,16 @@ Rules:
                 "message": "Could not identify location. Please specify a location like Cambridge Bay."
             }
         
-        # Step 3: Parse dates (no more clarification requests)
+        # Step 3: Parse dates (enhanced with spaCy if available)
         temporal_ref = raw_params.get("temporal_reference", "")
         temporal_type = raw_params.get("temporal_type", "single_date")
+        
+        # Enhance temporal reference with spaCy findings
+        if self.use_spacy_preprocessing and spacy_entities:
+            enhanced_temporal_ref = self.enhance_temporal_with_spacy(temporal_ref, spacy_entities)
+            if enhanced_temporal_ref != temporal_ref:
+                print(f"spaCy enhanced temporal reference: '{temporal_ref}' → '{enhanced_temporal_ref}'")
+                temporal_ref = enhanced_temporal_ref
         
         start_time, end_time = self.parse_temporal_reference(temporal_ref, temporal_type)
         
@@ -576,7 +710,9 @@ Rules:
             "metadata": {
                 "original_query": query,
                 "raw_extraction": raw_params,
-                "model_used": self.model
+                "model_used": self.model,
+                "spacy_preprocessing": self.use_spacy_preprocessing,
+                "spacy_entities": spacy_entities if self.use_spacy_preprocessing else None
             }
         }
         
