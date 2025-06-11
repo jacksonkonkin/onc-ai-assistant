@@ -1,1 +1,1 @@
-worker: uvicorn backend.app.main:app -reload
+worker: uvicorn backend.app.main:app --reload
