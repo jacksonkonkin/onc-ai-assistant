@@ -31,6 +31,6 @@ This project uses a fine-tuned BERT model to classify natural language queries i
 ## Example
 
 ```
-Enter a query: book a flight to Toronto
-Predicted label: travel
+Enter a query: what is pH sensor?
+Predicted label: knowledge
 ```
