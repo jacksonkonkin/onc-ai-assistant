@@ -30,3 +30,8 @@ lxml>=4.9.0                    # XML/HTML parser for BeautifulSoup
 # Optional: for alternative embedding providers
 # sentence-transformers>=2.2.0
 # transformers>=4.21.0
+
+# core dependencies for backend API deployment
+fastapi
+uvicorn[standard]
+gunicorn
