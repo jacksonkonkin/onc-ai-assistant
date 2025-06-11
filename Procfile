@@ -1,1 +1,1 @@
-worker: uvicorn backend.app.main:app --reload
+web: gunicorn backend.app.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
