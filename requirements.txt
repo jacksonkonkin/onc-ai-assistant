@@ -35,3 +35,4 @@ lxml>=4.9.0                    # XML/HTML parser for BeautifulSoup
 fastapi
 uvicorn[standard]
 gunicorn
+langchain-chroma
