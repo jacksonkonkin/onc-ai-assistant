@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import "./ChatPage.css";
+import { FiSend } from "react-icons/fi";
 
 type Message = {
   sender: "user" | "ai";
@@ -124,15 +125,7 @@ export default function ChatPage() {
             rows={1}
           />
           <button onClick={handleSend} className="send-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="send-icon"
-              height="20"
-              viewBox="0 0 24 24"
-              width="20"
-            >
-              <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
-            </svg>
+            <FiSend size={20} color="#007acc" className="send-icon"/>
           </button>
         </div>
       </div>

@@ -99,13 +99,13 @@
 }
 
 .send-icon {
-  fill: #007acc;
   transition: fill 0.3s ease;
-  margin-bottom: 8px;
+  margin-bottom: 50%;
 }
 
 .send-button:hover .send-icon {
-  fill: #005b99;
+  opacity: 0.7;
+  transition: color 0.3s ease;
 }
 
 .fish-logo {
