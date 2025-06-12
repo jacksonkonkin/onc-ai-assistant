@@ -1,25 +1,23 @@
 "use client";
 import './landingPage.css'; // global CSS import
 import { useRouter } from "next/navigation";
-
 import Image from "next/image";
 
-
-export default function Landing() {
-const router = useRouter();
+export default function Home() {
+  const router = useRouter();
   const goToLogIn = () => {
-    router.push("/authentication")
+    router.push("/authentication");
   };
 
   return (
     <div className="landing-container">
       <Image
-              src="/landingPageBG.jpg"
-              alt="Background"
-              layout="fill"
-              objectFit="cover"
-              className="bg-image"
-        />
+        src="/landingPageBG.jpg"
+        alt="Background"
+        layout="fill"
+        objectFit="cover"
+        className="bg-image"
+      />
 
       <main className="landing-hero">
         <h1>Meet Ocean Networks Canada’s Virtual Assistant!</h1>
@@ -32,6 +30,11 @@ const router = useRouter();
           <button onClick={goToLogIn} className="landing-ctaBtn">Log In</button>
           <button className="landing-ctaBtn">Sign Up</button>
         </div>
+
+        {/* Territorial Acknowledgment */}
+        <p className="territorial-ack">
+          We acknowledge with respect that the Cambridge Bay coastal community observatory is located on the lands and in the waters of the Inuit, in Iqaluktuuttiaq (Cambridge Bay) in the Kitikmeot Region of Nunavut.
+        </p>
       </main>
     </div>
   );
