@@ -1,16 +1,4 @@
-/* Background container */
-.landing-container {
-    background-image: url('/background.jpg');
-    background-size: cover;
-    background-position: center;
-    min-height: 100vh;
-    font-family: sans-serif;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  
+/* Background container */  
   .bg-image {
     z-index: -1;
   }
@@ -20,7 +8,7 @@
   .landing-hero {
     text-align: center;
     margin-top: auto;
-    margin-bottom: 500px; /*May want to switch this to Auto */
+    margin-bottom: 50%; /*May want to switch this to Auto */
     padding: 20px;
     color: #00296b;
     background-color: rgba(255, 255, 255, 0.00);
@@ -31,18 +19,20 @@
   }
   
   .landing-hero h1 {
+    font-family: 'Open Sans', sans-serif;
     font-size: 2rem;
     margin-bottom: 1rem;
   }
   
   .landing-hero p {
+    font-family: 'Open Sans', sans-serif;
     margin: 0.5rem 0;
     font-size: 1rem;
     color: #222;
   }
   
   .landing-hero a {
-    color: #0077b6;
+    color: #129DC0;
     font-weight: bold;
   }
   
@@ -53,7 +43,7 @@
   .landing-ctaBtn {
     padding: 12px 24px;
     margin: 0 10px;
-    background-color: #48cae4;
+    background-color: #129DC0;
     color: white;
     border: none;
     border-radius: 25px;
@@ -65,3 +55,15 @@
     background-color: #0096c7;
   }
   
+  /* Territorial acknowledgment styling */
+.territorial-ack {
+  font-family: 'Open Sans', sans-serif;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
