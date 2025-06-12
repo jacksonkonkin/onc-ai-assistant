@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 import time 
 import traceback
+import json
 
 # Initialize ONC API
 onc = ONC("9473c10d-5a6f-49bc-864b-80cfb1b0b932")
@@ -17,13 +18,14 @@ class ScalarDataParams(BaseModel):
     sensorCategoryCodes: Optional[str] = None
     dateFrom: Optional[str] = None
     dateTo: Optional[str] = None
-    rowLimit: int = 5
+    rowLimit: int =1
+    resamplePeriod: int =1
 
 class RawDataParams(BaseModel):
     deviceCode: str
     dateFrom: Optional[str] = None
     dateTo: Optional[str] = None
-    rowLimit: int = 10
+    rowLimit: int = 1
     outputFormat: str 
 
 # --- API call Functions ---
@@ -37,18 +39,23 @@ def get_devices(location_code: str, Device_category: str):
     return requested_devices
 
 '''fetch sensor data for one device code'''
-def fetch_sensor_data(device_code: str, sensor: Optional[str], DateFrom: str, DateTo: str, row_limit: int = 5):
+def fetch_sensor_data(device_code: str, sensor: Optional[str], DateFrom: str, DateTo: str, row_limit: int, resample_Period: int):
     scalar_params = ScalarDataParams(
         deviceCode=device_code,
         sensorCategoryCodes=sensor,
         dateFrom=DateFrom,
         dateTo=DateTo,
-        rowLimit=row_limit
+        rowLimit=row_limit,
+        resamplePeriod=resample_Period
     )
     data = onc.getScalardata(scalar_params.model_dump())
+
+    '''print("===first Full API Response ===")
+    print(json.dumps(data, indent=2))
+    print("=========================\n")'''
+
     return data.get('sensorData', [])
 
-'''fetch raw data for a device '''
 def fetch_raw_device_data(device_code: str, DateFrom: str, DateTo: str, row_limit: int, outputFormat: str):
     raw_params = RawDataParams(
         deviceCode=device_code,
@@ -76,21 +83,31 @@ def describe_sensor_data(sensor_data_list, sensor: str, device_name: str):
         if not values or not times:
             continue
 
-        value = values[-1]
-        timestamp = times[-1]
-        qaqc = flags[-1] if flags else None
-        status = "✓ Passed QA/QC" if qaqc == 0 else "⚠ Check QA/QC"
-
-        sentence = (
-            f"{name} sensor [{category}] measuring '{property_code}': "
-            f"{value:.2f} {unit} at {timestamp} from {device_name} ({status} QA/QC: Quality Assurance/Quality Control)"
-        )
-        results.append(sentence)
+        for value, timestamp, flag in zip(values, times, flags or [None]*len(values)):
+            if flag == 1:
+                status = "✓ Passed all QA/QC tests"
+            elif flag == 2 or flag == 3:
+                status = "Data probably good/failed minor QA/QC test"
+            elif flag == 0:
+                status = "No QA/QC tests"
+            elif flag == 7:
+                status = "Averaged valued"
+            elif flag == 4:
+                status =  "⚠ Data failed major QA/QC tests"
+            else:
+                status = "Interpolated value or Missing data"
+            
+            sentence = (
+                f"{name} sensor [{category}] measuring '{property_code}': "
+                f"{value:.2f} {unit} at {timestamp} from {device_name} ({status})"
+            )
+            results.append(sentence)
 
     return results
 
+
 '''fucntion to get data '''
-def get_cambridge_bay_scalar_sensor_data(location_code: str, Device_category: str, DateFrom: Optional[str] = None, DateTo: Optional[str] = None, sensor_type: Optional[str] = None):
+def get_cambridge_bay_scalar_sensor_data(location_code: str, Device_category: str,sensor_type: Optional[str] = None, DateFrom: Optional[str] = None, DateTo: Optional[str] = None, Row_limit: Optional[int] =1 , Resample_period: Optional[int]=1):
     try:
         if not DateFrom or not DateTo:
             end_time = datetime.now(timezone.utc)
@@ -107,7 +124,7 @@ def get_cambridge_bay_scalar_sensor_data(location_code: str, Device_category: st
             device_name = device['deviceName']
             print(f"\nTrying {device_name} ({device_code})")
 
-            sensor_data_list = fetch_sensor_data(device_code, sensor_type, DateFrom, DateTo)
+            sensor_data_list = fetch_sensor_data(device_code, sensor_type, DateFrom, DateTo, Row_limit, Resample_period)
             if not sensor_data_list:
                 print(f"No {sensor_type} data from {device_name}, trying next device...")
                 continue
@@ -121,7 +138,6 @@ def get_cambridge_bay_scalar_sensor_data(location_code: str, Device_category: st
         traceback.print_exc()
         return f"Error: {e}"
     
-'''fucntion to get raw data from a device '''
 def get_cambridge_bay_raw_device_data(location_code: str, Device_category: str, DateFrom: Optional[str] = None, DateTo: Optional[str] = None):
     try:
         if not DateFrom or not DateTo:
@@ -152,17 +168,28 @@ def get_cambridge_bay_raw_device_data(location_code: str, Device_category: str, 
         traceback.print_exc()
         return f"Error: {e}"
 
+
 # --- Main ---
 if __name__ == "__main__":
 
-    #testing:---
     location_code = "CBYIP"
     device_category = "CTD" 
-    sensor_type = "pressure" 
+    sensor_type = "temperature"  #sensorCategoryCodes
+
+    
+    # default values: row_limit = 1 and resample_period= 1sec
+    # if we want hourly data for 24 hours: row_limit = 24 and resample_period= 3600sec
+    # if we want daily data for a month: row_limit = 31 and resample_period= 86400sec
+    Row_limit = 31
+    resample_Period = 86400 
+    date_From="2025-01-01T00:00:00.000Z"
+    date_To= "2025-02-01T00:00:00.000Z"
+    
+
     print("Fetching latest {sensor_type} data from Cambridge Bay...\n")
 
-    result1 = get_cambridge_bay_scalar_sensor_data(location_code,device_category,"2024-12-31T00:00:00.000Z","2024-12-31T23:59:59.000Z")
-    #result2= get_cambridge_bay_raw_device_data(location_code,device_category,"2024-12-31T00:00:00.000Z","2024-12-31T23:59:59.000Z")
-    print(result1)
+    result = get_cambridge_bay_scalar_sensor_data(location_code,device_category,sensor_type,date_From,date_To,Row_limit,resample_Period)
+    #result2= get_cambridge_bay_raw_device_data(location_code,device_category,"2025-02-31T00:00:00.000Z","2025-02-31T23:59:59.000Z")
+    print(result)
 
 
