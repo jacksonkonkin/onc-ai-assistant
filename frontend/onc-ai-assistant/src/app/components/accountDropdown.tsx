@@ -3,7 +3,8 @@
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import "./navbar.css"; // assuming you're still using the same CSS
+import { FaUserCircle } from "react-icons/fa";
+import "./navbar.css";
 
 export default function AccountDropdown() {
   const { setIsLoggedIn } = useAuth();
@@ -28,18 +29,16 @@ export default function AccountDropdown() {
   return (
     <div className="account-dropdown" ref={dropdownRef}>
       <button className="account-icon" onClick={() => setOpen(!open)}>
-        👤
+        <FaUserCircle size={28} />
       </button>
-      {open && (
-        <div className="dropdown-menu">
-          <Link href="/accountSettings" className="dropdown-item">
-            Account Settings
-          </Link>
-          <button className="dropdown-item" onClick={handleLogout}>
-            Log out
-          </button>
-        </div>
-      )}
+      <div className={`dropdown-menu ${open ? "open" : ""}`}>
+        <Link href="/accountSettings" className="dropdown-item" onClick={() => setOpen(false)}>
+          Account Settings
+        </Link>
+        <button className="dropdown-item" onClick={handleLogout}>
+          Log out
+        </button>
+      </div>
     </div>
   );
 }
