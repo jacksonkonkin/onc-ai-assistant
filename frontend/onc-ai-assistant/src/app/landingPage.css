@@ -1,0 +1,69 @@
+/* Background container */  
+  .bg-image {
+    z-index: -1;
+  }
+  
+  
+  /* Hero section */
+  .landing-hero {
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: 50%; /*May want to switch this to Auto */
+    padding: 20px;
+    color: #00296b;
+    background-color: rgba(255, 255, 255, 0.00);
+    border-radius: 12px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .landing-hero h1 {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .landing-hero p {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #222;
+  }
+  
+  .landing-hero a {
+    color: #129DC0;
+    font-weight: bold;
+  }
+  
+  .landing-buttons {
+    margin-top: 1rem;
+  }
+  
+  .landing-ctaBtn {
+    padding: 12px 24px;
+    margin: 0 10px;
+    background-color: #129DC0;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .landing-ctaBtn:hover {
+    background-color: #0096c7;
+  }
+  
+  /* Territorial acknowledgment styling */
+.territorial-ack {
+  font-family: 'Open Sans', sans-serif;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
