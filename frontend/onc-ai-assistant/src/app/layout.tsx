@@ -16,9 +16,6 @@ const rajdhaniSans = Rajdhani({
 export const metadata: Metadata = {
   title: "ONC AI Assistant",
   description: "ONC AI Assistant",
-  icons: {
-    icon: "/favicon-v1.png",
-  },
 };
 
 export default function RootLayout({
