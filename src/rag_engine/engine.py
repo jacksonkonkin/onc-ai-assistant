@@ -93,7 +93,6 @@ EXPERT ONC ANALYSIS:""",
             input_variables=["question"]
         )
 
-        return self.rag_prompt
     
     def setup_rag_mode(self):
         """Setup RAG processing chain."""

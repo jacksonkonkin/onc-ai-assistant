@@ -40,13 +40,12 @@ class ConfigManager:
         llm_provider = self.get('llm.provider')
         if llm_provider == 'groq':
             required_keys.append(self.get('llm.groq.api_key_env'))
-        elif llm_provider == 'openai':
-            required_keys.append(self.get('llm.openai.api_key_env'))
         
         # Check embeddings API key
-        embeddings_key = self.get('embeddings.api_key_env')
-        if embeddings_key:
-            required_keys.append(embeddings_key)
+
+        ##embeddings_key = self.get('embeddings.api_key_env')
+        ##if embeddings_key:
+           ## required_keys.append(embeddings_key)
         
         missing_keys = []
         for key in required_keys:

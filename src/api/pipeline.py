@@ -96,6 +96,7 @@ class ONCPipeline:
         
         # Embeddings
         embeddings_config = self.config_manager.get_embeddings_config()
+        print(embeddings_config)
         self.embedding_manager = EmbeddingManager(embeddings_config)
         
         # LLM
