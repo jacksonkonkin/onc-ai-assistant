@@ -1,15 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
 import "./navbar.css";
+import AccountDropdown from "./accountDropdown";
 
 export default function Navbar() {
-  const { isLoggedIn, setIsLoggedIn } = useAuth(); // TEMP AUTH
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
+  const { isLoggedIn } = useAuth();
 
   return (
     <nav className="navBar">
@@ -21,9 +18,7 @@ export default function Navbar() {
         <Link href="/chatPage">Chat</Link>
         <Link href="/adminPages">Admin</Link>
         {isLoggedIn ? (
-          <button onClick={handleLogout} className="sign-in-btn">
-            Log out
-          </button>
+          <AccountDropdown /> 
         ) : (
           <Link href="/authentication" className="sign-in-btn">
             Sign in
