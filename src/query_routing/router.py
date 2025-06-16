@@ -44,10 +44,19 @@ class QueryRouter:
     def _load_database_keywords(self) -> List[str]:
         """Load keywords that indicate database search should be used."""
         default_keywords = [
-            "data", "measurement", "sensor", "instrument", "value",
-            "temperature", "salinity", "pressure", "time series",
-            "latest", "current", "recent", "when", "where",
-            "station", "location", "coordinates", "depth"
+            # Ocean parameters
+            "temperature", "salinity", "pressure", "depth", "ph", "oxygen", "conductivity",
+            "chlorophyll", "turbidity", "density", "fluorescence",
+            # Data request terms
+            "data", "measurement", "sensor", "instrument", "value", "reading",
+            "latest", "current", "recent", "today", "yesterday", "now",
+            # Location terms
+            "cambridge bay", "station", "location", "coordinates", "site",
+            # Time terms  
+            "time series", "when", "since", "from", "to", "between",
+            # Request patterns
+            "get", "show", "find", "retrieve", "what is the", "how much",
+            "give me", "tell me"
         ]
         return self.config.get('database_keywords', default_keywords)
     
@@ -107,32 +116,35 @@ class QueryRouter:
         
         # Check if specific data sources are available
         has_vector_store = context.get('has_vector_store', True)
-        has_database = context.get('has_database', False)  # Will be True when Ocean 3 DB is connected
+        has_database = context.get('has_database', False)
         
-        # Decision thresholds
+        # Decision thresholds - lowered database threshold to prioritize it
         vector_threshold = self.config.get('vector_threshold', 0.1)
-        database_threshold = self.config.get('database_threshold', 0.1)
+        database_threshold = self.config.get('database_threshold', 0.05)  # Lower threshold for database
         hybrid_threshold = self.config.get('hybrid_threshold', 0.15)
         
-        # Routing logic
-        if vector_score > hybrid_threshold and database_score > hybrid_threshold and has_database:
-            return {
-                'type': QueryType.HYBRID_SEARCH,
-                'vector_score': vector_score,
-                'database_score': database_score,
-                'parameters': {
-                    'vector_weight': 0.6,
-                    'database_weight': 0.4
+        # Prioritize database search for any data queries when available
+        if has_database and database_score > 0:
+            # If there's any database score and database is available, use it
+            if database_score > hybrid_threshold and vector_score > vector_threshold:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'vector_score': vector_score,
+                    'database_score': database_score,
+                    'parameters': {
+                        'vector_weight': 0.3,
+                        'database_weight': 0.7  # Favor database more
+                    }
                 }
-            }
-        elif database_score > vector_score and database_score > database_threshold and has_database:
-            return {
-                'type': QueryType.DATABASE_SEARCH,
-                'database_score': database_score,
-                'parameters': {
-                    'search_type': 'structured'
+            else:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'database_score': database_score,
+                    'parameters': {
+                        'search_type': 'structured'
+                    }
                 }
-            }
+        # Fall back to vector search for conceptual questions
         elif vector_score > vector_threshold and has_vector_store:
             return {
                 'type': QueryType.VECTOR_SEARCH,

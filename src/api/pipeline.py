@@ -11,7 +11,7 @@ from ..config.settings import ConfigManager
 from ..document_processing import DocumentProcessor, DocumentLoader
 from ..vector_database import VectorStoreManager, EmbeddingManager
 from ..query_routing import QueryRouter
-from ..database_search import Ocean3Client
+from ..database_search import OceanQuerySystem
 from ..rag_engine import RAGEngine, LLMWrapper
 
 logger = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ class ONCPipeline:
         self.embedding_manager = None
         self.vector_store_manager = None
         self.query_router = None
-        self.ocean3_client = None
+        self.ocean_query_system = None
         self.llm_wrapper = None
         self.rag_engine = None
         
@@ -169,9 +169,8 @@ class ONCPipeline:
         routing_config = self.config_manager.get('routing', {})
         self.query_router = QueryRouter(routing_config)
         
-        # Ocean 3 database client
-        db_config = self.config_manager.get('database', {})
-        self.ocean3_client = Ocean3Client(db_config)
+        # Ocean Query System
+        self.ocean_query_system = OceanQuerySystem()
         
         # Setup RAG engine modes
         if self.vector_store_ready:
@@ -202,7 +201,7 @@ class ONCPipeline:
             routing_context = context or {}
             routing_context.update({
                 'has_vector_store': self.vector_store_ready,
-                'has_database': self.ocean3_client.is_connected()
+                'has_database': self.ocean_query_system is not None
             })
             
             routing_decision = self.query_router.route_query(question, routing_context)
@@ -235,14 +234,28 @@ class ONCPipeline:
     
     def _process_database_query(self, question: str, parameters: Dict[str, Any]) -> str:
         """Process query using database search."""
-        if not self.ocean3_client.is_connected():
+        if not self.ocean_query_system:
             return self._process_direct_query(question)
         
-        # TODO: Implement database query logic
-        # This will be expanded by Backend/Data teams
-        
-        # For now, fall back to direct query
-        return self._process_direct_query(question)
+        try:
+            # Use the ocean query system to process the question
+            result = self.ocean_query_system.process_query(question)
+            
+            if result["status"] == "success":
+                # Format the ocean data response for the user
+                formatted_response = self.ocean_query_system.format_response_for_display(result)
+                return formatted_response
+            elif result["status"] == "no_data":
+                # Return helpful message about no data found
+                return self.ocean_query_system.format_response_for_display(result)
+            else:
+                # On error, fall back to direct query
+                logger.warning(f"Ocean query failed: {result.get('message', 'Unknown error')}")
+                return self._process_direct_query(question)
+                
+        except Exception as e:
+            logger.error(f"Error in database query: {e}")
+            return self._process_direct_query(question)
     
     def _process_hybrid_query(self, question: str, parameters: Dict[str, Any]) -> str:
         """Process query using both vector and database search."""
@@ -254,13 +267,25 @@ class ONCPipeline:
             vector_docs = self.vector_store_manager.retrieve_documents(question)
         
         # Get database results if available
-        if self.ocean3_client.is_connected():
-            # TODO: Implement database query
-            pass
+        ocean_response = None
+        if self.ocean_query_system:
+            try:
+                db_result = self.ocean_query_system.process_query(question)
+                if db_result["status"] == "success":
+                    database_results = db_result["data"]
+                    # Get the nicely formatted response from ocean query system
+                    ocean_response = self.ocean_query_system.format_response_for_display(db_result)
+                elif db_result["status"] == "no_data":
+                    ocean_response = self.ocean_query_system.format_response_for_display(db_result)
+            except Exception as e:
+                logger.warning(f"Database query failed in hybrid mode: {e}")
         
         # Generate hybrid response
-        if vector_docs or database_results:
-            return self.rag_engine.process_hybrid_query(question, vector_docs, database_results)
+        if ocean_response:
+            # If we got ocean data, prioritize that over hybrid processing
+            return ocean_response
+        elif vector_docs:
+            return self.rag_engine.process_rag_query(question, vector_docs)
         else:
             return self._process_direct_query(question)
     
@@ -313,7 +338,7 @@ class ONCPipeline:
             "document_count": len(self.documents) if hasattr(self, 'documents') else 0,
             "vector_store_ready": self.vector_store_ready,
             "vector_document_count": self.vector_store_manager.get_document_count() if self.vector_store_manager else 0,
-            "database_connected": self.ocean3_client.is_connected() if self.ocean3_client else False,
+            "database_connected": self.ocean_query_system is not None,
             "llm_info": self.llm_wrapper.get_model_info() if self.llm_wrapper else {},
             "config": self.config_manager.config
         }
