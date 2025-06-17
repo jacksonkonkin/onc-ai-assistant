@@ -18,7 +18,6 @@ class EmbeddingManager:
     """Manages embedding generation and configuration."""
     
     embedding_model = None
-    prompt_template = None
 
     def __init__(self, embeddings_config: Dict[str, Any]):
         """
@@ -29,7 +28,11 @@ class EmbeddingManager:
         """
         self.config = embeddings_config
         self.embedding_function = None
+        self.embedding_model = None
         self._setup_embeddings()
+
+   # def Mistral_embeddings(self):
+    #     return self.embed_query("what is today?"), self.embed_documents(["apple", "banana", "Tuesday is today"])
     
     def _setup_embeddings(self):
         """Setup embedding function based on configuration."""
@@ -37,40 +40,17 @@ class EmbeddingManager:
         
         if provider == 'mistral':
             self.embedding_model = SentenceTransformer("Linq-AI-Research/Linq-Embed-Mistral")
-            self.prompt_template =  PromptTemplate(
-            template="""You are an expert oceanographic data analyst and assistant for Ocean Networks Canada (ONC). 
-You help researchers, students, and the public understand ocean data, instruments, and marine observations.
-
-SPECIALIZATION AREAS:
-- Cambridge Bay Coastal Observatory and Arctic oceanography
-- Ocean monitoring instruments (CTD, hydrophones, ADCP, cameras)
-- Marine data interpretation (temperature, salinity, pressure, acoustic data)
-- Ocean Networks Canada's observatory network and data products
-- Ice conditions, marine mammals, and Arctic marine ecosystems
-
-INSTRUCTIONS:
-- Use ONLY the provided ONC documents and data to answer questions
-- Be specific about instrument types, measurement parameters, and data quality
-- When discussing measurements, include relevant units and typical ranges
-- If comparing different observatories or time periods, highlight key differences
-- For instrument questions, explain the measurement principles and applications
-- If the provided context doesn't contain sufficient information, clearly state this
-- Suggest related ONC resources or data products when appropriate
-- Maintain scientific accuracy and cite document sources when possible
-
-CONTEXT FROM ONC DOCUMENTS:
-{documents}
-
-USER QUESTION: {question}
-
-EXPERT ONC ANALYSIS:""",
-            input_variables=["question", "documents"]
-        )
-            self.embed_query()
-            self.embed_documents()
+            self.embedding_function = self.embed_query
+        
+            
         else:
             raise ValueError(f"Unsupported embedding provider: {provider}")
-        
+    
+    def get_embedding_function(self):
+        """Get the configured embedding function."""
+        if self.embedding_function is None:
+            raise ValueError("Embedding function not initialized")
+        return self.embedding_function
     
     def embed_query(self, query: str) -> list:
         """
@@ -82,7 +62,7 @@ EXPERT ONC ANALYSIS:""",
         Returns:
             list: Query embedding vector
         """
-        return self.embedding_model.encode(query, prompt=self.prompt_template)
+        return self.embedding_model.encode(query)
     
     def embed_documents(self, documents: list) -> list:
         """
@@ -92,6 +72,6 @@ EXPERT ONC ANALYSIS:""",
             documents (list): List of document texts
             
         Returns:
-            list: List of embedding vectors
+            Tuple: List of embedding vectors
         """
         return self.embedding_model.encode(documents)
