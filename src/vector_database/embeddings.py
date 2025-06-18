@@ -9,6 +9,7 @@ from typing import Dict, Any
 from sentence_transformers import SentenceTransformer
 from langchain.prompts import PromptTemplate
 from rag_engine import RAGEngine
+from chromadb.utils.embedding_functions import MistralEmbeddingFunction
 
 
 logger = logging.getLogger(__name__)
@@ -31,16 +32,14 @@ class EmbeddingManager:
         self.embedding_model = None
         self._setup_embeddings()
 
-   # def Mistral_embeddings(self):
-    #     return self.embed_query("what is today?"), self.embed_documents(["apple", "banana", "Tuesday is today"])
     
     def _setup_embeddings(self):
         """Setup embedding function based on configuration."""
         provider = self.config.get('provider', 'mistral')
-        
+
         if provider == 'mistral':
-            self.embedding_model = SentenceTransformer("Linq-AI-Research/Linq-Embed-Mistral")
-            self.embedding_function = self.embed_query
+            self.embedding_model = "mistral-embed"
+            self.embedding_function = MistralEmbeddingFunction(model=self.embedding_model)
         
             
         else:
