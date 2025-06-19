@@ -38,10 +38,6 @@ logs/
 *.tmp
 *.temp
 
-<<<<<<< HEAD
 .claude
 
 Data-Engineering/
-=======
-.claude
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97

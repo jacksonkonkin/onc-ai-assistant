@@ -34,7 +34,6 @@ class QueryRouter:
         self.config = routing_config or {}
         self.vector_keywords = self._load_vector_keywords()
         self.database_keywords = self._load_database_keywords()
-<<<<<<< HEAD
         
         # Initialize LLM client for enhanced routing
         self.groq_client = None
@@ -47,8 +46,6 @@ class QueryRouter:
         
         # Enable/disable LLM routing
         self.use_llm_routing = self.config.get('use_llm_routing', True) and self.groq_client is not None
-=======
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
     
     def _load_vector_keywords(self) -> List[str]:
         """Load keywords that indicate vector search should be used."""
@@ -90,7 +87,6 @@ class QueryRouter:
             Dict: Routing decision with type and parameters
         """
         context = context or {}
-<<<<<<< HEAD
         
         # Check for conversation context and follow-up detection
         conversation_context = context.get('conversation_context', '')
@@ -123,20 +119,10 @@ class QueryRouter:
                 vector_score, database_score, follow_up_info
             )
         
-=======
-        query_lower = query.lower()
-        
-        # Analyze query content
-        vector_score = self._calculate_vector_score(query_lower)
-        database_score = self._calculate_database_score(query_lower)
-        
-        # Make routing decision
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         routing_decision = self._make_routing_decision(
             vector_score, database_score, context
         )
         
-<<<<<<< HEAD
         logger.info(f"Keyword routed query to: {routing_decision['type']}")
         return routing_decision
     
@@ -406,11 +392,6 @@ Respond with ONLY the category name: deployment_info, observation_query, general
         
         return vector_score, database_score
     
-=======
-        logger.info(f"Routed query to: {routing_decision['type']}")
-        return routing_decision
-    
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
     def _calculate_vector_score(self, query: str) -> float:
         """Calculate score for vector search relevance."""
         score = 0.0
@@ -501,7 +482,6 @@ Respond with ONLY the category name: deployment_info, observation_query, general
         return {
             'vector_keywords_count': len(self.vector_keywords),
             'database_keywords_count': len(self.database_keywords),
-<<<<<<< HEAD
             'llm_routing_enabled': self.use_llm_routing,
             'groq_client_available': self.groq_client is not None,
             'config': self.config
@@ -516,7 +496,3 @@ Respond with ONLY the category name: deployment_info, observation_query, general
         self.use_llm_routing = enabled
         logger.info(f"LLM routing {'enabled' if enabled else 'disabled'}")
         return True
-=======
-            'config': self.config
-        }
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97

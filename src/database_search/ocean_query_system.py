@@ -13,10 +13,7 @@ from typing import Dict, Any, Optional, List
 
 from .enhanced_parameter_extractor import EnhancedParameterExtractor
 from .onc_api_client import ONCAPIClient
-<<<<<<< HEAD
 from .enhanced_response_formatter import EnhancedResponseFormatter
-=======
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
 
 # Setup logging
 logging.basicConfig(
@@ -29,25 +26,17 @@ logger = logging.getLogger(__name__)
 class OceanQuerySystem:
     """Complete ocean data query system"""
     
-<<<<<<< HEAD
     def __init__(self, onc_token: str = None, llm_wrapper=None):
-=======
-    def __init__(self, onc_token: str = None):
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         """
         Initialize the complete query system
         
         Args:
             onc_token: ONC API token (optional, will use default if not provided)
-<<<<<<< HEAD
             llm_wrapper: LLM wrapper for enhanced response formatting
-=======
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         """
         try:
             self.extractor = EnhancedParameterExtractor()
             self.api_client = ONCAPIClient(onc_token)
-<<<<<<< HEAD
             
             # Initialize enhanced response formatter if LLM wrapper is available
             self.enhanced_formatter = None
@@ -55,8 +44,6 @@ class OceanQuerySystem:
                 self.enhanced_formatter = EnhancedResponseFormatter(llm_wrapper)
                 logger.info("Enhanced response formatting enabled")
             
-=======
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
             logger.info("Ocean Query System initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize system: {e}")
@@ -195,7 +182,6 @@ class OceanQuerySystem:
                 "data": None
             }
 
-<<<<<<< HEAD
     def format_enhanced_response(self, response: Dict[str, Any], 
                                conversation_context: str = "") -> str:
         """
@@ -233,8 +219,6 @@ class OceanQuerySystem:
             # Fallback to regular formatting
             return self.format_response_for_display(response, show_api_calls=True)
 
-=======
->>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
     def format_response_for_display(self, response: Dict[str, Any], include_raw_data: bool = False, 
                                    show_api_calls: bool = False) -> str:
         """
