@@ -1,0 +1,188 @@
+*LOCATION CODE to DEVICE CATEGORY CODES*
+
+CBYIP
+├── ACOUSTICRECEIVER
+├── ADCP1200KHZ
+├── CAMLIGHTS
+├── CTD
+├── FLNTU
+├── FLUOROMETER
+├── HYDROPHONE
+├── ICEPROFILER
+├── NITRATESENSOR
+├── OXYSENSOR
+├── PHSENSOR
+├── PLANKTONSAMPLER
+├── RADIOMETER
+├── TURBIDITYMETER
+├── VIDEOCAM
+└── WETLABS_WQM
+
+CBYSP
+└── ICE_BUOY
+
+CBYSS
+├── AISRECEIVER
+├── BARPRESS
+└── VIDEOCAM
+
+CBYSS.M1
+└── METSTN
+
+CBYSS.M2
+└── METSTN
+
+*DEVICE CATEGORY CODE to PROPERTY CODES*
+
+ADCP1200KHZ
+├── magneticheading
+├── pitch
+├── roll
+├── seawatertemperature
+└── soundspeed
+
+AISRECEIVER
+└── (No properties available)
+
+BARPRESS
+└── absolutebarometricpressure
+
+CO2SENSOR
+├── calibratedphaseangle
+├── co2concentrationlinearized
+├── co2partialpressure
+├── compensatedphaseangle
+├── gasstreampressure
+├── internaltemperature
+├── scientificcount
+└── seawatertemperature
+
+CTD
+├── biofoulingprevention
+├── conductivity
+├── density
+├── depth
+├── gregoriantime
+├── pressure
+├── salinity
+├── seawatertemperature
+├── sigmat
+├── sigmatheta
+├── soundspeed
+└── turbidityntu
+
+FLNTU
+├── chlorophyll
+└── turbidityntu
+
+FLUOROMETER
+└── chlorophyll
+
+HYDROPHONE
+├── amperage
+├── batterycharge
+├── electriccharge
+├── engineeringcount
+├── gpsintervaltimeofweek
+├── gregoriantime
+├── internalhumidity
+├── internaltemperature
+├── magnetometer
+├── microgacceleration
+├── runtimesensor
+├── statuscode
+└── voltage
+
+ICEPROFILER
+├── icedraft
+├── pingtime
+├── seawatertemperature
+├── soundpressurelevel
+├── targetpersistence
+├── tilt
+└── totalpressure
+
+ICE_BUOY
+├── airtemperature
+├── altitude
+├── differentialtemperature
+├── gregoriantime
+├── icethickness
+├── latitude
+├── longitude
+├── snowthickness
+└── srslicebalancebuoytemperature
+
+
+METSTN
+├── absolutebarometricpressure
+├── absolutehumidity
+├── airdensity
+├── airtemperature
+├── barometrictrend
+├── dewpoint
+├── internalhumidity
+├── internaltemperature
+├── magneticheading
+├── mixingratio
+├── rainfallrate
+├── relativebarometricpressure
+├── relativehumidity
+├── solarradiation
+├── specificenthalpy
+├── uvindex
+├── voltage
+├── wetbulbtemperature
+├── windchilltemperature
+├── winddirection
+└── windspeed
+
+NAV
+├── depth
+├── latitude
+└── longitude
+
+OXYSENSOR
+├── gassaturation
+├── oxygen
+└── seawatertemperature
+
+PHSENSOR
+├── amperage
+├── gregoriantime
+├── internalhumidity
+├── internalph
+├── ph
+├── seawatertemperature
+└── voltage
+
+RADIOMETER
+├── internaltemperature
+├── parphotonbased
+└── voltage
+
+TURBIDITYMETER
+└── turbidityntu
+
+VIDEOCAM
+├── cameralight
+├── camerapan
+├── cameratilt
+├── focus
+└── zoom
+
+WETLABS_WQM
+├── chlorophyll
+├── conductivity
+├── density
+├── gassaturation
+├── gregoriantime
+├── oxygen
+├── pressure
+├── resevoirvolume
+├── salinity
+├── seawatertemperature
+├── sigmat
+├── sigmatheta
+├── soundspeed
+└── turbidityntu

@@ -34,6 +34,21 @@ vector_store:
   force_rebuild: false
   collection_name: onc_documents
 
+query_routing:
+  use_llm_routing: true  # Enable LLM-based query routing
+  vector_threshold: 0.1
+  database_threshold: 0.05
+  hybrid_threshold: 0.15
+
+conversation:
+  max_history_length: 10  # Maximum conversation exchanges to remember
+  context_window_minutes: 30  # Minutes after which context becomes less relevant
+
+ocean_responses:
+  enhanced_formatting: false  # Enable natural language responses for ocean data (temporarily disabled for debugging)
+  include_educational_context: true  # Add educational explanations
+  show_technical_summary: true  # Include technical details at the end
+
 onc_specific:
   cambridge_bay_focus: true
   instrument_priority:
