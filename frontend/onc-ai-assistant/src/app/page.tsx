@@ -1,15 +1,3 @@
-import Image from "next/image";
-
-export default function Home() {
-  return (
-    <div>
-      <main>
-        <h2>Landing Page</h2>
-      </main>
-    </div>
-  );
-}
-
 "use client";
 import './landingPage.css'; // global CSS import
 import { useRouter } from "next/navigation";
