@@ -6,8 +6,11 @@ Teams: Data team + LLM team
 import os
 import logging
 from typing import Dict, Any
+from sentence_transformers import SentenceTransformer
+from langchain.prompts import PromptTemplate
+from rag_engine import RAGEngine
+from chromadb.utils.embedding_functions import MistralEmbeddingFunction
 
-from langchain_openai import OpenAIEmbeddings
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +18,8 @@ logger = logging.getLogger(__name__)
 class EmbeddingManager:
     """Manages embedding generation and configuration."""
     
+    embedding_model = None
+
     def __init__(self, embeddings_config: Dict[str, Any]):
         """
         Initialize embedding manager.
@@ -24,33 +29,21 @@ class EmbeddingManager:
         """
         self.config = embeddings_config
         self.embedding_function = None
+        self.embedding_model = None
         self._setup_embeddings()
+
     
     def _setup_embeddings(self):
         """Setup embedding function based on configuration."""
-        provider = self.config.get('provider', 'openai')
+        provider = self.config.get('provider', 'mistral')
+
+        if provider == 'mistral':
+            self.embedding_model = "mistral-embed"
+            self.embedding_function = MistralEmbeddingFunction(model=self.embedding_model)
         
-        if provider == 'openai':
-            self._setup_openai_embeddings()
+            
         else:
             raise ValueError(f"Unsupported embedding provider: {provider}")
-    
-    def _setup_openai_embeddings(self):
-        """Setup OpenAI embeddings."""
-        api_key_env = self.config.get('api_key_env', 'OPENAI_API_KEY')
-        api_key = os.getenv(api_key_env)
-        
-        if not api_key:
-            raise ValueError(f"Environment variable {api_key_env} not set")
-        
-        model = self.config.get('model', 'text-embedding-ada-002')
-        
-        self.embedding_function = OpenAIEmbeddings(
-            openai_api_key=api_key,
-            model=model
-        )
-        
-        logger.info(f"Initialized OpenAI embeddings with model: {model}")
     
     def get_embedding_function(self):
         """Get the configured embedding function."""
@@ -68,7 +61,7 @@ class EmbeddingManager:
         Returns:
             list: Query embedding vector
         """
-        return self.embedding_function.embed_query(query)
+        return self.embedding_model.encode(query)
     
     def embed_documents(self, documents: list) -> list:
         """
@@ -78,6 +71,6 @@ class EmbeddingManager:
             documents (list): List of document texts
             
         Returns:
-            list: List of embedding vectors
+            Tuple: List of embedding vectors
         """
-        return self.embedding_function.embed_documents(documents)
+        return self.embedding_model.encode(documents)

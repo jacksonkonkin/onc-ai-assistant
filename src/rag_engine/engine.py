@@ -92,6 +92,7 @@ USER QUESTION: {question}
 EXPERT ONC ANALYSIS:""",
             input_variables=["question"]
         )
+
     
     def setup_rag_mode(self):
         """Setup RAG processing chain."""
