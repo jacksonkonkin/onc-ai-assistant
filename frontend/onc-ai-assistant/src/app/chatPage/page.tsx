@@ -3,16 +3,24 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import "./ChatPage.css";
+import { FiSend } from "react-icons/fi";
 
 type Message = {
   sender: "user" | "ai";
   text: string;
+  isThinking?: boolean;
 };
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [pageLoaded, setPageLoaded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    // Trigger fade-in after first render
+    setPageLoaded(true);
+  }, []);
 
   const fetchAIResponse = async (prompt: string): Promise<string> => {
     try {
@@ -20,19 +28,12 @@ export default function ChatPage() {
         "https://onc-assistant-822f952329ee.herokuapp.com/query",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: prompt }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error("API request failed");
-      }
-
+      if (!response.ok) throw new Error("API request failed");
       const data = await response.json();
-
       return data.response ?? "No response from AI.";
     } catch (error) {
       console.error("Error fetching AI response:", error);
@@ -47,19 +48,43 @@ export default function ChatPage() {
     setMessages((prev) => [
       ...prev,
       userMessage,
-      { sender: "ai", text: "thinking" },
+      { sender: "ai", text: "", isThinking: true },
     ]);
     setInput("");
 
     const aiText = await fetchAIResponse(input);
+
+    // Stop thinking
     setMessages((prev) => {
       const updated = [...prev];
-      updated[updated.length - 1] = { sender: "ai", text: aiText };
+      updated[updated.length - 1] = {
+        ...updated[updated.length - 1],
+        isThinking: false,
+      };
       return updated;
     });
+
+    // Typewriter effect
+    let index = 0;
+    const typeInterval = setInterval(() => {
+      setMessages((prev) => {
+        const updated = [...prev];
+        const currentAiMsg = updated[updated.length - 1];
+        updated[updated.length - 1] = {
+          ...currentAiMsg,
+          text: aiText.slice(0, index + 1),
+        };
+        return updated;
+      });
+
+      index++;
+
+      if (index >= aiText.length) {
+        clearInterval(typeInterval);
+      }
+    }, 30);
   };
 
-  // Auto-expand textarea height
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -69,7 +94,7 @@ export default function ChatPage() {
   }, [input]);
 
   const renderMessageText = (msg: Message) => {
-    if (msg.sender === "ai" && msg.text === "thinking") {
+    if (msg.sender === "ai" && msg.isThinking) {
       const dots = "Generating Response...".split("");
       return (
         <span className="thinking-animation">
@@ -89,7 +114,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${pageLoaded ? "fade-in" : ""}`}>
       <div className="chat-header">
         <Image
           src="/FishLogo.png"
@@ -97,10 +122,11 @@ export default function ChatPage() {
           width={100}
           height={100}
           quality={100}
-          className="fish-logo"
+          className="fish-logo floating"
         />
         <h2>Hello! How can I assist you today?</h2>
       </div>
+
       <div className="chat-body">
         <div className="messages">
           {messages.map((msg, i) => (
@@ -124,15 +150,7 @@ export default function ChatPage() {
             rows={1}
           />
           <button onClick={handleSend} className="send-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="send-icon"
-              height="20"
-              viewBox="0 0 24 24"
-              width="20"
-            >
-              <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
-            </svg>
+            <FiSend size={20} color="#007acc" className="send-icon" />
           </button>
         </div>
       </div>

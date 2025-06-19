@@ -8,6 +8,9 @@ export default function Home() {
   const goToLogIn = () => {
     router.push("/authentication");
   };
+  const goToSignUp = () => {
+    router.push("/authentication/signUp");
+  };
 
   return (
     <div className="landing-container">
@@ -23,12 +26,12 @@ export default function Home() {
         <h1>Meet Ocean Networks Canada’s Virtual Assistant!</h1>
         <p>
           Ocean Networks Canada’s AI-powered virtual assistant is here to help you navigate their{' '}
-          <a href="#">Oceans 3.0 Data Portal</a> and discover our oceans.
+          <a href="https://data.oceannetworks.ca/">Oceans 3.0 Data Portal</a> and discover our oceans.
         </p>
         <p>Log in or create an account to get started!</p>
         <div className="landing-buttons">
           <button onClick={goToLogIn} className="landing-ctaBtn">Log In</button>
-          <button className="landing-ctaBtn">Sign Up</button>
+          <button onClick={goToSignUp} className="landing-ctaBtn">Sign Up</button>
         </div>
 
         {/* Territorial Acknowledgment */}
