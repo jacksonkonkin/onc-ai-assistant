@@ -13,6 +13,7 @@ from typing import Dict, Any, Optional, List
 
 from .enhanced_parameter_extractor import EnhancedParameterExtractor
 from .onc_api_client import ONCAPIClient
+from .enhanced_response_formatter import EnhancedResponseFormatter
 
 # Setup logging
 logging.basicConfig(
@@ -25,16 +26,24 @@ logger = logging.getLogger(__name__)
 class OceanQuerySystem:
     """Complete ocean data query system"""
     
-    def __init__(self, onc_token: str = None):
+    def __init__(self, onc_token: str = None, llm_wrapper=None):
         """
         Initialize the complete query system
         
         Args:
             onc_token: ONC API token (optional, will use default if not provided)
+            llm_wrapper: LLM wrapper for enhanced response formatting
         """
         try:
             self.extractor = EnhancedParameterExtractor()
             self.api_client = ONCAPIClient(onc_token)
+            
+            # Initialize enhanced response formatter if LLM wrapper is available
+            self.enhanced_formatter = None
+            if llm_wrapper:
+                self.enhanced_formatter = EnhancedResponseFormatter(llm_wrapper)
+                logger.info("Enhanced response formatting enabled")
+            
             logger.info("Ocean Query System initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize system: {e}")
@@ -172,6 +181,43 @@ class OceanQuerySystem:
                 "message": f"Failed to get latest data: {str(e)}",
                 "data": None
             }
+
+    def format_enhanced_response(self, response: Dict[str, Any], 
+                               conversation_context: str = "") -> str:
+        """
+        Format response using enhanced natural language formatting.
+        
+        Args:
+            response: System response dictionary
+            conversation_context: Previous conversation context
+            
+        Returns:
+            Enhanced natural language response
+        """
+        if self.enhanced_formatter:
+            try:
+                # Get original query from metadata
+                metadata = response.get("metadata", {})
+                original_query = metadata.get("query", "")
+                
+                enhanced_response = self.enhanced_formatter.format_enhanced_response(
+                    response, conversation_context, original_query
+                )
+                
+                # If the enhanced response indicates an error, fall back to technical format
+                if "unexpected error while formatting" in enhanced_response:
+                    logger.warning("Enhanced formatting failed, falling back to technical format")
+                    return self.format_response_for_display(response, show_api_calls=True)
+                
+                return enhanced_response
+                
+            except Exception as e:
+                logger.error(f"Enhanced formatting failed: {e}")
+                logger.info("Falling back to technical formatting")
+                return self.format_response_for_display(response, show_api_calls=True)
+        else:
+            # Fallback to regular formatting
+            return self.format_response_for_display(response, show_api_calls=True)
 
     def format_response_for_display(self, response: Dict[str, Any], include_raw_data: bool = False, 
                                    show_api_calls: bool = False) -> str:

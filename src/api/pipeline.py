@@ -13,6 +13,7 @@ from ..vector_database import VectorStoreManager, EmbeddingManager
 from ..query_routing import QueryRouter
 from ..database_search import OceanQuerySystem
 from ..rag_engine import RAGEngine, LLMWrapper
+from ..conversation import ConversationManager
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ class ONCPipeline:
         self.ocean_query_system = None
         self.llm_wrapper = None
         self.rag_engine = None
+        self.conversation_manager = None
         
         # State tracking
         self.is_setup = False
@@ -166,11 +168,28 @@ class ONCPipeline:
     def _setup_additional_components(self):
         """Setup query routing and database components."""
         # Query router
-        routing_config = self.config_manager.get('routing', {})
+        routing_config = self.config_manager.get('query_routing', {})
         self.query_router = QueryRouter(routing_config)
         
-        # Ocean Query System
-        self.ocean_query_system = OceanQuerySystem()
+        # Ocean Query System with enhanced formatting
+        ocean_config = self.config_manager.get('ocean_responses', {})
+        enhanced_formatting_enabled = ocean_config.get('enhanced_formatting', False)
+        
+        if enhanced_formatting_enabled:
+            self.ocean_query_system = OceanQuerySystem(llm_wrapper=self.llm_wrapper)
+            logger.info("Ocean Query System initialized with enhanced formatting")
+        else:
+            self.ocean_query_system = OceanQuerySystem()
+            logger.info("Ocean Query System initialized with standard formatting")
+        
+        # Conversation Manager
+        conversation_config = self.config_manager.get('conversation', {})
+        max_history = conversation_config.get('max_history_length', 10)
+        context_window = conversation_config.get('context_window_minutes', 30)
+        self.conversation_manager = ConversationManager(
+            max_history_length=max_history,
+            context_window_minutes=context_window
+        )
         
         # Setup RAG engine modes
         if self.vector_store_ready:
@@ -197,67 +216,97 @@ class ONCPipeline:
         try:
             logger.info(f"Processing query: {question[:100]}...")
             
-            # Route the query
+            # Get conversation context and detect follow-ups
+            conversation_context = ""
+            follow_up_info = {}
+            
+            if self.conversation_manager:
+                # Add user message to conversation
+                self.conversation_manager.add_user_message(question, context)
+                
+                # Get conversation context
+                conversation_context = self.conversation_manager.get_conversation_context(include_metadata=True)
+                
+                # Detect follow-up questions
+                follow_up_info = self.conversation_manager.detect_follow_up_question(question)
+                
+                logger.debug(f"Follow-up detection: {follow_up_info}")
+            
+            # Route the query with conversation context
             routing_context = context or {}
             routing_context.update({
                 'has_vector_store': self.vector_store_ready,
-                'has_database': self.ocean_query_system is not None
+                'has_database': self.ocean_query_system is not None,
+                'conversation_context': conversation_context,
+                'follow_up_info': follow_up_info
             })
             
             routing_decision = self.query_router.route_query(question, routing_context)
             query_type = routing_decision['type']
             
-            # Process based on routing decision
+            # Process based on routing decision with conversation context
             if query_type.value == 'vector_search':
-                return self._process_vector_query(question)
+                response = self._process_vector_query(question, conversation_context)
             elif query_type.value == 'database_search':
-                return self._process_database_query(question, routing_decision.get('parameters', {}))
+                response = self._process_database_query(question, routing_decision.get('parameters', {}), conversation_context)
             elif query_type.value == 'hybrid_search':
-                return self._process_hybrid_query(question, routing_decision.get('parameters', {}))
+                response = self._process_hybrid_query(question, routing_decision.get('parameters', {}), conversation_context)
             else:  # direct_llm
-                return self._process_direct_query(question)
+                response = self._process_direct_query(question, conversation_context)
+            
+            # Add assistant response to conversation
+            if self.conversation_manager:
+                response_metadata = {
+                    'route_type': query_type.value,
+                    'classification': routing_decision.get('classification', ''),
+                    'confidence': routing_decision.get('confidence', ''),
+                    'is_follow_up': follow_up_info.get('is_follow_up', False)
+                }
+                self.conversation_manager.add_assistant_message(response, response_metadata)
+            
+            return response
                 
         except Exception as e:
             logger.error(f"Error processing query: {e}")
             return f"Sorry, I encountered an error processing your question: {str(e)}"
     
-    def _process_vector_query(self, question: str) -> str:
+    def _process_vector_query(self, question: str, conversation_context: str = "") -> str:
         """Process query using vector search."""
         if not self.vector_store_ready:
-            return self._process_direct_query(question)
+            return self._process_direct_query(question, conversation_context)
         
         # Retrieve documents
         documents = self.vector_store_manager.retrieve_documents(question)
         
-        # Generate response
-        return self.rag_engine.process_rag_query(question, documents)
+        # Generate response with conversation context
+        return self.rag_engine.process_rag_query(question, documents, conversation_context)
     
-    def _process_database_query(self, question: str, parameters: Dict[str, Any]) -> str:
+    def _process_database_query(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> str:
         """Process query using database search."""
         if not self.ocean_query_system:
-            return self._process_direct_query(question)
+            return self._process_direct_query(question, conversation_context)
         
         try:
             # Use the ocean query system to process the question
             result = self.ocean_query_system.process_query(question)
             
             if result["status"] == "success":
-                # Format the ocean data response for the user
-                formatted_response = self.ocean_query_system.format_response_for_display(result)
+                # Use enhanced formatting with conversation context
+                formatted_response = self.ocean_query_system.format_enhanced_response(result, conversation_context)
                 return formatted_response
             elif result["status"] == "no_data":
-                # Return helpful message about no data found
-                return self.ocean_query_system.format_response_for_display(result)
+                # Use enhanced formatting for no data responses too
+                return self.ocean_query_system.format_enhanced_response(result, conversation_context)
             else:
                 # On error, fall back to direct query
                 logger.warning(f"Ocean query failed: {result.get('message', 'Unknown error')}")
-                return self._process_direct_query(question)
+                return self._process_direct_query(question, conversation_context)
                 
         except Exception as e:
             logger.error(f"Error in database query: {e}")
-            return self._process_direct_query(question)
+            return self._process_direct_query(question, conversation_context)
     
-    def _process_hybrid_query(self, question: str, parameters: Dict[str, Any]) -> str:
+    def _process_hybrid_query(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> str:
         """Process query using both vector and database search."""
         vector_docs = []
         database_results = []
@@ -273,10 +322,10 @@ class ONCPipeline:
                 db_result = self.ocean_query_system.process_query(question)
                 if db_result["status"] == "success":
                     database_results = db_result["data"]
-                    # Get the nicely formatted response from ocean query system
-                    ocean_response = self.ocean_query_system.format_response_for_display(db_result)
+                    # Get the enhanced formatted response from ocean query system
+                    ocean_response = self.ocean_query_system.format_enhanced_response(db_result, conversation_context)
                 elif db_result["status"] == "no_data":
-                    ocean_response = self.ocean_query_system.format_response_for_display(db_result)
+                    ocean_response = self.ocean_query_system.format_enhanced_response(db_result, conversation_context)
             except Exception as e:
                 logger.warning(f"Database query failed in hybrid mode: {e}")
         
@@ -285,13 +334,13 @@ class ONCPipeline:
             # If we got ocean data, prioritize that over hybrid processing
             return ocean_response
         elif vector_docs:
-            return self.rag_engine.process_rag_query(question, vector_docs)
+            return self.rag_engine.process_rag_query(question, vector_docs, conversation_context)
         else:
-            return self._process_direct_query(question)
+            return self._process_direct_query(question, conversation_context)
     
-    def _process_direct_query(self, question: str) -> str:
+    def _process_direct_query(self, question: str, conversation_context: str = "") -> str:
         """Process query using direct LLM."""
-        return self.rag_engine.process_direct_query(question)
+        return self.rag_engine.process_direct_query(question, conversation_context)
     
     def add_documents(self, file_paths: List[str]) -> bool:
         """
@@ -330,6 +379,32 @@ class ONCPipeline:
             logger.error(f"Error adding documents: {e}")
             return False
     
+    def get_conversation_summary(self) -> Dict[str, Any]:
+        """Get summary of current conversation state."""
+        if self.conversation_manager:
+            return self.conversation_manager.get_conversation_summary()
+        return {"message": "Conversation management not available"}
+    
+    def clear_conversation(self) -> None:
+        """Clear current conversation history."""
+        if self.conversation_manager:
+            self.conversation_manager.clear_conversation()
+            logger.info("Conversation history cleared")
+        else:
+            logger.warning("Conversation manager not available")
+    
+    def save_conversation(self, filepath: str) -> bool:
+        """Save current conversation to file."""
+        if self.conversation_manager:
+            return self.conversation_manager.save_conversation(filepath)
+        return False
+    
+    def load_conversation(self, filepath: str) -> bool:
+        """Load conversation from file."""
+        if self.conversation_manager:
+            return self.conversation_manager.load_conversation(filepath)
+        return False
+    
     def get_pipeline_status(self) -> Dict[str, Any]:
         """Get comprehensive pipeline status."""
         return {
@@ -363,7 +438,11 @@ class ONCPipeline:
         
         print("-"*70)
         print("Ask about Ocean Networks Canada data and instruments")
-        print("Type 'quit' to exit")
+        print("Commands: 'quit' to exit, 'clear' to clear conversation, 'status' for conversation summary")
+        if self.conversation_manager:
+            print("💬 Conversation memory: ENABLED - Follow-up questions supported!")
+        else:
+            print("⚠️  Conversation memory: DISABLED")
         print("="*70 + "\n")
         
         question_count = 0
@@ -376,9 +455,44 @@ class ONCPipeline:
                     print(f"\nThank you for using the ONC Assistant!")
                     if question_count > 0:
                         print(f"You asked {question_count} question{'s' if question_count != 1 else ''}.")
+                    
+                    # Show conversation summary if available
+                    if self.conversation_manager and question_count > 0:
+                        summary = self.get_conversation_summary()
+                        print(f"Conversation summary: {summary.get('message_count', 0)} messages, "
+                              f"{summary.get('session_duration_minutes', 0):.1f} minutes")
                     break
                 
+                # Handle conversation management commands
+                if question.lower() == 'clear':
+                    self.clear_conversation()
+                    print("🗑️  Conversation history cleared. Starting fresh!")
+                    question_count = 0
+                    continue
+                
+                if question.lower() == 'status':
+                    if self.conversation_manager:
+                        summary = self.get_conversation_summary()
+                        print(f"💬 Conversation Status:")
+                        print(f"   Messages: {summary.get('message_count', 0)}")
+                        print(f"   Duration: {summary.get('session_duration_minutes', 0):.1f} minutes")
+                        print(f"   Topics: {', '.join(summary.get('topics_discussed', [])[:5])}")
+                        print(f"   Data queries: {summary.get('data_queries_made', 0)}")
+                    else:
+                        print("⚠️  Conversation management not available")
+                    continue
+                
+                if not question:
+                    continue
+                
                 question_count += 1
+                
+                # Show follow-up detection if available
+                if self.conversation_manager and question_count > 1:
+                    follow_up_info = self.conversation_manager.detect_follow_up_question(question)
+                    if follow_up_info.get('is_follow_up') and follow_up_info.get('confidence', 0) > 0.6:
+                        print("🔗 Follow-up question detected - using conversation context...")
+                
                 print("Processing query...", end='', flush=True)
                 
                 answer = self.query(question)

@@ -4,8 +4,11 @@ Teams: Backend team + Data team
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from enum import Enum
+import asyncio
+import os
+from groq import Groq
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +34,18 @@ class QueryRouter:
         self.config = routing_config or {}
         self.vector_keywords = self._load_vector_keywords()
         self.database_keywords = self._load_database_keywords()
+        
+        # Initialize LLM client for enhanced routing
+        self.groq_client = None
+        if os.getenv('GROQ_API_KEY'):
+            try:
+                self.groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+                logger.info("LLM-based query routing enabled")
+            except Exception as e:
+                logger.warning(f"Failed to initialize LLM client: {e}")
+        
+        # Enable/disable LLM routing
+        self.use_llm_routing = self.config.get('use_llm_routing', True) and self.groq_client is not None
     
     def _load_vector_keywords(self) -> List[str]:
         """Load keywords that indicate vector search should be used."""
@@ -72,19 +87,310 @@ class QueryRouter:
             Dict: Routing decision with type and parameters
         """
         context = context or {}
-        query_lower = query.lower()
         
-        # Analyze query content
+        # Check for conversation context and follow-up detection
+        conversation_context = context.get('conversation_context', '')
+        follow_up_info = context.get('follow_up_info', {})
+        
+        # Use LLM-based routing if available, otherwise fall back to keyword-based
+        if self.use_llm_routing:
+            try:
+                routing_decision = self._llm_route_query(query, context)
+                
+                # Enhance routing decision with conversation context
+                if conversation_context or follow_up_info.get('is_follow_up'):
+                    routing_decision = self._enhance_routing_with_context(
+                        routing_decision, query, context
+                    )
+                
+                logger.info(f"LLM routed query to: {routing_decision['type']}")
+                return routing_decision
+            except Exception as e:
+                logger.warning(f"LLM routing failed, falling back to keyword-based: {e}")
+        
+        # Fallback to keyword-based routing
+        query_lower = query.lower()
         vector_score = self._calculate_vector_score(query_lower)
         database_score = self._calculate_database_score(query_lower)
         
-        # Make routing decision
+        # Adjust scores based on conversation context
+        if follow_up_info.get('is_follow_up'):
+            vector_score, database_score = self._adjust_scores_for_follow_up(
+                vector_score, database_score, follow_up_info
+            )
+        
         routing_decision = self._make_routing_decision(
             vector_score, database_score, context
         )
         
-        logger.info(f"Routed query to: {routing_decision['type']}")
+        logger.info(f"Keyword routed query to: {routing_decision['type']}")
         return routing_decision
+    
+    def _llm_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Use LLM to classify and route the query.
+        
+        Args:
+            query: User query
+            context: Additional context for routing
+            
+        Returns:
+            Dict: Routing decision with type and parameters
+        """
+        has_vector_store = context.get('has_vector_store', True)
+        has_database = context.get('has_database', False)
+        
+        # Create the classification prompt
+        # Include conversation context in the prompt if available
+        conversation_context = context.get('conversation_context', '')
+        follow_up_info = context.get('follow_up_info', {})
+        
+        system_prompt = """You are a query router for an Ocean Networks Canada (ONC) oceanographic data system.
+
+Classify queries into one of these categories:
+1. **deployment_info**: Questions about sensor locations, device types, deployment setups, what sensors/devices are at specific locations
+2. **observation_query**: Requests for specific sensor data with locations and/or times (temperature, salinity, pressure, etc.)
+3. **general_knowledge**: Conceptual questions about oceanography, marine science, instrument explanations
+4. **document_search**: Questions that need to be answered from research papers or documents
+
+Available data sources:
+- Vector database: """ + ("Available" if has_vector_store else "Not available") + """
+- Ocean sensor database: """ + ("Available" if has_database else "Not available") + """
+
+Examples:
+- "What sensors are located at CBYIP?" → deployment_info
+- "Give me temperature data from CBYIP on Oct 10, 2022" → observation_query  
+- "What is dissolved oxygen?" → general_knowledge
+- "Explain how CTD sensors work" → document_search
+
+""" + (f"""
+CONVERSATION CONTEXT:
+{conversation_context}
+
+Note: This query may be a follow-up to the previous conversation. Consider the context when classifying.
+""" if conversation_context else "") + """
+
+Respond with ONLY the category name: deployment_info, observation_query, general_knowledge, or document_search"""
+
+        user_prompt = f"Classify this query: {query}"
+        
+        try:
+            completion = self.groq_client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                temperature=0.1,
+                max_tokens=50
+            )
+            
+            classification = completion.choices[0].message.content.strip().lower()
+            logger.debug(f"LLM classified query as: {classification}")
+            
+            # Map classification to routing decision
+            return self._map_llm_classification_to_route(classification, context, query)
+            
+        except Exception as e:
+            logger.error(f"LLM classification failed: {e}")
+            raise
+    
+    def _map_llm_classification_to_route(self, classification: str, context: Dict[str, Any], query: str) -> Dict[str, Any]:
+        """
+        Map LLM classification to routing decision.
+        
+        Args:
+            classification: LLM classification result
+            context: Context information
+            query: Original query for confidence scoring
+            
+        Returns:
+            Dict: Routing decision
+        """
+        has_vector_store = context.get('has_vector_store', True)
+        has_database = context.get('has_database', False)
+        
+        if classification == "observation_query" and has_database:
+            return {
+                'type': QueryType.DATABASE_SEARCH,
+                'classification': classification,
+                'confidence': 'high',
+                'parameters': {
+                    'search_type': 'structured',
+                    'llm_classified': True
+                }
+            }
+        
+        elif classification == "deployment_info" and has_database:
+            return {
+                'type': QueryType.DATABASE_SEARCH,
+                'classification': classification,
+                'confidence': 'high',
+                'parameters': {
+                    'search_type': 'deployment',
+                    'llm_classified': True
+                }
+            }
+        
+        elif classification == "document_search" and has_vector_store:
+            return {
+                'type': QueryType.VECTOR_SEARCH,
+                'classification': classification,
+                'confidence': 'high',
+                'parameters': {
+                    'search_type': 'semantic',
+                    'llm_classified': True
+                }
+            }
+        
+        elif classification == "general_knowledge":
+            # For general knowledge, prefer vector search if available, otherwise direct LLM
+            if has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'medium',
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'llm_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': 'medium',
+                    'parameters': {
+                        'reason': 'General knowledge query without vector store',
+                        'llm_classified': True
+                    }
+                }
+        
+        else:
+            # Fallback - check what data sources are available
+            if has_database and has_vector_store:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'parameters': {
+                        'vector_weight': 0.5,
+                        'database_weight': 0.5,
+                        'reason': f'Uncertain classification: {classification}',
+                        'llm_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Uncertain classification: {classification}',
+                        'llm_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Uncertain classification: {classification}',
+                        'llm_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'parameters': {
+                        'reason': f'No data sources available, classification: {classification}',
+                        'llm_classified': True
+                    }
+                }
+    
+    def _enhance_routing_with_context(self, routing_decision: Dict[str, Any], 
+                                    query: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Enhance routing decision with conversation context.
+        
+        Args:
+            routing_decision: Original routing decision
+            query: Current query
+            context: Context including conversation history
+            
+        Returns:
+            Enhanced routing decision
+        """
+        follow_up_info = context.get('follow_up_info', {})
+        conversation_context = context.get('conversation_context', '')
+        
+        # Add conversation context to parameters
+        if 'parameters' not in routing_decision:
+            routing_decision['parameters'] = {}
+        
+        routing_decision['parameters']['has_conversation_context'] = bool(conversation_context)
+        routing_decision['parameters']['is_follow_up'] = follow_up_info.get('is_follow_up', False)
+        routing_decision['parameters']['follow_up_confidence'] = follow_up_info.get('confidence', 0.0)
+        
+        # If it's a follow-up question, check if we should maintain the same route type
+        if follow_up_info.get('is_follow_up') and follow_up_info.get('confidence', 0) > 0.7:
+            last_query_metadata = follow_up_info.get('context_info', {}).get('last_metadata', {})
+            
+            # If last query had similar classification, maintain consistency
+            if 'classification' in last_query_metadata:
+                last_classification = last_query_metadata['classification']
+                current_classification = routing_decision.get('classification', '')
+                
+                # For high-confidence follow-ups, bias towards same route type if appropriate
+                if current_classification != last_classification and follow_up_info.get('confidence', 0) > 0.8:
+                    routing_decision['parameters']['route_adjustment'] = 'follow_up_bias'
+                    routing_decision['parameters']['original_classification'] = current_classification
+                    routing_decision['parameters']['inherited_classification'] = last_classification
+        
+        return routing_decision
+    
+    def _adjust_scores_for_follow_up(self, vector_score: float, database_score: float, 
+                                   follow_up_info: Dict[str, Any]) -> Tuple[float, float]:
+        """
+        Adjust routing scores based on follow-up question context.
+        
+        Args:
+            vector_score: Original vector search score
+            database_score: Original database search score
+            follow_up_info: Follow-up detection information
+            
+        Returns:
+            Adjusted (vector_score, database_score)
+        """
+        if not follow_up_info.get('is_follow_up'):
+            return vector_score, database_score
+        
+        confidence = follow_up_info.get('confidence', 0.0)
+        context_info = follow_up_info.get('context_info', {})
+        last_metadata = context_info.get('last_metadata', {})
+        
+        # Boost scores based on last query's routing
+        if 'route_type' in last_metadata:
+            last_route = last_metadata['route_type']
+            
+            # Apply follow-up bias - slightly favor the same route type
+            bias_strength = confidence * 0.3  # Up to 30% boost
+            
+            if last_route == 'vector_search':
+                vector_score += bias_strength
+            elif last_route == 'database_search':
+                database_score += bias_strength
+            elif last_route in ['hybrid_search']:
+                # For hybrid, boost both slightly
+                vector_score += bias_strength * 0.5
+                database_score += bias_strength * 0.5
+        
+        return vector_score, database_score
     
     def _calculate_vector_score(self, query: str) -> float:
         """Calculate score for vector search relevance."""
@@ -176,5 +482,17 @@ class QueryRouter:
         return {
             'vector_keywords_count': len(self.vector_keywords),
             'database_keywords_count': len(self.database_keywords),
+            'llm_routing_enabled': self.use_llm_routing,
+            'groq_client_available': self.groq_client is not None,
             'config': self.config
         }
+    
+    def set_llm_routing(self, enabled: bool):
+        """Enable or disable LLM-based routing."""
+        if enabled and self.groq_client is None:
+            logger.warning("Cannot enable LLM routing: Groq client not available")
+            return False
+        
+        self.use_llm_routing = enabled
+        logger.info(f"LLM routing {'enabled' if enabled else 'disabled'}")
+        return True
