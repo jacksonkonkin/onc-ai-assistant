@@ -7,6 +7,12 @@ ENV/
 # Environment variables (contains sensitive API keys)
 .env
 
+<<<<<<< HEAD
+=======
+# ONC documents directory
+onc_documents/
+
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
 # Python cache
 __pycache__/
 *.pyc
@@ -32,6 +38,10 @@ logs/
 *.tmp
 *.temp
 
+<<<<<<< HEAD
 .claude
 
 Data-Engineering/
+=======
+.claude
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97

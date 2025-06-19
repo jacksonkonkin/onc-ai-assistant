@@ -15,6 +15,7 @@ export default function ChatPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const fetchAIResponse = async (prompt: string): Promise<string> => {
+<<<<<<< HEAD
     try {
       const response = await fetch(
         "https://onc-assistant-822f952329ee.herokuapp.com/query",
@@ -38,17 +39,26 @@ export default function ChatPage() {
       console.error("Error fetching AI response:", error);
       return "Sorry, something went wrong.";
     }
+=======
+    // TODO: Replace this with actual backend call when ready
+    await new Promise((r) => setTimeout(r, 5000)); // simulate delay
+    return "This is a placeholder response.";
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
   };
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { sender: "user", text: input };
+<<<<<<< HEAD
     setMessages((prev) => [
       ...prev,
       userMessage,
       { sender: "ai", text: "thinking" },
     ]);
+=======
+    setMessages((prev) => [...prev, userMessage, { sender: "ai", text: "thinking" }]);
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
     setInput("");
 
     const aiText = await fetchAIResponse(input);
@@ -106,9 +116,13 @@ export default function ChatPage() {
           {messages.map((msg, i) => (
             <div
               key={i}
+<<<<<<< HEAD
               className={`message ${
                 msg.sender === "user" ? "user-msg" : "ai-msg"
               }`}
+=======
+              className={`message ${msg.sender === "user" ? "user-msg" : "ai-msg"}`}
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
             >
               {renderMessageText(msg)}
             </div>

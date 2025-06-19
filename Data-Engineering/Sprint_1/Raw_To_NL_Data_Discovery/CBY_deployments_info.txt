@@ -1,0 +1,2010 @@
+Deployment for location code 'CBY':
+- Device Code: COASTGUARDAIS003160185
+- Device Category: AISRECEIVER
+- Start Time: 2016-10-01T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.1147, Longitude -105.0197
+- Depth: -1.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYDS':
+- Device Code: CANONPOWERSHOTG168406B001AA
+- Device Category: ROV_CAMERA
+- Start Time: 2014-09-01T00:00:00.000Z
+- End Time: 2014-09-30T00:00:00.000Z
+- Coordinates: Latitude 69.117115, Longitude -105.04964
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYDS':
+- Device Code: GARMINGPSMAP62ST211006242
+- Device Category: NAV
+- Start Time: 2015-08-14T00:00:00.000Z
+- End Time: 2015-09-01T00:00:00.000Z
+- Coordinates: Latitude 69.117115, Longitude -105.04964
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYDS':
+- Device Code: GOPROCAMERACHDHX302H38B09133F05D8
+- Device Category: ROV_CAMERA
+- Start Time: 2014-09-01T00:00:00.000Z
+- End Time: 2014-09-30T00:00:00.000Z
+- Coordinates: Latitude 69.117115, Longitude -105.04964
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYDS':
+- Device Code: SUUNTOZOOP32800551
+- Device Category: DIVE_COMPUTER
+- Start Time: 2015-08-14T00:00:00.000Z
+- End Time: 2015-09-01T00:00:00.000Z
+- Coordinates: Latitude 69.117115, Longitude -105.04964
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIJ.J1':
+- Device Code: ONCMJB010
+- Device Category: JB
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading 225.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIJ.J2':
+- Device Code: ONCMJB009
+- Device Category: JB
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading 225.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIJ.J2':
+- Device Code: ONCMJB033
+- Device Category: JB
+- Start Time: 2022-09-11T23:40:00.000Z
+- End Time: 2023-08-01T23:15:00.000Z
+- Coordinates: Latitude 69.112967, Longitude -105.064
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIJ.J2':
+- Device Code: ONCMJB033
+- Device Category: JB
+- Start Time: 2023-08-01T23:15:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.112967, Longitude -105.064
+- Depth: 8.0 meters
+- Orientation: Heading 215.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53019
+- Device Category: ICEPROFILER
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-26T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53029
+- Device Category: ICEPROFILER
+- Start Time: 2012-10-02T00:00:00.000Z
+- End Time: 2013-09-02T16:45:00.000Z
+- Coordinates: Latitude 69.11386, Longitude -105.06058
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53029
+- Device Category: ICEPROFILER
+- Start Time: 2013-09-03T02:18:00.000Z
+- End Time: 2014-09-16T21:37:00.000Z
+- Coordinates: Latitude 69.11376, Longitude -105.06077
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53029
+- Device Category: ICEPROFILER
+- Start Time: 2015-08-27T20:05:40.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53029
+- Device Category: ICEPROFILER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-04T00:00:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53029
+- Device Category: ICEPROFILER
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53038
+- Device Category: ICEPROFILER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53038
+- Device Category: ICEPROFILER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53038
+- Device Category: ICEPROFILER
+- Start Time: 2022-09-12T01:15:00.000Z
+- End Time: 2022-09-12T23:20:00.000Z
+- Coordinates: Latitude 69.112967, Longitude -105.063517
+- Depth: 7.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53038
+- Device Category: ICEPROFILER
+- Start Time: 2022-09-12T23:40:00.000Z
+- End Time: 2023-08-01T20:49:00.000Z
+- Coordinates: Latitude 69.112867, Longitude -105.0636
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53038
+- Device Category: ICEPROFILER
+- Start Time: 2023-08-01T21:42:00.000Z
+- End Time: 2024-08-29T17:27:00.000Z
+- Coordinates: Latitude 69.112917, Longitude -105.063433
+- Depth: 7.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ASLSWIP53038
+- Device Category: ICEPROFILER
+- Start Time: 2024-08-29T19:45:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.112917, Longitude -105.063433
+- Depth: 7.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: AXISCAMACCC8ED935D1
+- Device Category: VIDEOCAM
+- Start Time: 2022-09-12T23:40:00.000Z
+- End Time: 2023-08-01T20:49:00.000Z
+- Coordinates: Latitude 69.112867, Longitude -105.0636
+- Depth: 8.0 meters
+- Orientation: Heading 210.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: AXISCAMACCC8ED935D1
+- Device Category: VIDEOCAM
+- Start Time: 2023-08-01T21:42:00.000Z
+- End Time: 2024-08-29T17:27:00.000Z
+- Coordinates: Latitude 69.112917, Longitude -105.063433
+- Depth: 7.0 meters
+- Orientation: Heading 165.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: AXISCAMACCC8ED935D1
+- Device Category: VIDEOCAM
+- Start Time: 2024-08-29T19:45:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.112917, Longitude -105.063433
+- Depth: 7.0 meters
+- Orientation: Heading 140.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: AXISQ6035HD1089
+- Device Category: VIDEOCAM
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: AXISQ6035HD1089
+- Device Category: VIDEOCAM
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: AXISQ6035HD1089
+- Device Category: VIDEOCAM
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: BIOLIGHTSENSOR50115
+- Device Category: RADIOMETER
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: BIOLIGHTSENSOR50115
+- Device Category: RADIOMETER
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: BIOLIGHTSENSOR70434
+- Device Category: RADIOMETER
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-26T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: BIOLIGHTSENSOR70434
+- Device Category: RADIOMETER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1251
+- Device Category: HYDROPHONE
+- Start Time: 2019-08-01T02:12:00.000Z
+- End Time: 2021-09-14T22:02:00.000Z
+- Coordinates: Latitude 69.1126, Longitude -105.064633
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1252
+- Device Category: HYDROPHONE
+- Start Time: 2013-09-03T03:18:00.000Z
+- End Time: 2014-09-16T21:24:00.000Z
+- Coordinates: Latitude 69.1133, Longitude -105.06061
+- Depth: 7.6 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1252
+- Device Category: HYDROPHONE
+- Start Time: 2015-08-27T20:18:00.000Z
+- End Time: 2016-08-22T22:13:00.000Z
+- Coordinates: Latitude 69.112685, Longitude -105.064899
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1252
+- Device Category: HYDROPHONE
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-04T00:00:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1266
+- Device Category: HYDROPHONE
+- Start Time: 2017-09-14T23:30:00.000Z
+- End Time: 2018-07-23T17:56:00.000Z
+- Coordinates: Latitude 69.112496, Longitude -105.065322
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1266
+- Device Category: HYDROPHONE
+- Start Time: 2018-07-26T21:19:00.000Z
+- End Time: 2019-07-29T21:32:00.000Z
+- Coordinates: Latitude 69.11224, Longitude -105.06407
+- Depth: 15.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1288
+- Device Category: HYDROPHONE
+- Start Time: 2014-09-26T22:52:00.000Z
+- End Time: 2015-08-26T16:40:00.000Z
+- Coordinates: Latitude 69.11342, Longitude -105.06129
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1561
+- Device Category: HYDROPHONE
+- Start Time: 2021-09-15T17:21:00.000Z
+- End Time: 2022-09-10T20:35:00.000Z
+- Coordinates: Latitude 69.112583, Longitude -105.064717
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1561
+- Device Category: HYDROPHONE
+- Start Time: 2022-09-12T00:12:00.000Z
+- End Time: 2023-08-01T19:05:00.000Z
+- Coordinates: Latitude 69.11245, Longitude -105.063233
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1951
+- Device Category: HYDROPHONE
+- Start Time: 2023-08-03T21:37:00.000Z
+- End Time: 2024-08-29T22:29:00.000Z
+- Coordinates: Latitude 69.112468, Longitude -105.063225
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ICLISTENHF1951
+- Device Category: HYDROPHONE
+- Start Time: 2024-08-29T22:32:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.112468, Longitude -105.063225
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ISUSX0116
+- Device Category: NITRATESENSOR
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: MCLANEPHYTOPLANKTONSAMPLER1293501
+- Device Category: PLANKTONSAMPLER
+- Start Time: 2019-08-01T00:19:00.000Z
+- End Time: 2020-09-30T17:58:00.000Z
+- Coordinates: Latitude 69.1131, Longitude -105.06435
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: OCEANCAMOPT06FHDE9300861
+- Device Category: VIDEOCAM
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-26T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: OCEANCAMOPT06HDE9300860
+- Device Category: VIDEOCAM
+- Start Time: 2012-10-02T00:00:00.000Z
+- End Time: 2013-09-02T16:45:00.000Z
+- Coordinates: Latitude 69.11386, Longitude -105.06058
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: OCEANCAMOPT06HDE9300860
+- Device Category: VIDEOCAM
+- Start Time: 2013-09-03T02:18:00.000Z
+- End Time: 2014-09-16T21:37:00.000Z
+- Coordinates: Latitude 69.11376, Longitude -105.06077
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ONCLIGHTS05AND06
+- Device Category: CAMLIGHTS
+- Start Time: 2022-09-12T01:15:00.000Z
+- End Time: 2022-09-12T23:20:00.000Z
+- Coordinates: Latitude 69.112967, Longitude -105.063517
+- Depth: 7.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ONCLIGHTS05AND06
+- Device Category: CAMLIGHTS
+- Start Time: 2022-09-12T23:40:00.000Z
+- End Time: 2023-08-01T20:49:00.000Z
+- Coordinates: Latitude 69.112867, Longitude -105.0636
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ONCLIGHTS05AND06
+- Device Category: CAMLIGHTS
+- Start Time: 2023-08-01T21:42:00.000Z
+- End Time: 2024-08-29T17:27:00.000Z
+- Coordinates: Latitude 69.112917, Longitude -105.063433
+- Depth: 7.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: PHSENSOR246
+- Device Category: PHSENSOR
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: PHSENSOR246
+- Device Category: PHSENSOR
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: PHSENSOR452
+- Device Category: PHSENSOR
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: RDIADCP1200WH9111
+- Device Category: ADCP1200KHZ
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-04T00:00:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 60.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: RDIADCP1200WH9111
+- Device Category: ADCP1200KHZ
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading 176.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: ROSLIGHTS21251SN21267
+- Device Category: CAMLIGHTS
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-25T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63630108
+- Device Category: OXYSENSOR
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63630225
+- Device Category: OXYSENSOR
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63630834
+- Device Category: OXYSENSOR
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-26T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63630834
+- Device Category: OXYSENSOR
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63630834
+- Device Category: OXYSENSOR
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63631008
+- Device Category: OXYSENSOR
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63631008
+- Device Category: OXYSENSOR
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63631500
+- Device Category: OXYSENSOR
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:15:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63631500
+- Device Category: OXYSENSOR
+- Start Time: 2023-08-01T20:38:00.000Z
+- End Time: 2023-08-02T20:05:00.000Z
+- Coordinates: Latitude 69.112933, Longitude -105.064317
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBE63631500
+- Device Category: OXYSENSOR
+- Start Time: 2023-08-02T20:34:00.000Z
+- End Time: 2024-08-29T15:11:00.000Z
+- Coordinates: Latitude 69.113006, Longitude -105.064497
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7036
+- Device Category: CTD
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7128
+- Device Category: CTD
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7518
+- Device Category: CTD
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-26T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7518
+- Device Category: CTD
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7518
+- Device Category: CTD
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7589
+- Device Category: CTD
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7589
+- Device Category: CTD
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7769
+- Device Category: CTD
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:15:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7769
+- Device Category: CTD
+- Start Time: 2023-08-01T20:38:00.000Z
+- End Time: 2023-08-02T20:05:00.000Z
+- Coordinates: Latitude 69.112933, Longitude -105.064317
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SBECTD19p7769
+- Device Category: CTD
+- Start Time: 2023-08-02T20:34:00.000Z
+- End Time: 2024-08-29T15:11:00.000Z
+- Coordinates: Latitude 69.113006, Longitude -105.064497
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: SUNSAMIpHP0073
+- Device Category: PHSENSOR
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450094
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2013-09-03T03:13:00.000Z
+- End Time: 2014-09-16T21:27:00.000Z
+- Coordinates: Latitude 69.11337, Longitude -105.06059
+- Depth: 7.6 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450094
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2014-09-26T22:45:00.000Z
+- End Time: 2015-08-26T16:42:00.000Z
+- Coordinates: Latitude 69.11343, Longitude -105.06098
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450094
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450094
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450094
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450150
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2015-08-27T20:18:00.000Z
+- End Time: 2016-08-22T22:13:00.000Z
+- Coordinates: Latitude 69.112685, Longitude -105.064899
+- Depth: 13.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2C450150
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T16:50:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: VEMCOVR2W112529
+- Device Category: ACOUSTICRECEIVER
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:10:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOFLRT6106
+- Device Category: FLUOROMETER
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:15:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOFLRT6106
+- Device Category: FLUOROMETER
+- Start Time: 2023-08-01T20:38:00.000Z
+- End Time: 2023-08-02T20:05:00.000Z
+- Coordinates: Latitude 69.112933, Longitude -105.064317
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOFLRT6106
+- Device Category: FLUOROMETER
+- Start Time: 2023-08-02T20:34:00.000Z
+- End Time: 2024-08-29T15:11:00.000Z
+- Coordinates: Latitude 69.113006, Longitude -105.064497
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOPARS440
+- Device Category: RADIOMETER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOPARS459
+- Device Category: RADIOMETER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOPARS459
+- Device Category: RADIOMETER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOPARS459
+- Device Category: RADIOMETER
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:10:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOPARS459
+- Device Category: RADIOMETER
+- Start Time: 2023-08-01T20:38:00.000Z
+- End Time: 2023-08-02T20:05:00.000Z
+- Coordinates: Latitude 69.112933, Longitude -105.064317
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSECOPARS459
+- Device Category: RADIOMETER
+- Start Time: 2023-08-02T20:34:00.000Z
+- End Time: 2024-08-29T15:11:00.000Z
+- Coordinates: Latitude 69.113006, Longitude -105.064497
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTU2586
+- Device Category: FLNTU
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTUS3441
+- Device Category: FLNTU
+- Start Time: 2014-09-26T22:36:00.000Z
+- End Time: 2015-08-26T16:50:00.000Z
+- Coordinates: Latitude 69.1137, Longitude -105.06082
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTUS3441
+- Device Category: FLNTU
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTUS3923
+- Device Category: FLNTU
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTUS3923
+- Device Category: FLNTU
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTUS3923
+- Device Category: FLNTU
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSFLNTUS3923
+- Device Category: FLNTU
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSWQM196
+- Device Category: WETLABS_WQM
+- Start Time: 2013-09-03T02:18:00.000Z
+- End Time: 2014-09-16T21:37:00.000Z
+- Coordinates: Latitude 69.11376, Longitude -105.06077
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WETLABSWQM233
+- Device Category: WETLABS_WQM
+- Start Time: 2012-10-02T00:00:00.000Z
+- End Time: 2013-09-02T16:45:00.000Z
+- Coordinates: Latitude 69.11386, Longitude -105.06058
+- Depth: 6.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WLNTUS319
+- Device Category: TURBIDITYMETER
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:15:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WLNTUS319
+- Device Category: TURBIDITYMETER
+- Start Time: 2023-08-01T20:38:00.000Z
+- End Time: 2023-08-02T20:05:00.000Z
+- Coordinates: Latitude 69.112933, Longitude -105.064317
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: WLNTUS319
+- Device Category: TURBIDITYMETER
+- Start Time: 2023-08-02T20:34:00.000Z
+- End Time: 2024-08-29T15:11:00.000Z
+- Coordinates: Latitude 69.113006, Longitude -105.064497
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: XWING-HDWebcam1088
+- Device Category: VIDEOCAM
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP':
+- Device Code: XWING-HDWebcam1088
+- Device Category: VIDEOCAM
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T16:50:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-35-250-75
+- Device Category: CO2SENSOR
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-35-250-75
+- Device Category: CO2SENSOR
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-35-250-75
+- Device Category: CO2SENSOR
+- Start Time: 2023-08-01T20:38:00.000Z
+- End Time: 2023-08-02T20:05:00.000Z
+- Coordinates: Latitude 69.112933, Longitude -105.064317
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-35-250-75
+- Device Category: CO2SENSOR
+- Start Time: 2023-08-02T20:34:00.000Z
+- End Time: 2024-08-29T15:11:00.000Z
+- Coordinates: Latitude 69.113006, Longitude -105.064497
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-36-314-75
+- Device Category: CO2SENSOR
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-36-314-75
+- Device Category: CO2SENSOR
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-36-314-75
+- Device Category: CO2SENSOR
+- Start Time: 2021-09-15T17:21:00.000Z
+- End Time: 2022-09-10T21:41:00.000Z
+- Coordinates: Latitude 69.113, Longitude -105.06385
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-36-314-75
+- Device Category: CO2SENSOR
+- Start Time: 2022-09-12T00:41:00.000Z
+- End Time: 2023-08-01T20:10:00.000Z
+- Coordinates: Latitude 69.11295, Longitude -105.064517
+- Depth: 10.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D1':
+- Device Code: PROCO2-36-314-75
+- Device Category: CO2SENSOR
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D2':
+- Device Code: AANDERAA4797PCO2OPTODE33
+- Device Category: CO2SENSOR
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D3':
+- Device Code: PROCO2-35-250-75
+- Device Category: CO2SENSOR
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D4':
+- Device Code: AandOpt4531A171
+- Device Category: OXYSENSOR
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.D4':
+- Device Code: AMLMETRECX50147
+- Device Category: CTD
+- Start Time: 2024-08-29T17:11:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.113, Longitude -105.0645
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K1':
+- Device Code: ROSLIGHTS66026
+- Device Category: CAMLIGHTS
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-04T00:00:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K1':
+- Device Code: ROSLIGHTS66026
+- Device Category: CAMLIGHTS
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K1':
+- Device Code: ROSLIGHTS66026
+- Device Category: CAMLIGHTS
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K1':
+- Device Code: ROSLIGHTS66028
+- Device Category: CAMLIGHTS
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K2':
+- Device Code: ROSLIGHTS66028
+- Device Category: CAMLIGHTS
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-04T00:00:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K2':
+- Device Code: ROSLIGHTS66028
+- Device Category: CAMLIGHTS
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K2':
+- Device Code: ROSLIGHTS66028
+- Device Category: CAMLIGHTS
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K2':
+- Device Code: ROSLIGHTS66029
+- Device Category: CAMLIGHTS
+- Start Time: 2019-07-31T23:56:00.000Z
+- End Time: 2022-09-10T22:35:00.000Z
+- Coordinates: Latitude 69.113183, Longitude -105.0644
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K3':
+- Device Code: ROSLIGHTS66029
+- Device Category: CAMLIGHTS
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-04T00:00:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K3':
+- Device Code: ROSLIGHTS66029
+- Device Category: CAMLIGHTS
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIP.K3':
+- Device Code: ROSLIGHTS66029
+- Device Category: CAMLIGHTS
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: HONEYWELLHMR3300ORIENTATION31963
+- Device Category: ORIENTATION
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: HONEYWELLHMR3300ORIENTATION31963
+- Device Category: ORIENTATION
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: HONEYWELLHMR3300ORIENTATION31963
+- Device Category: ORIENTATION
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading 176.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: HONEYWELLHMR3300ORIENTATION31963
+- Device Category: ORIENTATION
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: OMEGAIBTHX15120257
+- Device Category: INTERNAL_DEVICE_MONITOR
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: OMEGAIBTHX15120257
+- Device Category: INTERNAL_DEVICE_MONITOR
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: OMEGAIBTHX15120257
+- Device Category: INTERNAL_DEVICE_MONITOR
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU':
+- Device Code: OMEGAIBTHX15120257
+- Device Category: INTERNAL_DEVICE_MONITOR
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC1':
+- Device Code: iORELAYTADFC1007725
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC1':
+- Device Code: iORELAYTADFC1007725
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC1':
+- Device Code: iORELAYTADFC1007725
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC1':
+- Device Code: iORELAYTADFC1007725
+- Device Category: ADAPTER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC2':
+- Device Code: iORELAYTABLC1067517
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC2':
+- Device Code: iORELAYTABLC1067517
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC2':
+- Device Code: iORELAYTABLC1067517
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC2':
+- Device Code: iORELAYTABLC1067517
+- Device Category: ADAPTER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC3':
+- Device Code: iORELAYTABLC1067345
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC3':
+- Device Code: iORELAYTABLC1067345
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC3':
+- Device Code: iORELAYTABLC1067345
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC3':
+- Device Code: iORELAYTABLC1067345
+- Device Category: ADAPTER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC4':
+- Device Code: iORELAYTADFC1007805
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC4':
+- Device Code: iORELAYTADFC1007805
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC4':
+- Device Code: iORELAYTADFC1007805
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC4':
+- Device Code: iORELAYTADFC1007805
+- Device Category: ADAPTER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC5':
+- Device Code: iORELAYTABLC1067321
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-24T03:21:00.000Z
+- Coordinates: Latitude 69.113062, Longitude -105.06416
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC5':
+- Device Code: iORELAYTABLC1067321
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-02T17:02:00.000Z
+- Coordinates: Latitude 69.113117, Longitude -105.064083
+- Depth: 9.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC5':
+- Device Code: iORELAYTABLC1067321
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T23:22:00.000Z
+- End Time: 2018-07-24T22:06:00.000Z
+- Coordinates: Latitude 69.1129, Longitude -105.06403
+- Depth: 9.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYIU.AC5':
+- Device Code: iORELAYTABLC1067321
+- Device Category: ADAPTER
+- Start Time: 2018-07-26T20:58:00.000Z
+- End Time: 2019-07-29T23:00:00.000Z
+- Coordinates: Latitude 69.11289, Longitude -105.06391
+- Depth: 8.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSP':
+- Device Code: SRSLSIMBA1516027
+- Device Category: ICE_BUOY
+- Start Time: 2016-02-19T00:00:00.000Z
+- End Time: 2016-05-14T18:02:12.000Z
+- Coordinates: Latitude 69.121226, Longitude -105.045706
+- Depth: 5.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSP':
+- Device Code: SRSLSIMBA1516027
+- Device Category: ICE_BUOY
+- Start Time: 2017-02-02T23:00:00.000Z
+- End Time: 2017-06-28T22:00:00.000Z
+- Coordinates: Latitude 69.107556, Longitude -105.059667
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSP':
+- Device Code: SRSLSIMBA1516027
+- Device Category: ICE_BUOY
+- Start Time: 2017-11-01T00:00:00.000Z
+- End Time: 2018-06-29T20:30:00.000Z
+- Coordinates: Latitude 69.107567, Longitude -105.0597
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSP':
+- Device Code: SRSLSIMBACAN0201
+- Device Category: ICE_BUOY
+- Start Time: 2018-11-15T16:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.098783, Longitude -105.116183
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS':
+- Device Code: AXISCAM00408CC1C89C
+- Device Category: VIDEOCAM
+- Start Time: 2012-10-02T00:00:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS':
+- Device Code: AXISCAM00408CC1C89C
+- Device Category: VIDEOCAM
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading 229.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS':
+- Device Code: DIGITALYACHTAISNET1315-0006-01
+- Device Category: AISRECEIVER
+- Start Time: 2013-08-29T19:35:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.11764, Longitude -105.05327
+- Depth: -25.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS':
+- Device Code: VAISALAPTB210J3120006
+- Device Category: BARPRESS
+- Start Time: 2013-08-30T18:35:00.000Z
+- End Time: 2017-09-15T21:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS.M1':
+- Device Code: DAVIS6162CA111110P024
+- Device Category: METSTN
+- Start Time: 2012-10-02T00:00:00.000Z
+- End Time: 2013-08-28T00:30:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS.M1':
+- Device Code: DAVIS6162CA111110P024
+- Device Category: METSTN
+- Start Time: 2013-09-03T02:18:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS.M1':
+- Device Code: DAVIS6162CA111110P024
+- Device Category: METSTN
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: 2019-07-29T22:17:22.000Z
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS.M2':
+- Device Code: LUFFTWS501-07209121009031
+- Device Category: METSTN
+- Start Time: 2013-08-29T19:55:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSS.M2':
+- Device Code: LUFFTWS501-07209121009031
+- Device Category: METSTN
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading 0.0, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU':
+- Device Code: OMEGAIBTHX15110684
+- Device Category: INTERNAL_DEVICE_MONITOR
+- Start Time: 2016-08-25T22:24:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU':
+- Device Code: OMEGAIBTHX15110684
+- Device Category: INTERNAL_DEVICE_MONITOR
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU':
+- Device Code: TDKLAMBDA15D5095AA
+- Device Category: POWER_SUPPLY
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-23T12:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU':
+- Device Code: TDKLAMBDA15D5095AA
+- Device Category: POWER_SUPPLY
+- Start Time: 2016-08-25T19:00:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU':
+- Device Code: TDKLAMBDA15D5095AA
+- Device Category: POWER_SUPPLY
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU.AC1':
+- Device Code: iORELAYTABHC1037724
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-23T12:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU.AC1':
+- Device Code: iORELAYTABHC1037724
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T19:00:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU.AC1':
+- Device Code: iORELAYTABHC1037724
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU.AC2':
+- Device Code: iORELAYTADFC1007695
+- Device Category: ADAPTER
+- Start Time: 2015-08-27T20:05:00.000Z
+- End Time: 2016-08-23T12:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU.AC2':
+- Device Code: iORELAYTADFC1007695
+- Device Category: ADAPTER
+- Start Time: 2016-08-25T19:00:00.000Z
+- End Time: 2017-09-14T00:00:00.000Z
+- Coordinates: Latitude 69.11392, Longitude -105.0596
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CBYSU.AC2':
+- Device Code: iORELAYTADFC1007695
+- Device Category: ADAPTER
+- Start Time: 2017-09-14T00:00:00.000Z
+- End Time: N/A
+- Coordinates: Latitude 69.114233, Longitude -105.058967
+- Depth: 0.0 meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: ALECRINKO0408
+- Device Category: OXYSENSOR
+- Start Time: 2021-09-14T16:23:42.920Z
+- End Time: 2021-09-14T16:25:03.140Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: AML6LGRA60156
+- Device Category: CTD
+- Start Time: 2024-08-29T16:05:17.400Z
+- End Time: 2024-08-29T16:05:35.220Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: AML6LGRA60156
+- Device Category: CTD
+- Start Time: 2024-08-29T16:08:22.040Z
+- End Time: 2024-08-29T16:08:39.560Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: AMLPLUSX50334
+- Device Category: CTD
+- Start Time: 2021-09-14T16:23:42.920Z
+- End Time: 2021-09-14T16:25:03.140Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: JFERINKOFT0FNR014
+- Device Category: OXYSENSOR
+- Start Time: 2024-08-29T16:05:17.400Z
+- End Time: 2024-08-29T16:05:35.220Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: JFERINKOFT0FNR014
+- Device Category: OXYSENSOR
+- Start Time: 2024-08-29T16:08:22.040Z
+- End Time: 2024-08-29T16:08:39.560Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: SAMSUNGGALAXYTABActive3R52TA09CYBL
+- Device Category: NAV
+- Start Time: 2024-08-29T16:05:17.400Z
+- End Time: 2024-08-29T16:05:35.220Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: SAMSUNGGALAXYTABActive3R52TA09CYBL
+- Device Category: NAV
+- Start Time: 2024-08-29T16:08:22.040Z
+- End Time: 2024-08-29T16:08:39.560Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7-900178
+- Device Category: FLUOROMETER
+- Start Time: 2021-09-14T16:23:42.920Z
+- End Time: 2021-09-14T16:25:03.140Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7-900184
+- Device Category: CDOM
+- Start Time: 2021-09-14T16:23:42.920Z
+- End Time: 2021-09-14T16:25:03.140Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7F-900362
+- Device Category: TURBIDITYMETER
+- Start Time: 2024-08-29T16:05:17.400Z
+- End Time: 2024-08-29T16:05:35.220Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7F-900362
+- Device Category: TURBIDITYMETER
+- Start Time: 2024-08-29T16:08:22.040Z
+- End Time: 2024-08-29T16:08:39.560Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7F-900436
+- Device Category: FLUOROMETER
+- Start Time: 2024-08-29T16:05:17.400Z
+- End Time: 2024-08-29T16:05:35.220Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7F-900436
+- Device Category: FLUOROMETER
+- Start Time: 2024-08-29T16:08:22.040Z
+- End Time: 2024-08-29T16:08:39.560Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7F-900473
+- Device Category: CDOM
+- Start Time: 2024-08-29T16:05:17.400Z
+- End Time: 2024-08-29T16:05:35.220Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: TURNERCYCLOPS7F-900473
+- Device Category: CDOM
+- Start Time: 2024-08-29T16:08:22.040Z
+- End Time: 2024-08-29T16:08:39.560Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+
+Deployment for location code 'CF240':
+- Device Code: XSLATED10SY9560FS00043
+- Device Category: NAV
+- Start Time: 2021-09-14T16:23:42.920Z
+- End Time: 2021-09-14T16:25:03.140Z
+- Coordinates: Latitude 69.113383, Longitude -105.0644
+- Depth: N/A meters
+- Orientation: Heading N/A, Pitch N/A, Roll N/A
+- Device Data Available: Yes
+

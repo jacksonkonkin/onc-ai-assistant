@@ -13,7 +13,10 @@ from ..vector_database import VectorStoreManager, EmbeddingManager
 from ..query_routing import QueryRouter
 from ..database_search import OceanQuerySystem
 from ..rag_engine import RAGEngine, LLMWrapper
+<<<<<<< HEAD
 from ..conversation import ConversationManager
+=======
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +47,10 @@ class ONCPipeline:
         self.ocean_query_system = None
         self.llm_wrapper = None
         self.rag_engine = None
+<<<<<<< HEAD
         self.conversation_manager = None
+=======
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         
         # State tracking
         self.is_setup = False
@@ -168,6 +174,7 @@ class ONCPipeline:
     def _setup_additional_components(self):
         """Setup query routing and database components."""
         # Query router
+<<<<<<< HEAD
         routing_config = self.config_manager.get('query_routing', {})
         self.query_router = QueryRouter(routing_config)
         
@@ -190,6 +197,13 @@ class ONCPipeline:
             max_history_length=max_history,
             context_window_minutes=context_window
         )
+=======
+        routing_config = self.config_manager.get('routing', {})
+        self.query_router = QueryRouter(routing_config)
+        
+        # Ocean Query System
+        self.ocean_query_system = OceanQuerySystem()
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         
         # Setup RAG engine modes
         if self.vector_store_ready:
@@ -216,6 +230,7 @@ class ONCPipeline:
         try:
             logger.info(f"Processing query: {question[:100]}...")
             
+<<<<<<< HEAD
             # Get conversation context and detect follow-ups
             conversation_context = ""
             follow_up_info = {}
@@ -239,11 +254,19 @@ class ONCPipeline:
                 'has_database': self.ocean_query_system is not None,
                 'conversation_context': conversation_context,
                 'follow_up_info': follow_up_info
+=======
+            # Route the query
+            routing_context = context or {}
+            routing_context.update({
+                'has_vector_store': self.vector_store_ready,
+                'has_database': self.ocean_query_system is not None
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
             })
             
             routing_decision = self.query_router.route_query(question, routing_context)
             query_type = routing_decision['type']
             
+<<<<<<< HEAD
             # Process based on routing decision with conversation context
             if query_type.value == 'vector_search':
                 response = self._process_vector_query(question, conversation_context)
@@ -265,19 +288,38 @@ class ONCPipeline:
                 self.conversation_manager.add_assistant_message(response, response_metadata)
             
             return response
+=======
+            # Process based on routing decision
+            if query_type.value == 'vector_search':
+                return self._process_vector_query(question)
+            elif query_type.value == 'database_search':
+                return self._process_database_query(question, routing_decision.get('parameters', {}))
+            elif query_type.value == 'hybrid_search':
+                return self._process_hybrid_query(question, routing_decision.get('parameters', {}))
+            else:  # direct_llm
+                return self._process_direct_query(question)
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
                 
         except Exception as e:
             logger.error(f"Error processing query: {e}")
             return f"Sorry, I encountered an error processing your question: {str(e)}"
     
+<<<<<<< HEAD
     def _process_vector_query(self, question: str, conversation_context: str = "") -> str:
         """Process query using vector search."""
         if not self.vector_store_ready:
             return self._process_direct_query(question, conversation_context)
+=======
+    def _process_vector_query(self, question: str) -> str:
+        """Process query using vector search."""
+        if not self.vector_store_ready:
+            return self._process_direct_query(question)
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         
         # Retrieve documents
         documents = self.vector_store_manager.retrieve_documents(question)
         
+<<<<<<< HEAD
         # Generate response with conversation context
         return self.rag_engine.process_rag_query(question, documents, conversation_context)
     
@@ -285,12 +327,22 @@ class ONCPipeline:
         """Process query using database search."""
         if not self.ocean_query_system:
             return self._process_direct_query(question, conversation_context)
+=======
+        # Generate response
+        return self.rag_engine.process_rag_query(question, documents)
+    
+    def _process_database_query(self, question: str, parameters: Dict[str, Any]) -> str:
+        """Process query using database search."""
+        if not self.ocean_query_system:
+            return self._process_direct_query(question)
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         
         try:
             # Use the ocean query system to process the question
             result = self.ocean_query_system.process_query(question)
             
             if result["status"] == "success":
+<<<<<<< HEAD
                 # Use enhanced formatting with conversation context
                 formatted_response = self.ocean_query_system.format_enhanced_response(result, conversation_context)
                 return formatted_response
@@ -307,6 +359,24 @@ class ONCPipeline:
             return self._process_direct_query(question, conversation_context)
     
     def _process_hybrid_query(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> str:
+=======
+                # Format the ocean data response for the user
+                formatted_response = self.ocean_query_system.format_response_for_display(result)
+                return formatted_response
+            elif result["status"] == "no_data":
+                # Return helpful message about no data found
+                return self.ocean_query_system.format_response_for_display(result)
+            else:
+                # On error, fall back to direct query
+                logger.warning(f"Ocean query failed: {result.get('message', 'Unknown error')}")
+                return self._process_direct_query(question)
+                
+        except Exception as e:
+            logger.error(f"Error in database query: {e}")
+            return self._process_direct_query(question)
+    
+    def _process_hybrid_query(self, question: str, parameters: Dict[str, Any]) -> str:
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         """Process query using both vector and database search."""
         vector_docs = []
         database_results = []
@@ -322,10 +392,17 @@ class ONCPipeline:
                 db_result = self.ocean_query_system.process_query(question)
                 if db_result["status"] == "success":
                     database_results = db_result["data"]
+<<<<<<< HEAD
                     # Get the enhanced formatted response from ocean query system
                     ocean_response = self.ocean_query_system.format_enhanced_response(db_result, conversation_context)
                 elif db_result["status"] == "no_data":
                     ocean_response = self.ocean_query_system.format_enhanced_response(db_result, conversation_context)
+=======
+                    # Get the nicely formatted response from ocean query system
+                    ocean_response = self.ocean_query_system.format_response_for_display(db_result)
+                elif db_result["status"] == "no_data":
+                    ocean_response = self.ocean_query_system.format_response_for_display(db_result)
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
             except Exception as e:
                 logger.warning(f"Database query failed in hybrid mode: {e}")
         
@@ -334,6 +411,7 @@ class ONCPipeline:
             # If we got ocean data, prioritize that over hybrid processing
             return ocean_response
         elif vector_docs:
+<<<<<<< HEAD
             return self.rag_engine.process_rag_query(question, vector_docs, conversation_context)
         else:
             return self._process_direct_query(question, conversation_context)
@@ -341,6 +419,15 @@ class ONCPipeline:
     def _process_direct_query(self, question: str, conversation_context: str = "") -> str:
         """Process query using direct LLM."""
         return self.rag_engine.process_direct_query(question, conversation_context)
+=======
+            return self.rag_engine.process_rag_query(question, vector_docs)
+        else:
+            return self._process_direct_query(question)
+    
+    def _process_direct_query(self, question: str) -> str:
+        """Process query using direct LLM."""
+        return self.rag_engine.process_direct_query(question)
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
     
     def add_documents(self, file_paths: List[str]) -> bool:
         """
@@ -379,6 +466,7 @@ class ONCPipeline:
             logger.error(f"Error adding documents: {e}")
             return False
     
+<<<<<<< HEAD
     def get_conversation_summary(self) -> Dict[str, Any]:
         """Get summary of current conversation state."""
         if self.conversation_manager:
@@ -405,6 +493,8 @@ class ONCPipeline:
             return self.conversation_manager.load_conversation(filepath)
         return False
     
+=======
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
     def get_pipeline_status(self) -> Dict[str, Any]:
         """Get comprehensive pipeline status."""
         return {
@@ -438,11 +528,15 @@ class ONCPipeline:
         
         print("-"*70)
         print("Ask about Ocean Networks Canada data and instruments")
+<<<<<<< HEAD
         print("Commands: 'quit' to exit, 'clear' to clear conversation, 'status' for conversation summary")
         if self.conversation_manager:
             print("💬 Conversation memory: ENABLED - Follow-up questions supported!")
         else:
             print("⚠️  Conversation memory: DISABLED")
+=======
+        print("Type 'quit' to exit")
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
         print("="*70 + "\n")
         
         question_count = 0
@@ -455,6 +549,7 @@ class ONCPipeline:
                     print(f"\nThank you for using the ONC Assistant!")
                     if question_count > 0:
                         print(f"You asked {question_count} question{'s' if question_count != 1 else ''}.")
+<<<<<<< HEAD
                     
                     # Show conversation summary if available
                     if self.conversation_manager and question_count > 0:
@@ -493,6 +588,11 @@ class ONCPipeline:
                     if follow_up_info.get('is_follow_up') and follow_up_info.get('confidence', 0) > 0.6:
                         print("🔗 Follow-up question detected - using conversation context...")
                 
+=======
+                    break
+                
+                question_count += 1
+>>>>>>> 3ca2139892ffff115835c33cfed72df2ba532b97
                 print("Processing query...", end='', flush=True)
                 
                 answer = self.query(question)

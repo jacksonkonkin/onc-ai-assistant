@@ -1,0 +1,1670 @@
+
+=== Location Code: CBY ===
+Error retrieving properties for location CBY: 404 Client Error:  for url: https://data.oceannetworks.ca/api/properties?locationCode=CBY&method=get&token=45b4e105-43ed-411e-bd1b-1d2799eda3c4
+
+
+=== Location Code: CBYDS ===
+
+Property #1:
+Name: Depth
+Description: Depth
+Property Code: depth
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #2:
+Name: Latitude
+Description: Latitude: in degrees
+Property Code: latitude
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #3:
+Name: Longitude
+Description: Longitude: in degrees
+Property Code: longitude
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #4:
+Name: Sea Water Temperature
+Description: Temperature: sea water
+Property Code: seawatertemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+========================================
+
+=== Location Code: CBYIJ.J1 ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Electrical Resistance
+Description: Electrical Resistance
+Property Code: electricalresistance
+Unit of Measure: ohm
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UOHM/).
+
+Property #3:
+Name: Ground Fault
+Description: Ground Fault
+Property Code: groundfault
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #4:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Status Code
+Description: Status Code
+Property Code: statuscode
+Unit of Measure: NA
+Has Device Data: Yes
+Has Property Data: No
+
+Property #6:
+Name: Voltage
+Description: Voltage: voltage sensor
+Property Code: voltage
+Unit of Measure: V
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVLT/).
+
+========================================
+
+=== Location Code: CBYIJ.J2 ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Electrical Resistance
+Description: Electrical Resistance
+Property Code: electricalresistance
+Unit of Measure: ohm
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UOHM/).
+
+Property #3:
+Name: Ground Fault
+Description: Ground Fault
+Property Code: groundfault
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #4:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Status Code
+Description: Status Code
+Property Code: statuscode
+Unit of Measure: NA
+Has Device Data: Yes
+Has Property Data: No
+
+Property #6:
+Name: Voltage
+Description: Voltage: voltage sensor
+Property Code: voltage
+Unit of Measure: V
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVLT/).
+
+========================================
+
+=== Location Code: CBYIP ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Battery Charge
+Description: Battery Charge
+Property Code: batterycharge
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #3:
+Name: Camera Light
+Description: Camera Light
+Property Code: cameralight
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #4:
+Name: Camera Pan
+Description: Camera Pan
+Property Code: camerapan
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #5:
+Name: Camera Tilt
+Description: Camera Tilt
+Property Code: cameratilt
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #6:
+Name: Chlorophyll
+Description: Chlorophyll
+Property Code: chlorophyll
+Unit of Measure: ug/l
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UGPL/).
+
+Property #7:
+Name: CO2 Concentration Linearized
+Description: Concentration: carbon dioxide, linearized
+Property Code: co2concentrationlinearized
+Unit of Measure: umol/mol
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMPM/).
+
+Property #8:
+Name: CO2 Partial Pressure
+Description: Pressure: carbon dioxide, partial pressure
+Property Code: co2partialpressure
+Unit of Measure: pCO2 uatm
+Has Device Data: No
+Has Property Data: Yes
+
+Property #9:
+Name: Conductivity
+Description: Conductivity: siemens per metre
+Property Code: conductivity
+Unit of Measure: S/m
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UECA/).
+
+Property #10:
+Name: Density
+Description: Density
+Property Code: density
+Unit of Measure: kg/m3
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #11:
+Name: Depth
+Description: Depth
+Property Code: depth
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #12:
+Name: Electric Charge
+Description: Electric Charge
+Property Code: electriccharge
+Unit of Measure: mAh
+Has Device Data: Yes
+Has Property Data: No
+
+Property #13:
+Name: Engineering Count
+Description: Count: engineering data
+Property Code: engineeringcount
+Unit of Measure: Count
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UCNT/).
+
+Property #14:
+Name: Focus
+Description: Focus
+Property Code: focus
+Unit of Measure: Count
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UCNT/).
+
+Property #15:
+Name: Gas Saturation
+Description: Saturation: of gas
+Property Code: gassaturation
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #16:
+Name: GPS Interval Time of Week
+Description: Time: GPS interval time of week
+Property Code: gpsintervaltimeofweek
+Unit of Measure: s
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UTBB/).
+
+Property #17:
+Name: Gregorian Time
+Description: Time: Gregorian days since 19700101T000000Z
+Property Code: gregoriantime
+Unit of Measure: Gregorian days since 19700101T000000Z
+Has Device Data: Yes
+Has Property Data: No
+
+Property #18:
+Name: Ice Draft
+Description: Ice Draft
+Property Code: icedraft
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #19:
+Name: Internal Humidity
+Description: Humidity: internal to calibrate instrument
+Property Code: internalhumidity
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #20:
+Name: Internal pH
+Description: pH: internal or reference pH
+Property Code: internalph
+Unit of Measure: pH
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UUPH/).
+
+Property #21:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #22:
+Name: Magnetic Heading
+Description: Magnetic Heading
+Property Code: magneticheading
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #23:
+Name: Magnetometer
+Description: Magnetic flux density
+Property Code: magnetometer
+Unit of Measure: uT
+Has Device Data: Yes
+Has Property Data: No
+
+Property #24:
+Name: Micro-g Acceleration
+Description: Acceleration: micro-g
+Property Code: microgacceleration
+Unit of Measure: ug
+Has Device Data: Yes
+Has Property Data: No
+
+Property #25:
+Name: Nitrate Concentration
+Description: Concentration: nitrate
+Property Code: nitrateconcentration
+Unit of Measure: umol/l
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPOX/).
+
+Property #26:
+Name: Oxygen
+Description: Oxygen: optode sensor
+Property Code: oxygen
+Unit of Measure: ml/l
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMLL/).
+
+Property #27:
+Name: PAR Photon-based
+Description: Radiation: par, photon
+Property Code: parphotonbased
+Unit of Measure: umol / m^2 s
+Has Device Data: Yes
+Has Property Data: Yes
+
+Property #28:
+Name: pH
+Description: pH
+Property Code: ph
+Unit of Measure: pH
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UUPH/).
+
+Property #29:
+Name: Ping Time
+Description: Ping time to target
+Property Code: pingtime
+Unit of Measure: ms
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMSC/).
+
+Property #30:
+Name: Pitch
+Description: Pitch
+Property Code: pitch
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #31:
+Name: Pressure
+Description: Pressure
+Property Code: pressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #32:
+Name: Resevoir Volume
+Description: Reservoir Volume
+Property Code: resevoirvolume
+Unit of Measure: ml
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/VVML/).
+
+Property #33:
+Name: Roll
+Description: Roll
+Property Code: roll
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #34:
+Name: Runtime Sensor
+Description: Runtime Sensor
+Property Code: runtimesensor
+Unit of Measure: s
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UTBB/).
+
+Property #35:
+Name: Salinity
+Description: Salinity
+Property Code: salinity
+Unit of Measure: psu
+Has Device Data: Yes
+Has Property Data: Yes
+
+Property #36:
+Name: Sea Water Temperature
+Description: Temperature: sea water
+Property Code: seawatertemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #37:
+Name: Sigma-t
+Description: Sigma-t
+Property Code: sigmat
+Unit of Measure: kg/m3
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #38:
+Name: Sigma-theta
+Description: Sigma-theta
+Property Code: sigmatheta
+Unit of Measure: kg/m3
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #39:
+Name: Sound Pressure Level
+Description: Sound Pressure Level
+Property Code: soundpressurelevel
+Unit of Measure: Uncalibrated Amplitude
+Has Device Data: Yes
+Has Property Data: No
+
+Property #40:
+Name: Sound Speed
+Description: Sound Speed: sound velocity sensor
+Property Code: soundspeed
+Unit of Measure: m/s
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVAA/).
+
+Property #41:
+Name: Status Code
+Description: Status Code
+Property Code: statuscode
+Unit of Measure: NA
+Has Device Data: Yes
+Has Property Data: No
+
+Property #42:
+Name: Target Persistence
+Description: Target Persistence
+Property Code: targetpersistence
+Unit of Measure: s
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UTBB/).
+
+Property #43:
+Name: Tilt
+Description: Tilt: tilt sensor
+Property Code: tilt
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #44:
+Name: Total Pressure
+Description: Pressure: total depth pressure sensor
+Property Code: totalpressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #45:
+Name: Turbidity NTU
+Description: Turbidity: nephelometric turbidity units
+Property Code: turbidityntu
+Unit of Measure: NTU
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/USTU/).
+
+Property #46:
+Name: Voltage
+Description: Voltage: voltage sensor
+Property Code: voltage
+Unit of Measure: V
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVLT/).
+
+Property #47:
+Name: Zoom
+Description: Zoom
+Property Code: zoom
+Unit of Measure: Count
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UCNT/).
+
+========================================
+
+=== Location Code: CBYIP.D1 ===
+
+Property #1:
+Name: CO2 Concentration Linearized
+Description: Concentration: carbon dioxide, linearized
+Property Code: co2concentrationlinearized
+Unit of Measure: umol/mol
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMPM/).
+
+Property #2:
+Name: CO2 Partial Pressure
+Description: Pressure: carbon dioxide, partial pressure
+Property Code: co2partialpressure
+Unit of Measure: pCO2 uatm
+Has Device Data: Yes
+Has Property Data: No
+
+Property #3:
+Name: Gas Stream Pressure
+Description: Pressure: for dissolved gas sensors
+Property Code: gasstreampressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #4:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Scientific Count
+Description: Count: scientific data counter
+Property Code: scientificcount
+Unit of Measure: Count
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UCNT/).
+
+========================================
+
+=== Location Code: CBYIP.D2 ===
+
+Property #1:
+Name: Calibrated Phase Angle
+Description: Calibrated Phase Angle
+Property Code: calibratedphaseangle
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #2:
+Name: CO2 Partial Pressure
+Description: Pressure: carbon dioxide, partial pressure
+Property Code: co2partialpressure
+Unit of Measure: pCO2 uatm
+Has Device Data: Yes
+Has Property Data: No
+
+Property #3:
+Name: Compensated Phase Angle
+Description: Compensated Phase Angle
+Property Code: compensatedphaseangle
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #4:
+Name: Sea Water Temperature
+Description: Temperature: sea water
+Property Code: seawatertemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+========================================
+
+=== Location Code: CBYIP.D3 ===
+
+Property #1:
+Name: CO2 Concentration Linearized
+Description: Concentration: carbon dioxide, linearized
+Property Code: co2concentrationlinearized
+Unit of Measure: umol/mol
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMPM/).
+
+Property #2:
+Name: CO2 Partial Pressure
+Description: Pressure: carbon dioxide, partial pressure
+Property Code: co2partialpressure
+Unit of Measure: pCO2 uatm
+Has Device Data: Yes
+Has Property Data: No
+
+Property #3:
+Name: Gas Stream Pressure
+Description: Pressure: for dissolved gas sensors
+Property Code: gasstreampressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #4:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Scientific Count
+Description: Count: scientific data counter
+Property Code: scientificcount
+Unit of Measure: Count
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UCNT/).
+
+========================================
+
+=== Location Code: CBYIP.D4 ===
+
+Property #1:
+Name: Biofouling Prevention
+Description: Biofouling Prevention
+Property Code: biofoulingprevention
+Unit of Measure: ON/OFF
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Conductivity
+Description: Conductivity: siemens per metre
+Property Code: conductivity
+Unit of Measure: S/m
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UECA/).
+
+Property #3:
+Name: Density
+Description: Density
+Property Code: density
+Unit of Measure: kg/m3
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #4:
+Name: Gregorian Time
+Description: Time: Gregorian days since 19700101T000000Z
+Property Code: gregoriantime
+Unit of Measure: Gregorian days since 19700101T000000Z
+Has Device Data: Yes
+Has Property Data: No
+
+Property #5:
+Name: Oxygen
+Description: Oxygen: optode sensor
+Property Code: oxygen
+Unit of Measure: ml/l
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMLL/).
+
+Property #6:
+Name: Pressure
+Description: Pressure
+Property Code: pressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #7:
+Name: Salinity
+Description: Salinity
+Property Code: salinity
+Unit of Measure: psu
+Has Device Data: Yes
+Has Property Data: Yes
+
+Property #8:
+Name: Sea Water Temperature
+Description: Temperature: sea water
+Property Code: seawatertemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #9:
+Name: Sound Speed
+Description: Sound Speed: sound velocity sensor
+Property Code: soundspeed
+Unit of Measure: m/s
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVAA/).
+
+Property #10:
+Name: Turbidity NTU
+Description: Turbidity: nephelometric turbidity units
+Property Code: turbidityntu
+Unit of Measure: NTU
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/USTU/).
+
+========================================
+
+=== Location Code: CBYIP.K1 ===
+
+Property #1:
+Name: Camera Light
+Description: Camera Light
+Property Code: cameralight
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+========================================
+
+=== Location Code: CBYIP.K2 ===
+
+Property #1:
+Name: Camera Light
+Description: Camera Light
+Property Code: cameralight
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+========================================
+
+=== Location Code: CBYIP.K3 ===
+
+Property #1:
+Name: Camera Light
+Description: Camera Light
+Property Code: cameralight
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+========================================
+
+=== Location Code: CBYIU ===
+
+Property #1:
+Name: Dew Point
+Description: Dew Point
+Property Code: dewpoint
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #2:
+Name: Internal Humidity
+Description: Humidity: internal to calibrate instrument
+Property Code: internalhumidity
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #3:
+Name: Internal Pressure
+Description: Pressure: internal pressure of instrument
+Property Code: internalpressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #4:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Magnetic Heading
+Description: Magnetic Heading
+Property Code: magneticheading
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #6:
+Name: Pitch
+Description: Pitch
+Property Code: pitch
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #7:
+Name: Roll
+Description: Roll
+Property Code: roll
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+========================================
+
+=== Location Code: CBYIU.AC1 ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+========================================
+
+=== Location Code: CBYIU.AC2 ===
+
+Property #1:
+Name: On/Off Sensor
+Description: On/Off Sensor
+Property Code: onoffsensor
+Unit of Measure: ON/OFF
+Has Device Data: Yes
+Has Property Data: No
+
+========================================
+
+=== Location Code: CBYIU.AC3 ===
+
+Property #1:
+Name: On/Off Sensor
+Description: On/Off Sensor
+Property Code: onoffsensor
+Unit of Measure: ON/OFF
+Has Device Data: Yes
+Has Property Data: No
+
+========================================
+
+=== Location Code: CBYIU.AC4 ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+========================================
+
+=== Location Code: CBYIU.AC5 ===
+
+Property #1:
+Name: On/Off Sensor
+Description: On/Off Sensor
+Property Code: onoffsensor
+Unit of Measure: ON/OFF
+Has Device Data: Yes
+Has Property Data: No
+
+========================================
+
+=== Location Code: CBYSP ===
+
+Property #1:
+Name: Air Temperature
+Description: Temperature: air
+Property Code: airtemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #2:
+Name: Altitude
+Description: Depth: altitude
+Property Code: altitude
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #3:
+Name: Differential Temperature
+Description: Temperature: differential
+Property Code: differentialtemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #4:
+Name: Gregorian Time
+Description: Time: Gregorian days since 19700101T000000Z
+Property Code: gregoriantime
+Unit of Measure: Gregorian days since 19700101T000000Z
+Has Device Data: Yes
+Has Property Data: No
+
+Property #5:
+Name: Ice Thickness
+Description: Thickness: ice
+Property Code: icethickness
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #6:
+Name: Latitude
+Description: Latitude: in degrees
+Property Code: latitude
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #7:
+Name: Longitude
+Description: Longitude: in degrees
+Property Code: longitude
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #8:
+Name: Snow Thickness
+Description: Thickness: snow
+Property Code: snowthickness
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #9:
+Name: SRSL Ice Balance Buoy Temperature
+Description: Temperature: air, snow, ice, sea water
+Property Code: srslicebalancebuoytemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+========================================
+
+=== Location Code: CBYSS ===
+
+Property #1:
+Name: Absolute Barometric Pressure
+Description: Pressure: air, absolute barometric
+Property Code: absolutebarometricpressure
+Unit of Measure: hPa
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/HPAX/).
+
+Property #2:
+Name: Absolute Humidity
+Description: Humidity: absolute
+Property Code: absolutehumidity
+Unit of Measure: g/m^3
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UGCC/).
+
+Property #3:
+Name: Air Density
+Description: Density: air
+Property Code: airdensity
+Unit of Measure: kg/m3
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #4:
+Name: Air Temperature
+Description: Temperature: air
+Property Code: airtemperature
+Unit of Measure: C
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Barometric Trend
+Description: Barometric Trend
+Property Code: barometrictrend
+Unit of Measure: NA
+Has Device Data: No
+Has Property Data: Yes
+
+Property #6:
+Name: Dew Point
+Description: Dew Point
+Property Code: dewpoint
+Unit of Measure: C
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #7:
+Name: Magnetic Heading
+Description: Magnetic Heading
+Property Code: magneticheading
+Unit of Measure: deg
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #8:
+Name: Mixing Ratio
+Description: Mixing Ratio
+Property Code: mixingratio
+Unit of Measure: g/kg
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UGKG/).
+
+Property #9:
+Name: Rainfall Rate
+Description: Rainfall Rate
+Property Code: rainfallrate
+Unit of Measure: mm/hr
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/MMPH/).
+
+Property #10:
+Name: Relative Barometric Pressure
+Description: Pressure: air, relative barometric
+Property Code: relativebarometricpressure
+Unit of Measure: hPa
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/HPAX/).
+
+Property #11:
+Name: Relative Humidity
+Description: Humidity: relative
+Property Code: relativehumidity
+Unit of Measure: %
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #12:
+Name: Solar Radiation
+Description: Solar Radiation
+Property Code: solarradiation
+Unit of Measure: W/m^2
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UFAA/).
+
+Property #13:
+Name: Specific Enthalpy
+Description: Specific Enthalpy
+Property Code: specificenthalpy
+Unit of Measure: kJ/kg
+Has Device Data: No
+Has Property Data: Yes
+
+Property #14:
+Name: UV Index
+Description: UV Index
+Property Code: uvindex
+Unit of Measure: NA
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UUUU/).
+
+Property #15:
+Name: Wet Bulb Temperature
+Description: Temperature: wet bulb
+Property Code: wetbulbtemperature
+Unit of Measure: C
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #16:
+Name: Wind Chill Temperature
+Description: Temperature: air, wind chill
+Property Code: windchilltemperature
+Unit of Measure: C
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #17:
+Name: Wind Direction
+Description: Wind Direction
+Property Code: winddirection
+Unit of Measure: deg
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #18:
+Name: Wind Speed
+Description: Wind Speed
+Property Code: windspeed
+Unit of Measure: m/s
+Has Device Data: No
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVAA/).
+
+========================================
+
+=== Location Code: CBYSS.M1 ===
+
+Property #1:
+Name: Air Temperature
+Description: Temperature: air
+Property Code: airtemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #2:
+Name: Barometric Trend
+Description: Barometric Trend
+Property Code: barometrictrend
+Unit of Measure: NA
+Has Device Data: Yes
+Has Property Data: No
+
+Property #3:
+Name: Internal Humidity
+Description: Humidity: internal to calibrate instrument
+Property Code: internalhumidity
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #4:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Rainfall Rate
+Description: Rainfall Rate
+Property Code: rainfallrate
+Unit of Measure: mm/hr
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/MMPH/).
+
+Property #6:
+Name: Relative Barometric Pressure
+Description: Pressure: air, relative barometric
+Property Code: relativebarometricpressure
+Unit of Measure: hPa
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/HPAX/).
+
+Property #7:
+Name: Relative Humidity
+Description: Humidity: relative
+Property Code: relativehumidity
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #8:
+Name: Solar Radiation
+Description: Solar Radiation
+Property Code: solarradiation
+Unit of Measure: W/m^2
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UFAA/).
+
+Property #9:
+Name: UV Index
+Description: UV Index
+Property Code: uvindex
+Unit of Measure: NA
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UUUU/).
+
+Property #10:
+Name: Voltage
+Description: Voltage: voltage sensor
+Property Code: voltage
+Unit of Measure: V
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVLT/).
+
+========================================
+
+=== Location Code: CBYSS.M2 ===
+
+Property #1:
+Name: Absolute Barometric Pressure
+Description: Pressure: air, absolute barometric
+Property Code: absolutebarometricpressure
+Unit of Measure: hPa
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/HPAX/).
+
+Property #2:
+Name: Absolute Humidity
+Description: Humidity: absolute
+Property Code: absolutehumidity
+Unit of Measure: g/m^3
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UGCC/).
+
+Property #3:
+Name: Air Density
+Description: Density: air
+Property Code: airdensity
+Unit of Measure: kg/m3
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #4:
+Name: Air Temperature
+Description: Temperature: air
+Property Code: airtemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #5:
+Name: Dew Point
+Description: Dew Point
+Property Code: dewpoint
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #6:
+Name: Magnetic Heading
+Description: Magnetic Heading
+Property Code: magneticheading
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #7:
+Name: Mixing Ratio
+Description: Mixing Ratio
+Property Code: mixingratio
+Unit of Measure: g/kg
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UGKG/).
+
+Property #8:
+Name: Relative Barometric Pressure
+Description: Pressure: air, relative barometric
+Property Code: relativebarometricpressure
+Unit of Measure: hPa
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/HPAX/).
+
+Property #9:
+Name: Relative Humidity
+Description: Humidity: relative
+Property Code: relativehumidity
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #10:
+Name: Solar Radiation
+Description: Solar Radiation
+Property Code: solarradiation
+Unit of Measure: W/m^2
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UFAA/).
+
+Property #11:
+Name: Specific Enthalpy
+Description: Specific Enthalpy
+Property Code: specificenthalpy
+Unit of Measure: kJ/kg
+Has Device Data: Yes
+Has Property Data: Yes
+
+Property #12:
+Name: Wet Bulb Temperature
+Description: Temperature: wet bulb
+Property Code: wetbulbtemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #13:
+Name: Wind Chill Temperature
+Description: Temperature: air, wind chill
+Property Code: windchilltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #14:
+Name: Wind Direction
+Description: Wind Direction
+Property Code: winddirection
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #15:
+Name: Wind Speed
+Description: Wind Speed
+Property Code: windspeed
+Unit of Measure: m/s
+Has Device Data: Yes
+Has Property Data: Yes
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVAA/).
+
+========================================
+
+=== Location Code: CBYSU ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Dew Point
+Description: Dew Point
+Property Code: dewpoint
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #3:
+Name: Internal Humidity
+Description: Humidity: internal to calibrate instrument
+Property Code: internalhumidity
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #4:
+Name: Internal Pressure
+Description: Pressure: internal pressure of instrument
+Property Code: internalpressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #5:
+Name: Internal Temperature
+Description: Temperature: instrument internal temperature
+Property Code: internaltemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #6:
+Name: Voltage
+Description: Voltage: voltage sensor
+Property Code: voltage
+Unit of Measure: V
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVLT/).
+
+========================================
+
+=== Location Code: CBYSU.AC1 ===
+
+Property #1:
+Name: On/Off Sensor
+Description: On/Off Sensor
+Property Code: onoffsensor
+Unit of Measure: ON/OFF
+Has Device Data: Yes
+Has Property Data: No
+
+========================================
+
+=== Location Code: CBYSU.AC2 ===
+
+Property #1:
+Name: Amperage
+Description: Amperage
+Property Code: amperage
+Unit of Measure: A
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Bender Electrical Resistance
+Description: Bender Electrical Resistance
+Property Code: benderelectricalresistance
+Unit of Measure: mega-ohm
+Has Device Data: Yes
+Has Property Data: No
+
+Property #3:
+Name: Voltage
+Description: Voltage: voltage sensor
+Property Code: voltage
+Unit of Measure: V
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVLT/).
+
+========================================
+
+=== Location Code: CF240 ===
+
+Property #1:
+Name: CDOM
+Description: Colored Dissolved Organic Matter (CDOM)
+Property Code: cdom
+Unit of Measure: ppb QSDE
+Has Device Data: Yes
+Has Property Data: No
+
+Property #2:
+Name: Chlorophyll
+Description: Chlorophyll
+Property Code: chlorophyll
+Unit of Measure: ug/l
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UGPL/).
+
+Property #3:
+Name: Conductivity
+Description: Conductivity: siemens per metre
+Property Code: conductivity
+Unit of Measure: S/m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UECA/).
+
+Property #4:
+Name: Density
+Description: Density
+Property Code: density
+Unit of Measure: kg/m3
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UKMC/).
+
+Property #5:
+Name: Depth
+Description: Depth
+Property Code: depth
+Unit of Measure: m
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/ULAA/).
+
+Property #6:
+Name: Gas Saturation
+Description: Saturation: of gas
+Property Code: gassaturation
+Unit of Measure: %
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPCT/).
+
+Property #7:
+Name: Latitude
+Description: Latitude: in degrees
+Property Code: latitude
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #8:
+Name: Longitude
+Description: Longitude: in degrees
+Property Code: longitude
+Unit of Measure: deg
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UAAA/).
+
+Property #9:
+Name: Oxygen
+Description: Oxygen: optode sensor
+Property Code: oxygen
+Unit of Measure: ml/l
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UMLL/).
+
+Property #10:
+Name: Pressure
+Description: Pressure
+Property Code: pressure
+Unit of Measure: decibar
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPDB/).
+
+Property #11:
+Name: Salinity
+Description: Salinity
+Property Code: salinity
+Unit of Measure: psu
+Has Device Data: Yes
+Has Property Data: No
+
+Property #12:
+Name: Sea Water Temperature
+Description: Temperature: sea water
+Property Code: seawatertemperature
+Unit of Measure: C
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UPAA/).
+
+Property #13:
+Name: Sound Speed
+Description: Sound Speed: sound velocity sensor
+Property Code: soundspeed
+Unit of Measure: m/s
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/UVAA/).
+
+Property #14:
+Name: Turbidity NTU
+Description: Turbidity: nephelometric turbidity units
+Property Code: turbidityntu
+Unit of Measure: NTU
+Has Device Data: Yes
+Has Property Data: No
+Units of measure vocabularies: BODC data storage units (http://vocab.nerc.ac.uk/collection/P06/current/USTU/).
+
+========================================

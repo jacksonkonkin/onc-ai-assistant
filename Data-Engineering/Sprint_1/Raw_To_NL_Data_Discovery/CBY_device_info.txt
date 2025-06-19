@@ -1,0 +1,665 @@
+Device Category Info for location code 'CBY':
+- Category Code: AISRECEIVER
+- Category Name: Automatic Identification Systems Receiver
+- Short Description: Automatic Identification Systems Receiver
+- Long Description:  Land-based Automatic Identification System (AIS) receivers provide data that track marine vessels within range of the receiver. The data are used to monitor, understand and mitigate the impacts of marine shipping activities.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/POS27/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBY', the device named 'Coastguard AIS MMSI 003160185' (device code: COASTGUARDAIS003160185, ID: 24048) belongs to the category 'AISRECEIVER'. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=24048
+
+Device Category Info for location code 'CBYDS':
+- Category Code: DIVE_COMPUTER
+- Category Name: Dive Computer
+- Short Description: Dive Computer
+- Long Description:  Dive computers are devices used by scuba divers to measure the time and depth of a dive.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+Device Category Info for location code 'CBYDS':
+- Category Code: NAV
+- Category Name: Navigation System
+- Short Description: Navigation
+- Long Description:  Navigational instruments are used to measure and record positional information of ships, buoys, and autonomous underwater vehicles (AUVs). Typical sensors include latitude, longitude, speed, heading, pitch, roll, and depth.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/301/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYDS':
+- Category Code: ROV_CAMERA
+- Category Name: Remotely Operated Vehicle Camera
+- Short Description: Remotely Operated Vehicle Camera
+- Long Description:  Remotely Operated Vehicle (ROV) video cameras are used for many purposes. Operators can use ROV cameras for instrument operations, navigation, and maintenance procedures. They can also monitor the composition, abundance, behaviour, and interactions of organisms, and investigate the characteristics of seafloor geology.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYDS', the device named 'Canon PowerShot G16 Digital Camera 8406B001AA' (device code: CANONPOWERSHOTG168406B001AA, ID: 23459) belongs to the category 'ROV_CAMERA'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1959/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23459
+
+At location 'CBYDS', the device named 'Garmin GPSMAP 62st (S/N 211006242)' (device code: GARMINGPSMAP62ST211006242, ID: 23608) belongs to the category 'NAV'. It has been operational since August 19, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23608
+
+At location 'CBYDS', the device named 'GoPro Camera CHDHX-302 H38B09133F05D8' (device code: GOPROCAMERACHDHX302H38B09133F05D8, ID: 23266) belongs to the category 'ROV_CAMERA'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1963/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23266
+
+At location 'CBYDS', the device named 'Suunto Zoop Dive Computer (S/N 32800551)' (device code: SUUNTOZOOP32800551, ID: 22875) belongs to the category 'DIVE_COMPUTER'. It has been operational since January 01, 2013. This device collects data approximately every 30.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=22875
+
+Device Category Info for location code 'CBYIJ.J1':
+- Category Code: JB
+- Category Name: Junction Box
+- Short Description: Junction Box
+- Long Description:  Junction Boxes supply power and communications to deployed instruments. Junction boxes have a number of serial and ethernet ports, including 400V ethernet ports that enable connections to other junction boxes and high-voltage instruments. Junction boxes can convert high voltages to lower voltages (15V, 24V or 48V) required by many instruments.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIJ.J1', the device named 'ONC Mini Junction Box 010' (device code: ONCMJB010, ID: 31999) belongs to the category 'JB'. It has been operational since June 05, 2019. This device collects data approximately every 1.0 seconds, with each sample consisting of about 6 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=31999
+
+Device Category Info for location code 'CBYIJ.J2':
+- Category Code: JB
+- Category Name: Junction Box
+- Short Description: Junction Box
+- Long Description:  Junction Boxes supply power and communications to deployed instruments. Junction boxes have a number of serial and ethernet ports, including 400V ethernet ports that enable connections to other junction boxes and high-voltage instruments. Junction boxes can convert high voltages to lower voltages (15V, 24V or 48V) required by many instruments.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIJ.J2', the device named 'ONC Mini Junction Box 009' (device code: ONCMJB009, ID: 31920) belongs to the category 'JB'. It has been operational since June 05, 2019. This device collects data approximately every 1.0 seconds, with each sample consisting of about 6 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=31920
+
+At location 'CBYIJ.J2', the device named 'ONC Mini Junction Box 033' (device code: ONCMJB033, ID: 77112) belongs to the category 'JB'. It has been operational since August 11, 2022. This device collects data approximately every 1.0 seconds, with each sample consisting of about 9 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=77112
+
+Device Category Info for location code 'CBYIP':
+- Category Code: ACOUSTICRECEIVER
+- Category Name: Acoustic Receiver
+- Short Description: Acoustic Receiver
+- Long Description:  Acoustic receivers detect and decode transmissions from acoustic tags. Receivers are categorized as passive or active which define how the receivers are used.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/POS23/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: ADCP1200KHZ
+- Category Name: Acoustic Doppler Current Profiler 1200 kHz
+- Short Description: Acoustic Doppler Current Profiler 1200 kHz 
+- Long Description:  Acoustic Doppler Current Profilers are hydroacoustic instruments, similar to sonars. ADCPs measure current speed and direction at multiple predetermined depths simultaneously. ADCPs use the Doppler effect of sound waves that are scattered by particles in seawater over a depth range.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/115/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: CAMLIGHTS
+- Category Name: Camera Lights
+- Short Description: Camera Lights
+- Long Description:  Camera lights are used to improve visibility where cameras are deployed. Light controls and schedules can be remotely-controlled from on-shore using software. The length of time that lights are on is limited in order to minimize impact on the environment.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: CTD
+- Category Name: Conductivity Temperature Depth
+- Short Description: Conductivity Temperature (and Depth Sensor)
+- Long Description:  Conductivity Temperature Depth (CTD) is an instrument package that contains sensors for measuring the conductivity, temperature, and pressure of seawater. Salinity, sound velocity, depth and density are variables that can be derived from sensor measurements. CTDs can carry additional instruments and sensors such as oxygen sensors, turbidity sensors and fluorometers.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/130/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: FLNTU
+- Category Name: Fluorometer Turbidity
+- Short Description: Fluorometer Turbidity
+- Long Description:  Fluorometer Turbidity instruments measure chlorophyll fluorescence and turbidity within the same volume of seawater. The instrument uses a light emitting diode (LED) to provide an excitation source. The fluoresced light is received by a detector at a particular angle from the LED source, and uses an interference filter to discriminate against scattered excitation light. Turbidity is measured at the same time, by detecting scattered light from a LED, which is positioned at the same angle as the chlorophyll fluorescence.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/113/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: FLUOROMETER
+- Category Name: Fluorometer
+- Short Description: Fluorometer
+- Long Description:  Fluorometers measure the amount of stimulated electromagnetic radiation (fluorescence) produced by pulses of electromagnetic radiation emitted into the water column.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/113/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: HYDROPHONE
+- Category Name: Hydrophone
+- Short Description: Hydrophone
+- Long Description:  Hydrophones are devices containing transducers that convert underwater sound waves into electrical signals. They are acoustic instruments that can process data while they are being collected to produce calibrated waveform data. Hydrophones are typically used to study vocalizations of marine mammals, ship traffic and ambient noise.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/369/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: ICEPROFILER
+- Category Name: Ice Profiler
+- Short Description: Ice Profiler
+- Long Description:  Ice Profiler instruments are upward looking single beam echosounders mounted on the ocean floor and are specialized to measure ice draft. They can estimate ice forces, determine the thickness of ice, and the detail of the underside of sea-ice.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/ICEP/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: NITRATESENSOR
+- Category Name: Nitrate sensor
+- Short Description: Nitrate Sensor
+- Long Description:  Nitrate sensors measure the concentration of nitrate, a major nutrient for phytoplankton.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/181/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: OXYSENSOR
+- Category Name: Oxygen Sensor
+- Short Description: Oxygen Sensor
+- Long Description:  Oxygen sensors measure dissolved oxygen concentration in seawater.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/351/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: PHSENSOR
+- Category Name: pH Sensor
+- Short Description: pH Sensor
+- Long Description:  pH sensors measure the acidity, or alkalinity, of sea water by the concentration of hydrogen ions in the water column.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/355/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: PLANKTONSAMPLER
+- Category Name: Plankton Sampler
+- Short Description: Plankton Sampler
+- Long Description:  Plankton Samplers collect samples of plankton from the water column in a time series. Samples are analyzed upon the recovery of the instrument, to provide qualitative and quantitative information about plankton in the water column.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/21/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: RADIOMETER
+- Category Name: Radiometer
+- Short Description: Radiometer
+- Long Description:  Radiometers collect measurements of electromagnetic radiation in the ocean environment.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/122/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: TURBIDITYMETER
+- Category Name: Turbidity Meter
+- Short Description: Turbidity Meter
+- Long Description:  Turbidity meters are sensors that detect scattered light from suspended particles in water. The amount of scattered light that reaches the detector is proportional to the turbidity or particle concentration in the water.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/123/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: VIDEOCAM
+- Category Name: Video Camera
+- Short Description: Video Camera
+- Long Description:  Video cameras record video of characteristics of the surrounding environments and can be deployed on fixed and mobile platforms.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP':
+- Category Code: WETLABS_WQM
+- Category Name: Water Quality Monitor
+- Short Description: Water Quality Monitor
+- Long Description:  Water Quality Monitors (WQM) have sensors to measure temperature, salinity, depth, dissolved oxygen, chlorophyll fluorescence, turbidity and backscattering data.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/123/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP', the device named 'ASL Shallow Water Ice Profiler 53019' (device code: ASLSWIP53019, ID: 23369) belongs to the category 'ICEPROFILER'. It has been operational since September 22, 2014. This device collects data approximately every 5.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1250/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23369
+
+At location 'CBYIP', the device named 'ASL Shallow Water Ice Profiler 53029' (device code: ASLSWIP53029, ID: 524) belongs to the category 'ICEPROFILER'. It has been operational since October 04, 2012. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1250/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=524
+
+At location 'CBYIP', the device named 'ASL Shallow Water Ice Profiler 53038' (device code: ASLSWIP53038, ID: 24049) belongs to the category 'ICEPROFILER'. It has been operational since July 28, 2017. This device collects data approximately every 5.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1250/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=24049
+
+At location 'CBYIP', the device named 'Axis P1375 Camera SN ACCC8ED935D1' (device code: AXISCAMACCC8ED935D1, ID: 45940) belongs to the category 'VIDEOCAM'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1939/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=45940
+
+At location 'CBYIP', the device named 'Axis Q6035 HD Webcam 1089' (device code: AXISQ6035HD1089, ID: 23255) belongs to the category 'VIDEOCAM'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1942/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23255
+
+At location 'CBYIP', the device named 'Biospherical PAR Irradiance QSP-2350 50115' (device code: BIOLIGHTSENSOR50115, ID: 20117) belongs to the category 'RADIOMETER'. It has been operational since March 18, 2009. This device collects data approximately every 1.04 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1277/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=20117
+
+At location 'CBYIP', the device named 'Biospherical PAR Irradiance QSP-2350L 70434' (device code: BIOLIGHTSENSOR70434, ID: 23059) belongs to the category 'RADIOMETER'. It has been operational since July 08, 2013. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1277/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23059
+
+At location 'CBYIP', the device named 'Ocean Sonics icListen HF Hydrophone 1251' (device code: ICLISTENHF1251, ID: 23157) belongs to the category 'HYDROPHONE'. It has been operational since February 01, 2014. This device collects data approximately every 300.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0942/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23157
+
+At location 'CBYIP', the device named 'Ocean Sonics icListen HF Hydrophone 1252' (device code: ICLISTENHF1252, ID: 23155) belongs to the category 'HYDROPHONE'. It has been operational since September 03, 2013. This device collects data approximately every 300.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0942/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23155
+
+At location 'CBYIP', the device named 'Ocean Sonics icListen HF Hydrophone 1266' (device code: ICLISTENHF1266, ID: 23235) belongs to the category 'HYDROPHONE'. It has been operational since May 01, 2014. This device collects data approximately every 300.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0942/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23235
+
+At location 'CBYIP', the device named 'Ocean Sonics icListen HF Hydrophone 1288' (device code: ICLISTENHF1288, ID: 23330) belongs to the category 'HYDROPHONE'. It has been operational since July 10, 2014. This device collects data approximately every 300.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0942/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23330
+
+At location 'CBYIP', the device named 'Ocean Sonics icListen HF Hydrophone 1561' (device code: ICLISTENHF1561, ID: 24347) belongs to the category 'HYDROPHONE'. It has been operational since June 12, 2018. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0942/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=24347
+
+At location 'CBYIP', the device named 'Ocean Sonics icListen HF Hydrophone 1951' (device code: ICLISTENHF1951, ID: 47240) belongs to the category 'HYDROPHONE'. It has been operational since May 22, 2020. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1773/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=47240
+
+At location 'CBYIP', the device named 'Satlantic Nitrate Sensor ISUS-X V2 (SN 0116)' (device code: ISUSX0116, ID: 28) belongs to the category 'NITRATESENSOR'. It has been operational since December 12, 2006. This device collects data approximately every 3600.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1507/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=28
+
+At location 'CBYIP', the device named 'McLane Phytoplankton Sampler (SN 12935-01)' (device code: MCLANEPHYTOPLANKTONSAMPLER1293501, ID: 14090) belongs to the category 'PLANKTONSAMPLER'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1326/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=14090
+
+At location 'CBYIP', the device named 'Ocean Presence Technologies OPT-06FHDE 9300861' (device code: OCEANCAMOPT06FHDE9300861, ID: 13204) belongs to the category 'VIDEOCAM'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1945/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=13204
+
+At location 'CBYIP', the device named 'Ocean Presence Technologies OPT-06HDE 9300860' (device code: OCEANCAMOPT06HDE9300860, ID: 13202) belongs to the category 'VIDEOCAM'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1944/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=13202
+
+At location 'CBYIP', the device named 'Ocean Networks Canada Lights (SN05 SN06)' (device code: ONCLIGHTS05AND06, ID: 77812) belongs to the category 'CAMLIGHTS'. It has been operational since September 06, 2022. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=77812
+
+At location 'CBYIP', the device named 'Satlantic SeaFET Ocean pH Sensor (SN 246)' (device code: PHSENSOR246, ID: 23913) belongs to the category 'PHSENSOR'. It has been operational since July 25, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1292/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23913
+
+At location 'CBYIP', the device named 'Satlantic SeaFET Ocean pH Sensor (SN 452)' (device code: PHSENSOR452, ID: 24172) belongs to the category 'PHSENSOR'. It has been operational since July 25, 2017. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1292/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=24172
+
+At location 'CBYIP', the device named 'RDI Workhorse Monitor ADCP 1200 kHz (9111)' (device code: RDIADCP1200WH9111, ID: 20001) belongs to the category 'ADCP1200KHZ'. It has been operational since August 11, 2008. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1406/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=20001
+
+At location 'CBYIP', the device named 'ROS Lights (SN 21251 21267)' (device code: ROSLIGHTS21251SN21267, ID: 23363) belongs to the category 'CAMLIGHTS'. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23363
+
+At location 'CBYIP', the device named 'Sea-Bird SBE 63 Dissolved Oxygen Sensor 630108' (device code: SBE63630108, ID: 23045) belongs to the category 'OXYSENSOR'. It has been operational since June 12, 2013. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0739/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23045
+
+At location 'CBYIP', the device named 'Sea-Bird SBE 63 Dissolved Oxygen Sensor 630225' (device code: SBE63630225, ID: 23044) belongs to the category 'OXYSENSOR'. It has been operational since October 15, 2012. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0739/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23044
+
+At location 'CBYIP', the device named 'Sea-Bird SBE 63 Dissolved Oxygen Sensor 630834' (device code: SBE63630834, ID: 23356) belongs to the category 'OXYSENSOR'. It has been operational since September 02, 2014. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0739/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23356
+
+At location 'CBYIP', the device named 'Sea-Bird SBE 63 Dissolved Oxygen Sensor 631008' (device code: SBE63631008, ID: 23493) belongs to the category 'OXYSENSOR'. It has been operational since June 02, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0739/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23493
+
+At location 'CBYIP', the device named 'Sea-Bird SBE 63 Dissolved Oxygen Sensor 631500' (device code: SBE63631500, ID: 24003) belongs to the category 'OXYSENSOR'. It has been operational since March 10, 2017. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0739/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=24003
+
+At location 'CBYIP', the device named 'Sea-Bird SeaCAT SBE19plus V2 7036' (device code: SBECTD19p7036, ID: 23028) belongs to the category 'CTD'. It has been operational since July 08, 2013. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0871/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23028
+
+At location 'CBYIP', the device named 'Sea-Bird SeaCAT SBE19plus V2 7128' (device code: SBECTD19p7128, ID: 23830) belongs to the category 'CTD'. It has been operational since February 22, 2016. This device collects data approximately every 0.25 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0871/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23830
+
+At location 'CBYIP', the device named 'Sea-Bird SeaCAT SBE19plus V2 7518' (device code: SBECTD19p7518, ID: 23355) belongs to the category 'CTD'. It has been operational since September 02, 2014. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0871/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23355
+
+At location 'CBYIP', the device named 'Sea-Bird SeaCAT SBE19plus V2 7589' (device code: SBECTD19p7589, ID: 23491) belongs to the category 'CTD'. It has been operational since June 02, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0871/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23491
+
+At location 'CBYIP', the device named 'Sea-Bird SeaCAT SBE19plus V2 7769' (device code: SBECTD19p7769, ID: 24000) belongs to the category 'CTD'. It has been operational since March 10, 2017. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0871/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=24000
+
+At location 'CBYIP', the device named 'Sunburst SAMI pH P0073' (device code: SUNSAMIpHP0073, ID: 17000) belongs to the category 'PHSENSOR'. It has been operational since February 13, 2013. This device collects data approximately every 3600.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1493/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=17000
+
+At location 'CBYIP', the device named 'Vemco VR2C-69kHz Single-Channel Acoustic Receiver 450094' (device code: VEMCOVR2C450094, ID: 23189) belongs to the category 'ACOUSTICRECEIVER'. It has been operational since August 19, 2013. This device collects data approximately every 10.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0949/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23189
+
+At location 'CBYIP', the device named 'Vemco VR2C-69kHz Single-Channel Acoustic Receiver 450150' (device code: VEMCOVR2C450150, ID: 23455) belongs to the category 'ACOUSTICRECEIVER'. It has been operational since June 04, 2015. This device collects data approximately every 60.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0949/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23455
+
+At location 'CBYIP', the device named 'Vemco VR2W Single-Channel Acoustic Receiver 112529' (device code: VEMCOVR2W112529, ID: 26059) belongs to the category 'ACOUSTICRECEIVER'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1160/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=26059
+
+At location 'CBYIP', the device named 'WET Labs ECO FLRT 6106' (device code: WETLABSECOFLRT6106, ID: 46360) belongs to the category 'FLUOROMETER'. It has been operational since March 19, 2020. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1392/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=46360
+
+At location 'CBYIP', the device named 'WET Labs ECO-PARS (S/N 440)' (device code: WETLABSECOPARS440, ID: 23382) belongs to the category 'RADIOMETER'. It has been operational since July 13, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0676/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23382
+
+At location 'CBYIP', the device named 'WET Labs ECO-PARS (S/N 459)' (device code: WETLABSECOPARS459, ID: 23488) belongs to the category 'RADIOMETER'. It has been operational since June 02, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0676/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23488
+
+At location 'CBYIP', the device named 'WET Labs ECO FLNTUS 2586' (device code: WETLABSFLNTU2586, ID: 23062) belongs to the category 'FLNTU'. It has been operational since October 15, 2012. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0215/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23062
+
+At location 'CBYIP', the device named 'WET Labs ECO FLNTUS 3441' (device code: WETLABSFLNTUS3441, ID: 23357) belongs to the category 'FLNTU'. It has been operational since September 02, 2014. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0215/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23357
+
+At location 'CBYIP', the device named 'WET Labs ECO FLNTUS 3923' (device code: WETLABSFLNTUS3923, ID: 23490) belongs to the category 'FLNTU'. It has been operational since June 02, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0215/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23490
+
+At location 'CBYIP', the device named 'WET Labs Water Quality Monitor 196' (device code: WETLABSWQM196, ID: 9001) belongs to the category 'WETLABS_WQM'. It has been operational since November 19, 2010. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0675/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=9001
+
+At location 'CBYIP', the device named 'WET Labs Water Quality Monitor 233' (device code: WETLABSWQM233, ID: 13200) belongs to the category 'WETLABS_WQM'. It has been operational since April 30, 2012. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0675/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=13200
+
+At location 'CBYIP', the device named 'WET Labs ECO-NTUS 319' (device code: WLNTUS319, ID: 1302) belongs to the category 'TURBIDITYMETER'. It has been operational since February 13, 2012. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1390/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=1302
+
+At location 'CBYIP', the device named 'Axis Q6304 HD Webcam 1088' (device code: XWING-HDWebcam1088, ID: 23022) belongs to the category 'VIDEOCAM'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1941/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23022
+
+Device Category Info for location code 'CBYIP.D1':
+- Category Code: CO2SENSOR
+- Category Name: Carbon Dioxide Sensor
+- Short Description: Carbon Dioxide Sensor
+- Long Description:  Carbon Dioxide sensors monitor CO2 levels in the ocean. CO2 sensors measure the partial pressure, or the concentration of dissolved CO2 in seawater by a variety of techniques.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/351/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.D1', the device named 'Pro-Oceanus CO2-Pro CV (SN 35-250-75)' (device code: PROCO2-35-250-75, ID: 23492) belongs to the category 'CO2SENSOR'. It has been operational since June 05, 2015. This device collects data approximately every 1.6 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1119/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23492
+
+At location 'CBYIP.D1', the device named 'Pro-Oceanus CO2-Pro CV (SN 36-314-75)' (device code: PROCO2-36-314-75, ID: 23816) belongs to the category 'CO2SENSOR'. It has been operational since July 11, 2016. This device collects data approximately every 1.6 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1119/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23816
+
+Device Category Info for location code 'CBYIP.D2':
+- Category Code: CO2SENSOR
+- Category Name: Carbon Dioxide Sensor
+- Short Description: Carbon Dioxide Sensor
+- Long Description:  Carbon Dioxide sensors monitor CO2 levels in the ocean. CO2 sensors measure the partial pressure, or the concentration of dissolved CO2 in seawater by a variety of techniques.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/351/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.D2', the device named 'Aanderaa Optode 4797 pCO2 (S/N 33)' (device code: AANDERAA4797PCO2OPTODE33, ID: 22670) belongs to the category 'CO2SENSOR'. It has been operational since August 16, 2016. This device collects data approximately every 30.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=22670
+
+Device Category Info for location code 'CBYIP.D3':
+- Category Code: CO2SENSOR
+- Category Name: Carbon Dioxide Sensor
+- Short Description: Carbon Dioxide Sensor
+- Long Description:  Carbon Dioxide sensors monitor CO2 levels in the ocean. CO2 sensors measure the partial pressure, or the concentration of dissolved CO2 in seawater by a variety of techniques.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/351/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.D3', the device named 'Pro-Oceanus CO2-Pro CV (SN 35-250-75)' (device code: PROCO2-35-250-75, ID: 23492) belongs to the category 'CO2SENSOR'. It has been operational since June 05, 2015. This device collects data approximately every 1.6 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1119/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23492
+
+Device Category Info for location code 'CBYIP.D4':
+- Category Code: CTD
+- Category Name: Conductivity Temperature Depth
+- Short Description: Conductivity Temperature (and Depth Sensor)
+- Long Description:  Conductivity Temperature Depth (CTD) is an instrument package that contains sensors for measuring the conductivity, temperature, and pressure of seawater. Salinity, sound velocity, depth and density are variables that can be derived from sensor measurements. CTDs can carry additional instruments and sensors such as oxygen sensors, turbidity sensors and fluorometers.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/130/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIP.D4':
+- Category Code: OXYSENSOR
+- Category Name: Oxygen Sensor
+- Short Description: Oxygen Sensor
+- Long Description:  Oxygen sensors measure dissolved oxygen concentration in seawater.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/351/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.D4', the device named 'Aanderaa Optode 4531A (S/N 171)' (device code: AandOpt4531A171, ID: 23567) belongs to the category 'OXYSENSOR'. It has been operational since December 01, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0969/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23567
+
+At location 'CBYIP.D4', the device named 'AML CTD Metrec X 50147' (device code: AMLMETRECX50147, ID: 23501) belongs to the category 'CTD'. It has been operational since November 28, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1318/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23501
+
+Device Category Info for location code 'CBYIP.K1':
+- Category Code: CAMLIGHTS
+- Category Name: Camera Lights
+- Short Description: Camera Lights
+- Long Description:  Camera lights are used to improve visibility where cameras are deployed. Light controls and schedules can be remotely-controlled from on-shore using software. The length of time that lights are on is limited in order to minimize impact on the environment.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.K1', the device named 'ROS Lights (SN 66026)' (device code: ROSLIGHTS66026, ID: 23532) belongs to the category 'CAMLIGHTS'. It has been operational since August 30, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23532
+
+At location 'CBYIP.K1', the device named 'ROS Lights (SN 66028)' (device code: ROSLIGHTS66028, ID: 23539) belongs to the category 'CAMLIGHTS'. It has been operational since August 30, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23539
+
+Device Category Info for location code 'CBYIP.K2':
+- Category Code: CAMLIGHTS
+- Category Name: Camera Lights
+- Short Description: Camera Lights
+- Long Description:  Camera lights are used to improve visibility where cameras are deployed. Light controls and schedules can be remotely-controlled from on-shore using software. The length of time that lights are on is limited in order to minimize impact on the environment.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.K2', the device named 'ROS Lights (SN 66028)' (device code: ROSLIGHTS66028, ID: 23539) belongs to the category 'CAMLIGHTS'. It has been operational since August 30, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23539
+
+At location 'CBYIP.K2', the device named 'ROS Lights (SN 66029)' (device code: ROSLIGHTS66029, ID: 23540) belongs to the category 'CAMLIGHTS'. It has been operational since August 30, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23540
+
+Device Category Info for location code 'CBYIP.K3':
+- Category Code: CAMLIGHTS
+- Category Name: Camera Lights
+- Short Description: Camera Lights
+- Long Description:  Camera lights are used to improve visibility where cameras are deployed. Light controls and schedules can be remotely-controlled from on-shore using software. The length of time that lights are on is limited in order to minimize impact on the environment.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIP.K3', the device named 'ROS Lights (SN 66029)' (device code: ROSLIGHTS66029, ID: 23540) belongs to the category 'CAMLIGHTS'. It has been operational since August 30, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23540
+
+Device Category Info for location code 'CBYIU':
+- Category Code: INTERNAL_DEVICE_MONITOR
+- Category Name: Internal Device Monitor
+- Short Description: Internal Device Monitor
+- Long Description:  Internal device monitors record the internal conditions of a another device or sensor. They are used to ensure proper functioning of the host instrument.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/PERMON/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYIU':
+- Category Code: ORIENTATION
+- Category Name: Orientation Instrument
+- Short Description: Orientation
+- Long Description:  Orientation instruments are used on ships, ROVs and instrument packages to record variables like heading, pitch and roll.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/385/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYIU', the device named 'Honeywell HMR3300 Orientation (SN 31963)' (device code: HONEYWELLHMR3300ORIENTATION31963, ID: 23538) belongs to the category 'ORIENTATION'. It has been operational since August 29, 2015. This device collects data approximately every 0.125 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1662/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23538
+
+At location 'CBYIU', the device named 'Omega Environment iBTHX-D Monitor (SN 15120257)' (device code: OMEGAIBTHX15120257, ID: 22430) belongs to the category 'INTERNAL_DEVICE_MONITOR'. It has been operational since August 29, 2015. This device collects data approximately every 8.0 seconds, with each sample consisting of about 4 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=22430
+
+Device Category Info for location code 'CBYIU.AC1':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIU.AC1', the device named 'MOXA ioLogik E1242 TADFC1007725' (device code: iORELAYTADFC1007725, ID: 22431) belongs to the category 'ADAPTER'. It has been operational since August 29, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=22431
+
+Device Category Info for location code 'CBYIU.AC2':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIU.AC2', the device named 'MOXA ioLogik E1214 TABLC1067517' (device code: iORELAYTABLC1067517, ID: 23537) belongs to the category 'ADAPTER'. It has been operational since August 29, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23537
+
+Device Category Info for location code 'CBYIU.AC3':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIU.AC3', the device named 'MOXA ioLogik E1214 TABLC1067345' (device code: iORELAYTABLC1067345, ID: 23536) belongs to the category 'ADAPTER'. It has been operational since August 29, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23536
+
+Device Category Info for location code 'CBYIU.AC4':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIU.AC4', the device named 'MOXA ioLogik E1242 TADFC1007805' (device code: iORELAYTADFC1007805, ID: 23552) belongs to the category 'ADAPTER'. It has been operational since August 29, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23552
+
+Device Category Info for location code 'CBYIU.AC5':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYIU.AC5', the device named 'MOXA ioLogik E1214 TABLC1067321' (device code: iORELAYTABLC1067321, ID: 23535) belongs to the category 'ADAPTER'. It has been operational since August 29, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23535
+
+Device Category Info for location code 'CBYSP':
+- Category Code: ICE_BUOY
+- Category Name: Ice Buoy
+- Short Description: Ice Buoy
+- Long Description:  Ice Mass Balance Buoys measure various parameters including ice surface and bottom position, ice drift, meteorological data, and snow-ice-ocean temperature profiles.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYSP', the device named 'SRSL Ice Mass Balance Buoy 1516027' (device code: SRSLSIMBA1516027, ID: 22050) belongs to the category 'ICE_BUOY'. It has been operational since February 19, 2016. This device collects data approximately every 21600.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=22050
+
+At location 'CBYSP', the device named 'SRSL Ice Mass Balance Buoy CAN 02 01' (device code: SRSLSIMBACAN0201, ID: 26959) belongs to the category 'ICE_BUOY'. It has been operational since November 03, 2018. This device collects data approximately every 3600.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=26959
+
+Device Category Info for location code 'CBYSS':
+- Category Code: AISRECEIVER
+- Category Name: Automatic Identification Systems Receiver
+- Short Description: Automatic Identification Systems Receiver
+- Long Description:  Land-based Automatic Identification System (AIS) receivers provide data that track marine vessels within range of the receiver. The data are used to monitor, understand and mitigate the impacts of marine shipping activities.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/POS27/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYSS':
+- Category Code: BARPRESS
+- Category Name: Barometric Pressure Sensor
+- Short Description: Barometric Pressure Sensor
+- Long Description:  Barometric pressure sensors are used to monitor weather fluctuations and conditions above the surface of the water.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/102/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYSS':
+- Category Code: VIDEOCAM
+- Category Name: Video Camera
+- Short Description: Video Camera
+- Long Description:  Video cameras record video of characteristics of the surrounding environments and can be deployed on fixed and mobile platforms.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/311/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYSS', the device named 'Axis P1346 Camera SN 00408CC1C89C' (device code: AXISCAM00408CC1C89C, ID: 526) belongs to the category 'VIDEOCAM'. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1927/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=526
+
+At location 'CBYSS', the device named 'Digital Yacht AISnet Receiver 1315-0006-01' (device code: DIGITALYACHTAISNET1315-0006-01, ID: 23192) belongs to the category 'AISRECEIVER'. It has been operational since September 03, 2013. This device collects data approximately every 60.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23192
+
+At location 'CBYSS', the device named 'Vaisala PTB210 Barometer J3120006' (device code: VAISALAPTB210J3120006, ID: 23193) belongs to the category 'BARPRESS'. It has been operational since August 21, 2013. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL0397/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23193
+
+Device Category Info for location code 'CBYSS.M1':
+- Category Code: METSTN
+- Category Name: Meteorological Station
+- Short Description: Meteorological Station
+- Long Description:  Meteorological stations are instruments that make routine meteorological measurements on the atmosphere and are comprised of a suite of sensors. Typical examples of measurements include temperature, barometric pressure, humidity, rainfall, solar radiation, wind speed and direction. 
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/102/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYSS.M1', the device named 'Davis Vantage Pro2 Plus 6162C A111110P024' (device code: DAVIS6162CA111110P024, ID: 13201) belongs to the category 'METSTN'. It has been operational since May 03, 2012. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: 	http://vocab.nerc.ac.uk/collection/L22/current/TOOL1512/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=13201
+
+Device Category Info for location code 'CBYSS.M2':
+- Category Code: METSTN
+- Category Name: Meteorological Station
+- Short Description: Meteorological Station
+- Long Description:  Meteorological stations are instruments that make routine meteorological measurements on the atmosphere and are comprised of a suite of sensors. Typical examples of measurements include temperature, barometric pressure, humidity, rainfall, solar radiation, wind speed and direction. 
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/102/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CBYSS.M2', the device named 'Lufft WS501 (S/N 072.0912.1009.031) Weather Station' (device code: LUFFTWS501-07209121009031, ID: 23184) belongs to the category 'METSTN'. It has been operational since August 22, 2013. This device collects data approximately every 60.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1365/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23184
+
+Device Category Info for location code 'CBYSU':
+- Category Code: INTERNAL_DEVICE_MONITOR
+- Category Name: Internal Device Monitor
+- Short Description: Internal Device Monitor
+- Long Description:  Internal device monitors record the internal conditions of a another device or sensor. They are used to ensure proper functioning of the host instrument.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/PERMON/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CBYSU':
+- Category Code: POWER_SUPPLY
+- Category Name: Power Supply
+- Short Description: Power Supply
+- Long Description:  Power supplies provide power to associated devices.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYSU', the device named 'Omega Environment iBTHX-D Monitor (SN 15110684)' (device code: OMEGAIBTHX15110684, ID: 23551) belongs to the category 'INTERNAL_DEVICE_MONITOR'. It has been operational since August 03, 2016. This device collects data approximately every 8.0 seconds, with each sample consisting of about 4 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23551
+
+At location 'CBYSU', the device named 'TDK Lambda 300VDC Power Supply 15D5095AA' (device code: TDKLAMBDA15D5095AA, ID: 23618) belongs to the category 'POWER_SUPPLY'. It has been operational since September 29, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 4 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23618
+
+Device Category Info for location code 'CBYSU.AC1':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYSU.AC1', the device named 'MOXA ioLogik E1214 TABHC1037724' (device code: iORELAYTABHC1037724, ID: 23616) belongs to the category 'ADAPTER'. It has been operational since August 28, 2015. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23616
+
+Device Category Info for location code 'CBYSU.AC2':
+- Category Code: ADAPTER
+- Category Name: Adapter
+- Short Description: Adapter
+- Long Description:  Instrument adapters connect a variety of sensors and instruments. Typically, these devices do not collect any data, and our digital infrastructure system does not communicate with them.
+- Device Data Available: Yes
+- Vocabulary URI: N/A
+- Vocabulary Source: N/A
+
+At location 'CBYSU.AC2', the device named 'MOXA ioLogik E1242 TADFC1007695' (device code: iORELAYTADFC1007695, ID: 23617) belongs to the category 'ADAPTER'. It has been operational since February 01, 2016. This device collects data approximately every 1.0 seconds, with each sample consisting of about 1 data point. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=23617
+
+Device Category Info for location code 'CF240':
+- Category Code: CDOM
+- Category Name: Coloured Dissolved Organic Matter
+- Short Description: Coloured Dissolved Organic Matter 
+- Long Description:  Coloured Dissolved Organic Matter (CDOM), or Chromophoric, is a component of dissolved organic matter (DOM) that is measured optically. CDOM fluorometers measure the intensity and wavelength distribution of an emission spectrum after excitation by a particular spectrum of light. These parameters detect the amount of CDOM, because it absorbs short wavelengths ranging from blue to ultraviolet.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/113/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CF240':
+- Category Code: CTD
+- Category Name: Conductivity Temperature Depth
+- Short Description: Conductivity Temperature (and Depth Sensor)
+- Long Description:  Conductivity Temperature Depth (CTD) is an instrument package that contains sensors for measuring the conductivity, temperature, and pressure of seawater. Salinity, sound velocity, depth and density are variables that can be derived from sensor measurements. CTDs can carry additional instruments and sensors such as oxygen sensors, turbidity sensors and fluorometers.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/130/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CF240':
+- Category Code: FLUOROMETER
+- Category Name: Fluorometer
+- Short Description: Fluorometer
+- Long Description:  Fluorometers measure the amount of stimulated electromagnetic radiation (fluorescence) produced by pulses of electromagnetic radiation emitted into the water column.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/113/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CF240':
+- Category Code: NAV
+- Category Name: Navigation System
+- Short Description: Navigation
+- Long Description:  Navigational instruments are used to measure and record positional information of ships, buoys, and autonomous underwater vehicles (AUVs). Typical sensors include latitude, longitude, speed, heading, pitch, roll, and depth.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/301/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CF240':
+- Category Code: OXYSENSOR
+- Category Name: Oxygen Sensor
+- Short Description: Oxygen Sensor
+- Long Description:  Oxygen sensors measure dissolved oxygen concentration in seawater.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/351/
+- Vocabulary Source: SeaDataNet device categories
+
+Device Category Info for location code 'CF240':
+- Category Code: TURBIDITYMETER
+- Category Name: Turbidity Meter
+- Short Description: Turbidity Meter
+- Long Description:  Turbidity meters are sensors that detect scattered light from suspended particles in water. The amount of scattered light that reaches the detector is proportional to the turbidity or particle concentration in the water.
+- Device Data Available: Yes
+- Vocabulary URI: http://vocab.nerc.ac.uk/collection/L05/current/123/
+- Vocabulary Source: SeaDataNet device categories
+
+At location 'CF240', the device named 'Alec Electronics Rinko-III 0408' (device code: ALECRINKO0408, ID: 48141) belongs to the category 'OXYSENSOR'. It has been operational since May 14, 2020. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1294/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=48141
+
+At location 'CF240', the device named 'AML-6 LGR A60156' (device code: AML6LGRA60156, ID: 83552) belongs to the category 'CTD'. It has been operational since September 19, 2023. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1599/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=83552
+
+At location 'CF240', the device named 'AML CTD Plus X 50334' (device code: AMLPLUSX50334, ID: 48040) belongs to the category 'CTD'. It has been operational since May 14, 2020. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1410/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=48040
+
+At location 'CF240', the device named 'JFE Rinko ARO-FT (SN 0FNR014)' (device code: JFERINKOFT0FNR014, ID: 83792) belongs to the category 'OXYSENSOR'. It has been operational since August 31, 2023. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1783/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=83792
+
+At location 'CF240', the device named 'Samsung Galaxy Tab Active3 (SN R52TA09CYBL)' (device code: SAMSUNGGALAXYTABActive3R52TA09CYBL, ID: 79312) belongs to the category 'NAV'. It has been operational since May 07, 2024. This device collects data approximately every 5.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=79312
+
+At location 'CF240', the device named 'Turner Cyclops-7 Fluorometer (S/N 900178)' (device code: TURNERCYCLOPS7-900178, ID: 48260) belongs to the category 'FLUOROMETER'. It has been operational since May 14, 2020. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1447/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=48260
+
+At location 'CF240', the device named 'Turner Cyclops-7 Fluorometer (S/N 900184)' (device code: TURNERCYCLOPS7-900184, ID: 48360) belongs to the category 'CDOM'. It has been operational since May 14, 2020. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1447/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=48360
+
+At location 'CF240', the device named 'Turner Cyclops-7F Fluorometer (S/N 900362)' (device code: TURNERCYCLOPS7F-900362, ID: 79372) belongs to the category 'TURBIDITYMETER'. It has been operational since January 03, 2023. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1447/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=79372
+
+At location 'CF240', the device named 'Turner Cyclops-7F Fluorometer (S/N 900436)' (device code: TURNERCYCLOPS7F-900436, ID: 79352) belongs to the category 'FLUOROMETER'. It has been operational since February 22, 2023. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1447/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=79352
+
+At location 'CF240', the device named 'Turner Cyclops-7F Fluorometer (S/N 900473)' (device code: TURNERCYCLOPS7F-900473, ID: 83572) belongs to the category 'CDOM'. It has been operational since September 19, 2023. This device collects data approximately every 0.167 seconds, with each sample consisting of about 1 data point. The device has collected usable data. It is classified under the vocabulary 'SeaVoX Device Catalogue', which can be referenced here: http://vocab.nerc.ac.uk/collection/L22/current/TOOL1447/. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=83572
+
+At location 'CF240', the device named 'XSlate D10 Tablet (S/N SY9560FS00043)' (device code: XSLATED10SY9560FS00043, ID: 49060) belongs to the category 'NAV'. It has been operational since May 01, 2020. This device collects data approximately every 5.0 seconds, with each sample consisting of about 0 data points. The device has collected usable data. More details can be found at: https://data.oceannetworks.ca/DeviceListing?DeviceId=49060
+
