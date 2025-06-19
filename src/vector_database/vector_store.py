@@ -10,6 +10,8 @@ from pathlib import Path
 from langchain.schema import Document
 from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import chromadb
+
 
 from .embeddings import EmbeddingManager
 
