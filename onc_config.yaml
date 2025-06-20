@@ -16,7 +16,7 @@ llm:
 
 embeddings:
   provider: mistral
-  model: Linq-AI-Research/Linq-Embed-Mistral
+  model: mistral-embed
 
 processing:
   chunk_size: 500

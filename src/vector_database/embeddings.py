@@ -13,7 +13,17 @@ from chromadb.utils.embedding_functions import MistralEmbeddingFunction
 
 
 logger = logging.getLogger(__name__)
+class EmbeddingWrapper:
+        def __init__(self, embedding_fn):
+            self.embedding_fn = embedding_fn
 
+        def embed_query(self, query):
+            # Assumes query is a single string
+            return self.embedding_fn([query])[0]
+
+        def embed_documents(self, documents):
+            # Assumes documents is a list of strings
+            return self.embedding_fn(documents)
 
 class EmbeddingManager:
     """Manages embedding generation and configuration."""
@@ -39,7 +49,9 @@ class EmbeddingManager:
 
         if provider == 'mistral':
             self.embedding_model = "mistral-embed"
-            self.embedding_function = MistralEmbeddingFunction(model=self.embedding_model)
+            raw_embedding_fn = MistralEmbeddingFunction(model=self.embedding_model)
+            self.embedding_function = EmbeddingWrapper(raw_embedding_fn)
+            
         
             
         else:
@@ -74,3 +86,5 @@ class EmbeddingManager:
             Tuple: List of embedding vectors
         """
         return self.embedding_model.encode(documents)
+    
+    
