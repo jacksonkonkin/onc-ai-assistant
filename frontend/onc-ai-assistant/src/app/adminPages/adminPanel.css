@@ -53,6 +53,7 @@
     margin: 5px 0px;
     border: 1px solid grey;
     border-radius: 15px;
+    font-family: "Open Sans", sans-serif;
 }
 
 .upload {
@@ -69,6 +70,7 @@
 .upload p {
     text-align: center;
     color: #7F7F7F;
+    font-family: "Open Sans", sans-serif;
 }
 
 .upload label {
@@ -80,4 +82,5 @@
     border-radius: 25px;
     cursor: pointer;
     font-weight: bold;
+    font-family: "Open Sans", sans-serif;
 }
