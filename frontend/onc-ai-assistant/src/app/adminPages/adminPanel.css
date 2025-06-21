@@ -31,7 +31,6 @@
     flex-basis: 75em;
     height: 25%;
     border-radius: 15px;
-    /* border: 2px solid black; */
     box-shadow: 0 4px 4px 4px #BFBFBF;
     padding: 20px;
     margin: 1rem 0;
@@ -43,6 +42,17 @@
     font-size: 1.5rem;
     color: #123253;
     padding: 10px 20px;
+}
+
+.frequent-queries {
+    padding: 5px 20px;
+}
+
+.frequent-queries li {
+    padding: 5px 10px;
+    margin: 5px 0px;
+    border: 1px solid grey;
+    border-radius: 15px;
 }
 
 .upload {
