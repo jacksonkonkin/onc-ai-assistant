@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+.admin-container h1 {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: #123253;
+    padding: 20px 0 0 20px;
+}
+
+.admin-dashboard {
+    box-sizing: border-box;
+    width: 90vw;
+    margin: auto;
+    justify-content: space-evenly;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: stretch;
+    height: 100vh;
+}
+
+.dash-column {
+    flex-basis: 45em;
+    margin: 0 1rem;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
+}
+
+.module {
+    flex-basis: 75em;
+    height: 25%;
+    border-radius: 15px;
+    /* border: 2px solid black; */
+    box-shadow: 0 4px 4px 4px #BFBFBF;
+    padding: 20px;
+    margin: 1rem 0;
+}
+
+.module h2 {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #123253;
+    padding: 10px 20px;
+}
+
+.upload {
+    border: 2px dashed #7F7F7F;
+    height: 60%;
+    margin: auto;
+    max-width: 90%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload p {
+    text-align: center;
+    color: #7F7F7F;
+}
+
+.upload label {
+    padding: 12px 24px;
+    align-self: center;
+    background-color: #129DC0;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+}
