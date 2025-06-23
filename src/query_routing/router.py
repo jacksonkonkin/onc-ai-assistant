@@ -9,6 +9,10 @@ from enum import Enum
 import asyncio
 import os
 from groq import Groq
+from transformers import BertForSequenceClassification, BertTokenizer
+from huggingface_hub import hf_hub_download
+import torch
+import pickle
 
 logger = logging.getLogger(__name__)
 
@@ -35,16 +39,38 @@ class QueryRouter:
         self.vector_keywords = self._load_vector_keywords()
         self.database_keywords = self._load_database_keywords()
         
-        # Initialize LLM client for enhanced routing
+        # Initialize BERT model for query classification
+        self.bert_model = None
+        self.bert_tokenizer = None
+        self.label_encoder = None
+        
+        try:
+            repo_id = "kgosal03/bert-query-classifier"
+            self.bert_model = BertForSequenceClassification.from_pretrained(repo_id)
+            self.bert_tokenizer = BertTokenizer.from_pretrained(repo_id)
+            
+            # Load label encoder
+            label_path = hf_hub_download(repo_id, filename="label_encoder.pkl")
+            with open(label_path, "rb") as f:
+                self.label_encoder = pickle.load(f)
+            
+            # Set model to evaluation mode
+            self.bert_model.eval()
+            logger.info("BERT-based query routing enabled")
+        except Exception as e:
+            logger.warning(f"Failed to initialize BERT model: {e}")
+        
+        # Initialize LLM client for fallback routing
         self.groq_client = None
         if os.getenv('GROQ_API_KEY'):
             try:
                 self.groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
-                logger.info("LLM-based query routing enabled")
+                logger.info("LLM fallback routing enabled")
             except Exception as e:
                 logger.warning(f"Failed to initialize LLM client: {e}")
         
-        # Enable/disable LLM routing
+        # Enable/disable BERT routing (prefer BERT over LLM)
+        self.use_bert_routing = self.config.get('use_bert_routing', True) and self.bert_model is not None
         self.use_llm_routing = self.config.get('use_llm_routing', True) and self.groq_client is not None
     
     def _load_vector_keywords(self) -> List[str]:
@@ -92,7 +118,23 @@ class QueryRouter:
         conversation_context = context.get('conversation_context', '')
         follow_up_info = context.get('follow_up_info', {})
         
-        # Use LLM-based routing if available, otherwise fall back to keyword-based
+        # Use BERT-based routing if available, otherwise fall back to LLM, then keyword-based
+        if self.use_bert_routing:
+            try:
+                routing_decision = self._bert_route_query(query, context)
+                
+                # Enhance routing decision with conversation context
+                if conversation_context or follow_up_info.get('is_follow_up'):
+                    routing_decision = self._enhance_routing_with_context(
+                        routing_decision, query, context
+                    )
+                
+                logger.info(f"BERT routed query to: {routing_decision['type']}")
+                return routing_decision
+            except Exception as e:
+                logger.warning(f"BERT routing failed, falling back to LLM: {e}")
+        
+        # Fallback to LLM-based routing if BERT fails
         if self.use_llm_routing:
             try:
                 routing_decision = self._llm_route_query(query, context)
@@ -125,6 +167,240 @@ class QueryRouter:
         
         logger.info(f"Keyword routed query to: {routing_decision['type']}")
         return routing_decision
+    
+    def _bert_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Use BERT model to classify and route the query.
+        
+        Args:
+            query: User query
+            context: Additional context for routing
+            
+        Returns:
+            Dict: Routing decision with type and parameters
+        """
+        # Tokenize input
+        inputs = self.bert_tokenizer(query, return_tensors="pt", truncation=True, padding=True)
+        
+        # Predict
+        with torch.no_grad():
+            outputs = self.bert_model(**inputs)
+            predicted_class_id = torch.argmax(outputs.logits, dim=1).item()
+            
+            # Get confidence score (softmax probability)
+            probabilities = torch.softmax(outputs.logits, dim=1)
+            confidence = probabilities[0][predicted_class_id].item()
+        
+        # Decode the label
+        predicted_label = self.label_encoder.inverse_transform([predicted_class_id])[0]
+        
+        logger.debug(f"BERT classified query as: {predicted_label} (confidence: {confidence:.3f})")
+        
+        # Apply post-processing correction for known BERT model issues
+        corrected_label = self._correct_bert_classification(predicted_label, query)
+        if corrected_label != predicted_label:
+            logger.info(f"Corrected BERT classification from '{predicted_label}' to '{corrected_label}'")
+            predicted_label = corrected_label
+        
+        # Map BERT classification to routing decision
+        return self._map_bert_classification_to_route(predicted_label, confidence, context, query)
+    
+    def _correct_bert_classification(self, predicted_label: str, query: str) -> str:
+        """
+        Apply post-processing corrections for known BERT model classification issues.
+        
+        Args:
+            predicted_label: Original BERT classification
+            query: User query
+            
+        Returns:
+            Corrected classification
+        """
+        query_lower = query.lower()
+        
+        # Keywords that strongly indicate data/observation requests
+        data_request_keywords = [
+            "do you have", "show me", "get me", "give me", "find", "retrieve",
+            "data", "measurements", "readings", "values", "observations",
+            "temperature data", "salinity data", "pressure data", "ph data",
+            "sensor data", "instrument data", "latest", "recent", "current",
+            "from yesterday", "from today", "last week", "last month"
+        ]
+        
+        # Temporal patterns that indicate data requests
+        temporal_patterns = [
+            "last year", "this day last year", "yesterday", "today", "last week",
+            "last month", "on this day", "current", "now", "recent", "latest"
+        ]
+        
+        # Parameter patterns that indicate observation queries
+        parameter_patterns = [
+            "temperature", "salinity", "pressure", "ph", "oxygen", "conductivity",
+            "chlorophyll", "turbidity", "density", "fluorescence"
+        ]
+        
+        # If classified as deployment_info but contains strong data request indicators
+        if predicted_label == "deployment_info":
+            data_score = sum(1 for keyword in data_request_keywords if keyword in query_lower)
+            temporal_score = sum(1 for pattern in temporal_patterns if pattern in query_lower)
+            parameter_score = sum(1 for param in parameter_patterns if param in query_lower)
+            
+            # High confidence observation query patterns
+            if any(pattern in query_lower for pattern in [
+                "what was the", "what is the", "current", "temperature in", "temperature at",
+                "temperature on", "data from", "measurements from", "readings from"
+            ]):
+                return "observation_query"
+            
+            # If query has temporal references + parameters = observation query
+            if temporal_score >= 1 and parameter_score >= 1:
+                return "observation_query"
+            
+            # If query has multiple data request indicators, likely an observation query
+            if data_score >= 2:
+                return "observation_query"
+        
+        # If classified as general_knowledge but contains specific data/time requests
+        elif predicted_label == "general_knowledge":
+            if any(pattern in query_lower for pattern in [
+                "measurements from", "data from", "yesterday", "last week",
+                "show me", "get me", "give me data"
+            ]):
+                return "observation_query"
+        
+        return predicted_label
+    
+    def _map_bert_classification_to_route(self, classification: str, confidence: float, 
+                                        context: Dict[str, Any], query: str) -> Dict[str, Any]:
+        """
+        Map BERT classification to routing decision.
+        
+        Args:
+            classification: BERT classification result
+            confidence: Classification confidence score
+            context: Context information
+            query: Original query
+            
+        Returns:
+            Dict: Routing decision
+        """
+        has_vector_store = context.get('has_vector_store', True)
+        has_database = context.get('has_database', False)
+        
+        # Determine confidence level
+        confidence_level = 'high' if confidence > 0.8 else 'medium' if confidence > 0.6 else 'low'
+        
+        if classification == "observation_query" and has_database:
+            return {
+                'type': QueryType.DATABASE_SEARCH,
+                'classification': classification,
+                'confidence': confidence_level,
+                'bert_confidence': confidence,
+                'parameters': {
+                    'search_type': 'structured',
+                    'bert_classified': True
+                }
+            }
+        
+        elif classification == "deployment_info" and has_vector_store:
+            return {
+                'type': QueryType.VECTOR_SEARCH,
+                'classification': classification,
+                'confidence': confidence_level,
+                'bert_confidence': confidence,
+                'parameters': {
+                    'search_type': 'semantic',
+                    'bert_classified': True
+                }
+            }
+        
+        elif classification == "document_search" and has_vector_store:
+            return {
+                'type': QueryType.VECTOR_SEARCH,
+                'classification': classification,
+                'confidence': confidence_level,
+                'bert_confidence': confidence,
+                'parameters': {
+                    'search_type': 'semantic',
+                    'bert_classified': True
+                }
+            }
+        
+        elif classification == "general_knowledge":
+            # For general knowledge, prefer vector search if available, otherwise direct LLM
+            if has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'bert_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'reason': 'General knowledge query without vector store',
+                        'bert_classified': True
+                    }
+                }
+        
+        else:
+            # Fallback - check what data sources are available
+            if has_database and has_vector_store:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'vector_weight': 0.5,
+                        'database_weight': 0.5,
+                        'reason': f'Uncertain classification: {classification}',
+                        'bert_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Uncertain classification: {classification}',
+                        'bert_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Uncertain classification: {classification}',
+                        'bert_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'reason': f'No data sources available, classification: {classification}',
+                        'bert_classified': True
+                    }
+                }
     
     def _llm_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -221,13 +497,13 @@ Respond with ONLY the category name: deployment_info, observation_query, general
                 }
             }
         
-        elif classification == "deployment_info" and has_database:
+        elif classification == "deployment_info" and has_vector_store:
             return {
-                'type': QueryType.DATABASE_SEARCH,
+                'type': QueryType.VECTOR_SEARCH,
                 'classification': classification,
                 'confidence': 'high',
                 'parameters': {
-                    'search_type': 'deployment',
+                    'search_type': 'semantic',
                     'llm_classified': True
                 }
             }
@@ -482,10 +758,22 @@ Respond with ONLY the category name: deployment_info, observation_query, general
         return {
             'vector_keywords_count': len(self.vector_keywords),
             'database_keywords_count': len(self.database_keywords),
+            'bert_routing_enabled': self.use_bert_routing,
+            'bert_model_available': self.bert_model is not None,
             'llm_routing_enabled': self.use_llm_routing,
             'groq_client_available': self.groq_client is not None,
             'config': self.config
         }
+    
+    def set_bert_routing(self, enabled: bool):
+        """Enable or disable BERT-based routing."""
+        if enabled and self.bert_model is None:
+            logger.warning("Cannot enable BERT routing: BERT model not available")
+            return False
+        
+        self.use_bert_routing = enabled
+        logger.info(f"BERT routing {'enabled' if enabled else 'disabled'}")
+        return True
     
     def set_llm_routing(self, enabled: bool):
         """Enable or disable LLM-based routing."""

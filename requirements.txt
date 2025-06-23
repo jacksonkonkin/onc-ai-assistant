@@ -1,7 +1,6 @@
 # Core dependencies for Generic JSON RAG Application
 langchain>=0.1.0
 langchain-community>=0.0.20
-langchain-openai>=0.0.5
 langchain-ollama>=0.1.0
 langchain-core>=0.1.23
 langchain-chroma>=0.2.4
@@ -11,9 +10,6 @@ scikit-learn>=1.3.0
 numpy>=1.24.0
 chromadb>=0.4.0
 mistralai >= 1.8.2
-
-# OpenAI API (if using OpenAI embeddings)
-openai>=1.0.0
 
 # Configuration and utilities
 PyYAML>=6.0
@@ -29,9 +25,13 @@ beautifulsoup4>=4.12.0         # HTML parsing
 PyPDF2>=3.0.0                  # PDF document processing
 lxml>=4.9.0                    # XML/HTML parser for BeautifulSoup
 
+# Required for BERT query routing
+transformers>=4.21.0
+huggingface_hub>=0.16.0
+torch>=1.13.0
+
 # Optional: for alternative embedding providers
 # sentence-transformers>=2.2.0
-# transformers>=4.21.0
 
 # core dependencies for backend API deployment
 fastapi

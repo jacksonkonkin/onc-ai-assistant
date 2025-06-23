@@ -82,7 +82,20 @@ class EnhancedParameterExtractor:
             "wind direction": "winddirection",
             "humidity": "relativehumidity",
             "pressure atmospheric": "absolutebarometricpressure",
-            "barometric pressure": "absolutebarometricpressure"
+            "barometric pressure": "absolutebarometricpressure",
+            # Acoustic and ship noise mappings
+            "ship noise": "soundpressurelevel",
+            "acoustic": "soundpressurelevel",
+            "underwater sound": "soundpressurelevel",
+            "noise levels": "soundpressurelevel",
+            "sound pressure": "soundpressurelevel",
+            "ambient noise": "soundpressurelevel",
+            "hydrophone data": "soundpressurelevel",
+            "acoustic data": "soundpressurelevel",
+            "sound": "soundpressurelevel",
+            "underwater noise": "soundpressurelevel",
+            "vessel noise": "soundpressurelevel",
+            "marine noise": "soundpressurelevel"
         }
         
         # Location name mappings
@@ -158,7 +171,9 @@ class EnhancedParameterExtractor:
             "CTD": ["seawatertemperature", "salinity", "pressure", "depth", "conductivity"],
             "OXYSENSOR": ["oxygen", "seawatertemperature"],
             "PHSENSOR": ["ph", "seawatertemperature"],
-            "METSTN": ["airtemperature", "windspeed", "humidity", "absolutebarometricpressure"]
+            "METSTN": ["airtemperature", "windspeed", "humidity", "absolutebarometricpressure"],
+            "ICEPROFILER": ["soundpressurelevel", "seawatertemperature", "icedraft", "pingtime"],
+            "HYDROPHONE": ["amperage", "batterycharge", "voltage", "internaltemperature"]
         }
 
     def extract_parameters(self, query: str) -> Dict:
@@ -196,9 +211,11 @@ Return ONLY a JSON object with these exact fields:
 
 Mapping rules:
 - For temperature/temp/hot/cold/warm → map to "seawatertemperature" if water-related, "airtemperature" if air/weather
+- For ship noise/acoustic/sound/hydrophone/underwater noise → map to "soundpressurelevel" property with "ICEPROFILER" device
 - For Cambridge Bay standard queries → use "CBYIP" location with "CTD" device
 - For weather/wind/air queries → use "CBYSS.M1" or "CBYSS.M2" location with "METSTN" device  
 - For salt/salinity → use "salinity" property with CTD device
+- For acoustic/sound pressure measurements → use "ICEPROFILER" device at "CBYIP" location
 - Always use exact codes from the available options
 - If location unclear, default to "CBYIP"
 - If device unclear for property, pick the most appropriate device that has that property
@@ -323,8 +340,17 @@ Return ONLY the JSON object."""
             if property_code in self.device_properties.get(device, []):
                 return device
         
-        # Fallback logic
-        if any("temp" in property_code.lower() for prop in ["seawatertemperature"]):
+        # Fallback logic for specific property types
+        
+        # Acoustic properties should use ICEPROFILER
+        if "sound" in property_code.lower() or property_code == "soundpressurelevel":
+            if "ICEPROFILER" in available_devices:
+                return "ICEPROFILER"
+            elif "HYDROPHONE" in available_devices:
+                return "HYDROPHONE"  # Fallback, though may not have acoustic data
+        
+        # Temperature properties should use CTD or weather station
+        if any(temp_term in property_code.lower() for temp_term in ["temp", "seawatertemperature"]):
             if "CTD" in available_devices:
                 return "CTD"
             elif "METSTN" in available_devices:
