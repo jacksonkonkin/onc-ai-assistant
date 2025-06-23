@@ -53,6 +53,9 @@ INSTRUCTIONS:
 - If the provided context doesn't contain sufficient information, clearly state this
 - Suggest related ONC resources or data products when appropriate
 - Maintain scientific accuracy and cite document sources when possible
+- If this is a follow-up question, reference previous conversation context appropriately
+
+{conversation_history}
 
 CONTEXT FROM ONC DOCUMENTS:
 {documents}
@@ -60,7 +63,7 @@ CONTEXT FROM ONC DOCUMENTS:
 USER QUESTION: {question}
 
 EXPERT ONC ANALYSIS:""",
-            input_variables=["question", "documents"]
+            input_variables=["question", "documents", "conversation_history"]
         )
         
         # Direct mode template (without documents)
@@ -84,13 +87,16 @@ INSTRUCTIONS:
 - If you don't have specific information, clearly state this and suggest consulting ONC resources
 - Suggest related ONC data products or documentation when appropriate
 - Maintain scientific accuracy and provide educational value
+- If this is a follow-up question, reference previous conversation context appropriately
+
+{conversation_history}
 
 NOTE: No specific ONC documents are currently loaded, so responses are based on general oceanographic knowledge.
 
 USER QUESTION: {question}
 
 EXPERT ONC ANALYSIS:""",
-            input_variables=["question"]
+            input_variables=["question", "conversation_history"]
         )
 
     
@@ -114,13 +120,15 @@ EXPERT ONC ANALYSIS:""",
         self.direct_chain = direct_chain
         logger.info("Direct mode chain initialized")
     
-    def process_rag_query(self, question: str, documents: List[Document]) -> str:
+    def process_rag_query(self, question: str, documents: List[Document], 
+                         conversation_context: str = "") -> str:
         """
         Process query using RAG mode with documents.
         
         Args:
             question: User question
             documents: Retrieved documents
+            conversation_context: Previous conversation context
             
         Returns:
             Generated response
@@ -132,10 +140,14 @@ EXPERT ONC ANALYSIS:""",
             # Format documents for the prompt
             formatted_docs = self._format_documents(documents)
             
+            # Format conversation context
+            formatted_conversation = self._format_conversation_context(conversation_context)
+            
             # Generate response
             response = self.rag_chain({
                 "question": question,
-                "documents": formatted_docs
+                "documents": formatted_docs,
+                "conversation_history": formatted_conversation
             })
             
             logger.info("RAG query processed successfully")
@@ -145,12 +157,13 @@ EXPERT ONC ANALYSIS:""",
             logger.error(f"Error processing RAG query: {e}")
             return f"Sorry, I encountered an error processing your question: {str(e)}"
     
-    def process_direct_query(self, question: str) -> str:
+    def process_direct_query(self, question: str, conversation_context: str = "") -> str:
         """
         Process query using direct LLM mode.
         
         Args:
             question: User question
+            conversation_context: Previous conversation context
             
         Returns:
             Generated response
@@ -159,7 +172,13 @@ EXPERT ONC ANALYSIS:""",
             self.setup_direct_mode()
         
         try:
-            response = self.direct_chain({"question": question})
+            # Format conversation context
+            formatted_conversation = self._format_conversation_context(conversation_context)
+            
+            response = self.direct_chain({
+                "question": question,
+                "conversation_history": formatted_conversation
+            })
             logger.info("Direct query processed successfully")
             return response
             
@@ -168,7 +187,8 @@ EXPERT ONC ANALYSIS:""",
             return f"Sorry, I encountered an error processing your question: {str(e)}"
     
     def process_hybrid_query(self, question: str, vector_docs: List[Document], 
-                           database_results: List[Dict[str, Any]]) -> str:
+                           database_results: List[Dict[str, Any]], 
+                           conversation_context: str = "") -> str:
         """
         Process query using hybrid mode (vector + database results).
         
@@ -176,6 +196,7 @@ EXPERT ONC ANALYSIS:""",
             question: User question
             vector_docs: Documents from vector search
             database_results: Results from database search
+            conversation_context: Previous conversation context
             
         Returns:
             Generated response
@@ -187,10 +208,14 @@ EXPERT ONC ANALYSIS:""",
             # Combine vector documents and database results
             combined_context = self._combine_contexts(vector_docs, database_results)
             
+            # Format conversation context
+            formatted_conversation = self._format_conversation_context(conversation_context)
+            
             # Generate response
             response = self.rag_chain({
                 "question": question,
-                "documents": combined_context
+                "documents": combined_context,
+                "conversation_history": formatted_conversation
             })
             
             logger.info("Hybrid query processed successfully")
@@ -245,6 +270,31 @@ EXPERT ONC ANALYSIS:""",
             formatted_results.append(result_text)
         
         return "\n".join(formatted_results)
+    
+    def _format_conversation_context(self, conversation_context: str) -> str:
+        """
+        Format conversation context for inclusion in prompts.
+        
+        Args:
+            conversation_context: Raw conversation context string
+            
+        Returns:
+            Formatted conversation context
+        """
+        if not conversation_context or not conversation_context.strip():
+            return ""
+        
+        # If already formatted, return as is
+        if conversation_context.startswith("Previous conversation context:"):
+            return conversation_context
+        
+        # Otherwise, format it properly
+        return f"""
+CONVERSATION CONTEXT:
+{conversation_context}
+
+Instructions: Reference the above conversation when answering the current question. If this appears to be a follow-up question, provide context-aware responses that build on previous answers.
+"""
     
     def get_engine_status(self) -> Dict[str, Any]:
         """Get current engine status and configuration."""

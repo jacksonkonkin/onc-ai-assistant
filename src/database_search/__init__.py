@@ -1,9 +1,11 @@
 """
 Database Search Module
-Handles Ocean 3 database queries and structured data search
-Teams: Backend team + Data team + LLM team
+Natural language queries to Ocean Networks Canada API
 """
 
-from .ocean3_client import Ocean3Client
+# Main components available for import
+from .ocean_query_system import OceanQuerySystem
+from .enhanced_parameter_extractor import EnhancedParameterExtractor
+from .onc_api_client import ONCAPIClient
 
-__all__ = ['Ocean3Client']
+__all__ = ['OceanQuerySystem', 'EnhancedParameterExtractor', 'ONCAPIClient']

@@ -36,3 +36,5 @@ logs/
 *.temp
 
 .claude
+
+Data-Engineering/

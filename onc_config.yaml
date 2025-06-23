@@ -1,7 +1,7 @@
 document_dir: onc_documents
 
 llm:
-  provider: groq  # groq, ollama, or openai
+  provider: groq  # groq or ollama only (OpenAI removed)
   groq:
     model: llama3-70b-8192
     temperature: 0.1
@@ -9,10 +9,7 @@ llm:
   ollama:
     model: llama3.1
     temperature: 0.1
-  openai:
-    model: gpt-4
-    temperature: 0.1
-    api_key_env: OPENAI_API_KEY
+  # OpenAI configuration removed - using Groq/Ollama only
 
 embeddings:
   provider: mistral
@@ -32,6 +29,21 @@ vector_store:
   persist_directory: onc_vectorstore
   force_rebuild: false
   collection_name: onc_documents
+
+query_routing:
+  use_llm_routing: true  # Enable LLM-based query routing
+  vector_threshold: 0.1
+  database_threshold: 0.05
+  hybrid_threshold: 0.15
+
+conversation:
+  max_history_length: 10  # Maximum conversation exchanges to remember
+  context_window_minutes: 30  # Minutes after which context becomes less relevant
+
+ocean_responses:
+  enhanced_formatting: false  # Enable natural language responses for ocean data (temporarily disabled for debugging)
+  include_educational_context: true  # Add educational explanations
+  show_technical_summary: true  # Include technical details at the end
 
 onc_specific:
   cambridge_bay_focus: true
