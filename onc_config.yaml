@@ -15,9 +15,8 @@ llm:
     api_key_env: OPENAI_API_KEY
 
 embeddings:
-  provider: openai
-  model: text-embedding-ada-002
-  api_key_env: OPENAI_API_KEY
+  provider: mistral
+  model: mistral-embed
 
 processing:
   chunk_size: 500

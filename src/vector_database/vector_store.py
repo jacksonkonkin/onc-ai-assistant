@@ -4,12 +4,15 @@ Teams: Data team + LLM team
 """
 
 import logging
+import shutil
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 from langchain.schema import Document
 from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import chromadb
+
 
 from .embeddings import EmbeddingManager
 

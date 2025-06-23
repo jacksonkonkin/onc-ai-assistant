@@ -7,10 +7,9 @@
   /* Hero section */
   .landing-hero {
     text-align: center;
-    margin-top: auto;
-    margin-bottom: 50%; /*May want to switch this to Auto */
+    margin-top: 5%;
     padding: 20px;
-    color: #00296b;
+    color: #123253;
     background-color: rgba(255, 255, 255, 0.00);
     border-radius: 12px;
     max-width: 700px;
@@ -43,7 +42,8 @@
   .landing-ctaBtn {
     padding: 12px 24px;
     margin: 0 10px;
-    background-color: #129DC0;
+    background: linear-gradient(to right, #129dc0, #123253);
+    width: 20%;
     color: white;
     border: none;
     border-radius: 25px;
@@ -52,7 +52,7 @@
   }
   
   .landing-ctaBtn:hover {
-    background-color: #0096c7;
+    opacity: 0.9;
   }
   
   /* Territorial acknowledgment styling */

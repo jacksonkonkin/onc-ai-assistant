@@ -99,13 +99,13 @@
 }
 
 .send-icon {
-  fill: #007acc;
   transition: fill 0.3s ease;
-  margin-bottom: 8px;
+  margin-bottom: 50%;
 }
 
 .send-button:hover .send-icon {
-  fill: #005b99;
+  opacity: 0.7;
+  transition: color 0.3s ease;
 }
 
 .fish-logo {
@@ -143,3 +143,26 @@
     transform: translateY(-4px);
   }
 }
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+

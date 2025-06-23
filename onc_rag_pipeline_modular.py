@@ -39,15 +39,16 @@ logger = logging.getLogger(__name__)
 def validate_environment():
     """Validate that required environment variables are set."""
     groq_key = os.getenv('GROQ_API_KEY')
-    openai_key = os.getenv('OPENAI_API_KEY')
+    print(groq_key)
+    # openai_key = os.getenv('OPENAI_API_KEY')
     
     if not groq_key:
         logger.error("GROQ_API_KEY is required")
         return False
     
-    if not openai_key:
-        logger.error("OPENAI_API_KEY is required for embeddings")
-        return False
+    ###if not openai_key:
+       ### logger.error("OPENAI_API_KEY is required for embeddings")
+        ### return False
     
     logger.info("Environment validation passed")
     return True
