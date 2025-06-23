@@ -12,7 +12,6 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
 class MessageType(Enum):
     """Types of messages in conversation."""
     USER = "user"
@@ -46,7 +45,6 @@ class ConversationMessage:
             timestamp=datetime.fromisoformat(data['timestamp']),
             metadata=data.get('metadata')
         )
-
 
 class ConversationManager:
     """Manages conversation context and memory."""
