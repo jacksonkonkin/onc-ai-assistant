@@ -23,6 +23,16 @@ It’s designed to run **interactively in terminal**, keeping the model and data
 pip install pandas torch sentence-transformers
 ```
 
+NOTE: Make sure to keep the csv files along with script as they are needed when you run the model for the first time at least.
+
+### Project Structure:
+
+├── app.py # Main script
+├── deployments.csv
+├── device_info.csv
+├── property.csv
+├── device_category.csv
+├── locations.csv
 ## To Run
 
 ```bash

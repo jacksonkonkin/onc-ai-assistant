@@ -9,6 +9,17 @@ A lightweight FastAPI web service that classifies user queries using a pre-train
 pip install fastapi uvicorn pandas sentence-transformers torch
 ```
 
+NOTE: Make sure to keep the csv files along with script as they are needed when you run the model for the first time at least.
+
+### Project Structure:
+
+├── app.py # Main script
+├── deployments.csv
+├── device_info.csv
+├── property.csv
+├── device_category.csv
+├── locations.csv
+
 ## 2. Run the API
 
 ```bash
