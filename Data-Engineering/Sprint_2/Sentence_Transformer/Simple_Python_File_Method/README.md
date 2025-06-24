@@ -1,4 +1,4 @@
-# 🧠 Sentence Classifier (Terminal Version)
+# Sentence Classifier (Terminal Version)
 
 This is a **console-based semantic query classifier** built with Python and [Sentence Transformers](https://www.sbert.net/). It classifies user queries into predefined labels by comparing them against labeled questions from multiple CSV files using **cosine similarity**.
 
