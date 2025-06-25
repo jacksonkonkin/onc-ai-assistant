@@ -834,7 +834,7 @@ Keep questions concise and natural."""
             Formatted suggestions message
         """
         if analysis.volume_level == ResultVolumeLevel.NONE:
-            message = "I couldn't find any results for your query. Here are some suggestions:\n\n"
+            return ""
         elif analysis.volume_level in [ResultVolumeLevel.HIGH, ResultVolumeLevel.EXCESSIVE]:
             message = f"I found {analysis.result_count} results. To help narrow this down:\n\n"
         else:

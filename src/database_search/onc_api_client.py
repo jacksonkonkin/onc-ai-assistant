@@ -254,6 +254,60 @@ class ONCAPIClient:
         
         return response
 
+    def search_data_range(self, location_code: str, device_category: str, 
+                         property_code: str, date_from: str, date_to: str, 
+                         row_limit: int = 1000, max_devices: int = None,
+                         parallel: bool = False) -> Dict[str, Any]:
+        """
+        Enhanced method to search for data ranges with multiple options
+        
+        Args:
+            location_code: ONC location code
+            device_category: ONC device category code
+            property_code: ONC property code
+            date_from: Start date (ISO format)
+            date_to: End date (ISO format)
+            row_limit: Maximum rows per device (default: 1000)
+            max_devices: Maximum number of devices to query (None = all)
+            parallel: Whether to query devices in parallel
+            
+        Returns:
+            Structured response with aggregated data from multiple devices
+        """
+        start_time = time.time()
+        
+        # Get devices
+        devices_response = self._make_request('devices', {
+            'locationCode': location_code,
+            'deviceCategoryCode': device_category
+        })
+        
+        if isinstance(devices_response, dict) and 'error' in devices_response:
+            devices = []
+        elif isinstance(devices_response, list):
+            devices = devices_response
+        elif isinstance(devices_response, dict) and 'data' in devices_response:
+            devices = devices_response['data']
+        else:
+            devices = []
+            
+        if not devices:
+            return {
+                "status": "error",
+                "message": f"No {device_category} devices found at location {location_code}",
+                "data": [],
+                "raw_api_responses": {"devices_request": devices_response}
+            }
+        
+        # Limit devices if specified
+        if max_devices and len(devices) > max_devices:
+            devices = devices[:max_devices]
+        
+        if parallel:
+            return self._search_devices_parallel(devices, property_code, date_from, date_to, row_limit, devices_response)
+        else:
+            return self._search_devices_sequential(devices, property_code, date_from, date_to, row_limit, devices_response)
+
     def search_data(self, location_code: str, device_category: str, 
                    property_code: str, date_from: str, date_to: str, 
                    row_limit: int = 100) -> Dict[str, Any]:
@@ -460,6 +514,200 @@ class ONCAPIClient:
             formatted.append(formatted_entry)
         
         return formatted
+
+    def _search_devices_sequential(self, devices, property_code, date_from, date_to, row_limit, devices_response):
+        """Search devices sequentially (existing logic)"""
+        all_sensor_data = []
+        successful_devices = []
+        all_api_responses = {
+            "devices_request": devices_response,
+            "scalar_data_requests": []
+        }
+        
+        for device in devices:
+            device_code = device['deviceCode']
+            device_name = device.get('deviceName', device_code)
+            
+            logger.info(f"Trying device: {device_name} ({device_code})")
+            
+            scalar_response = self.get_scalar_data(
+                device_code=device_code,
+                property_code=property_code,
+                date_from=date_from,
+                date_to=date_to,
+                row_limit=row_limit
+            )
+            
+            all_api_responses["scalar_data_requests"].append({
+                "device_code": device_code,
+                "device_name": device_name,
+                "response": scalar_response
+            })
+            
+            sensor_data_list = scalar_response.get('sensorData', []) or []
+            
+            matching_sensors = [
+                sensor for sensor in sensor_data_list 
+                if sensor and sensor.get('propertyCode') == property_code
+            ]
+            
+            if matching_sensors:
+                all_sensor_data.extend(matching_sensors)
+                successful_devices.append(device)
+                logger.info(f"Found {len(matching_sensors)} sensors with {property_code} data")
+        
+        return self._format_range_response(all_sensor_data, successful_devices, devices, all_api_responses, property_code)
+
+    def _search_devices_parallel(self, devices, property_code, date_from, date_to, row_limit, devices_response):
+        """Search devices in parallel using threading"""
+        import concurrent.futures
+        import threading
+        
+        all_sensor_data = []
+        successful_devices = []
+        all_api_responses = {
+            "devices_request": devices_response,
+            "scalar_data_requests": []
+        }
+        lock = threading.Lock()
+        
+        def query_device(device):
+            device_code = device['deviceCode']
+            device_name = device.get('deviceName', device_code)
+            
+            scalar_response = self.get_scalar_data(
+                device_code=device_code,
+                property_code=property_code,
+                date_from=date_from,
+                date_to=date_to,
+                row_limit=row_limit
+            )
+            
+            with lock:
+                all_api_responses["scalar_data_requests"].append({
+                    "device_code": device_code,
+                    "device_name": device_name,
+                    "response": scalar_response
+                })
+            
+            sensor_data_list = scalar_response.get('sensorData', []) or []
+            matching_sensors = [
+                sensor for sensor in sensor_data_list 
+                if sensor and sensor.get('propertyCode') == property_code
+            ]
+            
+            if matching_sensors:
+                with lock:
+                    all_sensor_data.extend(matching_sensors)
+                    successful_devices.append(device)
+                logger.info(f"Found {len(matching_sensors)} sensors with {property_code} data from {device_name}")
+        
+        # Execute parallel queries
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(query_device, device) for device in devices]
+            concurrent.futures.wait(futures)
+        
+        return self._format_range_response(all_sensor_data, successful_devices, devices, all_api_responses, property_code)
+
+    def _format_range_response(self, all_sensor_data, successful_devices, all_devices, all_api_responses, property_code):
+        """Format the response for range queries"""
+        if not all_sensor_data:
+            return {
+                "status": "no_data",
+                "message": f"No {property_code} data found from any devices",
+                "data": [],
+                "metadata": {
+                    "devices_checked": len(all_devices),
+                    "successful_devices": 0,
+                    "total_sensors": 0
+                },
+                "raw_api_responses": all_api_responses
+            }
+        
+        # Aggregate statistics
+        total_readings = sum(len(sensor.get('data', {}).get('values', [])) for sensor in all_sensor_data)
+        
+        return {
+            "status": "success",
+            "message": f"Found data from {len(successful_devices)} devices with {len(all_sensor_data)} sensors",
+            "data": all_sensor_data,
+            "metadata": {
+                "devices_checked": len(all_devices),
+                "successful_devices": len(successful_devices),
+                "total_sensors": len(all_sensor_data),
+                "total_readings": total_readings,
+                "successful_device_codes": [d['deviceCode'] for d in successful_devices]
+            },
+            "raw_api_responses": all_api_responses
+        }
+
+    def get_paginated_data(self, location_code: str, device_category: str, 
+                          property_code: str, date_from: str, date_to: str,
+                          page_size: int = 500, max_pages: int = 10) -> Dict[str, Any]:
+        """
+        Get paginated data by splitting time ranges
+        
+        Args:
+            location_code: ONC location code
+            device_category: ONC device category code
+            property_code: ONC property code
+            date_from: Start date (ISO format)
+            date_to: End date (ISO format)
+            page_size: Rows per time chunk
+            max_pages: Maximum number of time chunks
+            
+        Returns:
+            Paginated response with data from multiple time windows
+        """
+        from datetime import datetime, timedelta
+        
+        start_dt = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        end_dt = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+        
+        total_duration = end_dt - start_dt
+        chunk_duration = total_duration / max_pages
+        
+        all_data = []
+        all_responses = []
+        
+        for i in range(max_pages):
+            chunk_start = start_dt + (chunk_duration * i)
+            chunk_end = start_dt + (chunk_duration * (i + 1))
+            
+            chunk_from = chunk_start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+            chunk_to = chunk_end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+            
+            response = self.search_data_range(
+                location_code=location_code,
+                device_category=device_category,
+                property_code=property_code,
+                date_from=chunk_from,
+                date_to=chunk_to,
+                row_limit=page_size
+            )
+            
+            all_responses.append({
+                "chunk": i + 1,
+                "time_range": {"from": chunk_from, "to": chunk_to},
+                "response": response
+            })
+            
+            if response.get('status') == 'success':
+                all_data.extend(response.get('data', []))
+        
+        return {
+            "status": "success" if all_data else "no_data",
+            "message": f"Retrieved {len(all_data)} sensors across {max_pages} time chunks",
+            "data": all_data,
+            "metadata": {
+                "pagination": {
+                    "total_chunks": max_pages,
+                    "chunk_duration_hours": chunk_duration.total_seconds() / 3600,
+                    "page_size": page_size
+                }
+            },
+            "raw_responses": all_responses
+        }
 
     def close(self):
         """Close the session"""

@@ -50,7 +50,10 @@ class OceanQuerySystem:
             raise
 
     def process_query(self, query: str, include_metadata: bool = True, 
-                     query_type: str = "data") -> Dict[str, Any]:
+                     query_type: str = "data", row_limit: int = 1000, 
+                     max_devices: int = None, parallel: bool = False,
+                     use_pagination: bool = False, page_size: int = 500, 
+                     max_pages: int = 10) -> Dict[str, Any]:
         """
         Process a natural language query and return ONC API data
         
@@ -58,6 +61,12 @@ class OceanQuerySystem:
             query: Natural language query
             include_metadata: Whether to include processing metadata
             query_type: Type of query - "data" for sensor data, "device_discovery" for device listing
+            row_limit: Maximum rows per device (default: 1000)
+            max_devices: Maximum number of devices to query (None = all)
+            parallel: Whether to query devices in parallel
+            use_pagination: Whether to use time-based pagination
+            page_size: Rows per time chunk when using pagination
+            max_pages: Maximum number of time chunks
             
         Returns:
             Complete response with data and metadata
@@ -71,7 +80,8 @@ class OceanQuerySystem:
         elif query_type == "data_products":
             return self.process_data_products_query(query, include_metadata)
         else:
-            return self.process_data_query(query, include_metadata)
+            return self.process_data_query(query, include_metadata, row_limit, max_devices, 
+                                         parallel, use_pagination, page_size, max_pages)
 
     def process_device_discovery_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
         """
@@ -432,13 +442,22 @@ class OceanQuerySystem:
                 } if include_metadata else None
             }
 
-    def process_data_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
+    def process_data_query(self, query: str, include_metadata: bool = True,
+                          row_limit: int = 1000, max_devices: int = None, 
+                          parallel: bool = False, use_pagination: bool = False,
+                          page_size: int = 500, max_pages: int = 10) -> Dict[str, Any]:
         """
         Process a sensor data query to download actual measurements
         
         Args:
             query: Natural language query
             include_metadata: Whether to include processing metadata
+            row_limit: Maximum rows per device (default: 1000)
+            max_devices: Maximum number of devices to query (None = all)
+            parallel: Whether to query devices in parallel
+            use_pagination: Whether to use time-based pagination
+            page_size: Rows per time chunk when using pagination
+            max_pages: Maximum number of time chunks
             
         Returns:
             Complete response with sensor data and metadata
@@ -471,14 +490,28 @@ class OceanQuerySystem:
         logger.info("Step 2: Calling ONC API...")
         
         try:
-            api_result = self.api_client.search_data(
-                location_code=params["location_code"],
-                device_category=params["device_category"],
-                property_code=params["property_code"],
-                date_from=params["start_time"],
-                date_to=params["end_time"],
-                row_limit=100
-            )
+            # Choose the appropriate API method based on parameters
+            if use_pagination:
+                api_result = self.api_client.get_paginated_data(
+                    location_code=params["location_code"],
+                    device_category=params["device_category"],
+                    property_code=params["property_code"],
+                    date_from=params["start_time"],
+                    date_to=params["end_time"],
+                    page_size=page_size,
+                    max_pages=max_pages
+                )
+            else:
+                api_result = self.api_client.search_data_range(
+                    location_code=params["location_code"],
+                    device_category=params["device_category"],
+                    property_code=params["property_code"],
+                    date_from=params["start_time"],
+                    date_to=params["end_time"],
+                    row_limit=row_limit,
+                    max_devices=max_devices,
+                    parallel=parallel
+                )
             
             logger.info(f"API call completed with status: {api_result['status']}")
             
