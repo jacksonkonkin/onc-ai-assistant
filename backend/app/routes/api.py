@@ -24,12 +24,13 @@ async def health_check():
 @router.post("/query")
 async def query(query: Query):
     try:
-        # Run the Python script with the query argument
+        # Run the Python script with the query argument from project root
         result = subprocess.run(
             ["python", "onc_rag_pipeline_modular.py", "--query", query.text],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            cwd="/Users/jacksonkonkin/Documents/UVIC/SENG499/onc-ai-assistant"
         )
         response = result.stdout.strip()
         response = response.split("Answer: ",1)[1]

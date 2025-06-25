@@ -1,0 +1,24 @@
+# Query Refinement Configuration
+# This configuration enables the query refinement features
+
+query_refinement:
+  # Enable/disable ambiguity detection
+  enable_ambiguity_detection: true
+  
+  # Enable/disable result suggestions
+  enable_result_suggestions: true
+  
+  # Enable/disable feedback prompts
+  enable_feedback_prompts: true
+  
+  # Threshold for considering query ambiguous (0.0-1.0)
+  ambiguity_threshold: 0.6
+  
+  # Result count thresholds for suggestions
+  moderate_results_threshold: 10
+  high_results_threshold: 20
+  excessive_results_threshold: 50
+
+# Example usage in main config:
+# Include this section in your onc_config.yaml file
+# The query refinement system will automatically be enabled

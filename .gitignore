@@ -9,7 +9,6 @@ ENV/
 
 # ONC documents directory
 
-
 # Python cache
 __pycache__/
 *.pyc
@@ -37,4 +36,3 @@ logs/
 
 .claude
 
-Data-Engineering/

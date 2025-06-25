@@ -25,7 +25,7 @@ export default function ChatPage() {
   const fetchAIResponse = async (prompt: string): Promise<string> => {
     try {
       const response = await fetch(
-        "https://onc-assistant-822f952329ee.herokuapp.com/query",
+        "http://localhost:8000/query",
         {
           method: "POST",
           headers: {

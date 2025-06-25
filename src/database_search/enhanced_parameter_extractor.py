@@ -5,11 +5,14 @@ Maps natural language queries to specific ONC location/device/property codes
 """
 
 import json
+import logging
 import os
 import sys
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple, List
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 def load_env_file():
@@ -41,7 +44,7 @@ except ImportError:
 class EnhancedParameterExtractor:
     """Extract parameters and map to exact ONC codes"""
     
-    def __init__(self):
+    def __init__(self, onc_client=None):
         # Initialize Groq client
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
@@ -49,6 +52,9 @@ class EnhancedParameterExtractor:
         
         self.client = Groq(api_key=api_key)
         self.model = "llama3-70b-8192"
+        
+        # Store ONC API client for location discovery
+        self.onc_client = onc_client
         
         # Load ONC codes mappings
         self._load_onc_codes()
@@ -266,30 +272,41 @@ Return ONLY the JSON object."""
         temporal_type = raw_params.get("temporal_type", "single_date")
         depth = raw_params.get("depth_meters")
         
-        # Validate location code
+        # Validate location code - try dynamic discovery first if available
         if location_code not in self.location_devices:
-            # Try to map from aliases
-            query_lower = original_query.lower()
-            location_code = None
-            for alias, code in self.location_aliases.items():
-                if alias in query_lower:
-                    location_code = code
-                    break
-            
-            if not location_code:
-                location_code = "CBYIP"  # Default location
+            # Try dynamic location discovery for Cambridge Bay queries
+            discovered_location = self._discover_location(original_query)
+            if discovered_location:
+                location_code = discovered_location
+            else:
+                # Try to map from aliases
+                query_lower = original_query.lower()
+                location_code = None
+                for alias, code in self.location_aliases.items():
+                    if alias in query_lower:
+                        location_code = code
+                        break
+                
+                if not location_code:
+                    location_code = "CBYIP"  # Default location
 
         # Validate device category exists for this location
         available_devices = self.location_devices.get(location_code, [])
         
-        # First check if current device has the requested property
-        current_device_properties = self.device_properties.get(device_category, [])
-        
-        # If device doesn't exist OR device doesn't have the property, find appropriate device
-        if (device_category not in available_devices or 
-            property_code not in current_device_properties):
-            # Try to find appropriate device for the property
-            device_category = self._find_device_for_property(property_code, available_devices)
+        # Try dynamic device discovery if device category is not found
+        if device_category not in available_devices:
+            discovered_device = self._discover_device(original_query)
+            if discovered_device:
+                device_category = discovered_device
+            else:
+                # First check if current device has the requested property
+                current_device_properties = self.device_properties.get(device_category, [])
+                
+                # If device doesn't exist OR device doesn't have the property, find appropriate device
+                if (device_category not in available_devices or 
+                    property_code not in current_device_properties):
+                    # Try to find appropriate device for the property
+                    device_category = self._find_device_for_property(property_code, available_devices)
 
         # Validate property code exists for the selected device
         available_properties = self.device_properties.get(device_category, [])
@@ -319,6 +336,8 @@ Return ONLY the JSON object."""
                 "location_code": location_code,
                 "device_category": device_category,
                 "property_code": property_code,
+                "temporal_reference": temporal_ref if temporal_ref else None,
+                "temporal_type": temporal_type,
                 "start_time": start_time.strftime('%Y-%m-%dT%H:%M:%S.000Z') if start_time else None,
                 "end_time": end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z') if end_time else None,
                 "depth_meters": depth
@@ -360,7 +379,7 @@ Return ONLY the JSON object."""
         return available_devices[0] if available_devices else "CTD"
 
     def _parse_temporal_reference(self, temporal_ref: str, temporal_type: str) -> Tuple[datetime, datetime]:
-        """Convert natural language dates to datetime objects"""
+        """Convert natural language dates and times to datetime objects"""
         if not temporal_ref:
             # Default to last 24 hours
             end_time = datetime.now()
@@ -401,15 +420,79 @@ Return ONLY the JSON object."""
                     # Default to yesterday to avoid future dates
                     date = (now - timedelta(days=1)).date()
         
-        # For single dates, create time range (use a smaller range for better results)
+        # Parse specific time if mentioned
+        specific_time = self._parse_specific_time(temporal_ref)
+        
+        # For single dates, create time range
         if temporal_type == "single_date":
-            start_time = datetime.combine(date, datetime.min.time())
-            end_time = start_time + timedelta(hours=12)  # 12 hour window instead of 24
+            if specific_time is not None:
+                # If specific time is found, create a 2-hour window around it
+                start_time = datetime.combine(date, specific_time)
+                end_time = start_time + timedelta(hours=2)
+            else:
+                # Default to 12-hour window from midnight
+                start_time = datetime.combine(date, datetime.min.time())
+                end_time = start_time + timedelta(hours=12)
         else:
             start_time = datetime.combine(date, datetime.min.time())
-            end_time = start_time + timedelta(days=1)  # 1 day range instead of 7
+            end_time = start_time + timedelta(days=1)  # 1 day range
         
         return start_time, end_time
+
+    def _parse_specific_time(self, temporal_ref: str) -> Optional:
+        """
+        Parse specific time expressions like '4:00pm', '16:00', 'at 4pm', etc.
+        Returns a time object if parsing succeeds, None otherwise.
+        """
+        import re
+        from datetime import time
+        
+        # Common time patterns
+        time_patterns = [
+            # 12-hour format with AM/PM
+            r'(\d{1,2}):(\d{2})\s*(am|pm)',  # 4:00pm, 12:30am
+            r'(\d{1,2})\s*(am|pm)',          # 4pm, 12am
+            r'(\d{1,2}):(\d{2})',            # 16:00, 4:00 (24-hour assumed if > 12)
+            r'at\s+(\d{1,2}):(\d{2})\s*(am|pm)',  # at 4:00pm
+            r'at\s+(\d{1,2})\s*(am|pm)',          # at 4pm
+            r'at\s+(\d{1,2}):(\d{2})',            # at 16:00
+        ]
+        
+        temporal_ref = temporal_ref.lower().strip()
+        
+        for pattern in time_patterns:
+            match = re.search(pattern, temporal_ref)
+            if match:
+                groups = match.groups()
+                
+                if len(groups) == 3:  # Hour, minute, AM/PM
+                    hour, minute, am_pm = groups
+                    hour, minute = int(hour), int(minute)
+                    
+                    # Convert to 24-hour format
+                    if am_pm == 'pm' and hour != 12:
+                        hour += 12
+                    elif am_pm == 'am' and hour == 12:
+                        hour = 0
+                        
+                elif len(groups) == 2:
+                    if groups[1] in ['am', 'pm']:  # Hour only with AM/PM
+                        hour, am_pm = groups
+                        hour, minute = int(hour), 0
+                        
+                        # Convert to 24-hour format
+                        if am_pm == 'pm' and hour != 12:
+                            hour += 12
+                        elif am_pm == 'am' and hour == 12:
+                            hour = 0
+                    else:  # Hour and minute (24-hour format)
+                        hour, minute = int(groups[0]), int(groups[1])
+                
+                # Validate time
+                if 0 <= hour <= 23 and 0 <= minute <= 59:
+                    return time(hour, minute)
+        
+        return None
 
     def _parse_specific_date(self, temporal_ref: str, now: datetime) -> Optional:
         """
@@ -520,6 +603,121 @@ Return ONLY the JSON object."""
                             
                 except (ValueError, IndexError):
                     continue
+        
+        return None
+
+    def _discover_location(self, query: str) -> Optional[str]:
+        """
+        Discover Cambridge Bay location using ONC API client
+        
+        Args:
+            query: User query that may contain location references
+            
+        Returns:
+            Location code if found, None otherwise
+        """
+        if not self.onc_client or not query:
+            return None
+        
+        try:
+            query_lower = query.lower()
+            
+            # Check if query mentions Cambridge Bay
+            if any(term in query_lower for term in ["cambridge bay", "cambridge", "iqaluktuuttiaq"]):
+                # Get Cambridge Bay locations from ONC API
+                cambridge_locations = self.onc_client.find_cambridge_bay_locations()
+                
+                if cambridge_locations:
+                    # For queries about locations/deployments, return the main CBYIP location
+                    # For specific device/sensor queries, could return more specific locations
+                    if any(term in query_lower for term in ["location", "where", "site", "station"]):
+                        # Return first location for general location queries
+                        return cambridge_locations[0].get('locationCode', 'CBYIP')
+                    else:
+                        # For data queries, use CBYIP as default Cambridge Bay location
+                        return 'CBYIP'
+                        
+        except Exception as e:
+            # If API call fails, fall back to default
+            logger.warning(f"Location discovery failed: {e}")
+            return None
+        
+        return None
+
+    def _discover_device(self, query: str) -> Optional[str]:
+        """
+        Discover Cambridge Bay devices using ONC API client
+        
+        Args:
+            query: User query that may contain device references
+            
+        Returns:
+            Device category code if found, None otherwise
+        """
+        if not self.onc_client or not query:
+            return None
+        
+        try:
+            query_lower = query.lower()
+            
+            # Check for device discovery queries
+            device_discovery_terms = [
+                "device", "sensor", "instrument", "equipment", "ctd", "hydrophone",
+                "weather station", "oxygen sensor", "ph sensor", "ice profiler",
+                "what sensors", "what devices", "what instruments"
+            ]
+            
+            if any(term in query_lower for term in device_discovery_terms):
+                # Extract device type from query
+                device_type = self._extract_device_type_from_query(query_lower)
+                
+                if device_type:
+                    # Try to find devices of this type at Cambridge Bay
+                    devices = self.onc_client.discover_devices_by_type(device_type)
+                    
+                    if devices:
+                        # Return the device category of the first matching device
+                        return devices[0].get('deviceCategoryCode')
+                        
+        except Exception as e:
+            logger.warning(f"Device discovery failed: {e}")
+            return None
+        
+        return None
+
+    def _extract_device_type_from_query(self, query_lower: str) -> Optional[str]:
+        """
+        Extract device type from natural language query
+        
+        Args:
+            query_lower: Lowercase query string
+            
+        Returns:
+            Device type if found, None otherwise
+        """
+        # Device type patterns to look for
+        device_patterns = {
+            'ctd': ['ctd', 'conductivity', 'temperature', 'depth'],
+            'hydrophone': ['hydrophone', 'acoustic', 'underwater sound', 'sound pressure'],
+            'weather': ['weather', 'meteorological', 'wind', 'air temperature', 'met station'],
+            'oxygen': ['oxygen', 'o2', 'dissolved oxygen'],
+            'ph': ['ph', 'acidity', 'ph sensor'],
+            'ice': ['ice', 'ice profiler', 'ice draft']
+        }
+        
+        for device_type, patterns in device_patterns.items():
+            if any(pattern in query_lower for pattern in patterns):
+                return device_type
+        
+        # If no specific pattern matched, try generic terms
+        if any(term in query_lower for term in ['sensor', 'device', 'instrument']):
+            # Look for measurement types that might indicate device type
+            if any(term in query_lower for term in ['temperature', 'salinity', 'conductivity']):
+                return 'ctd'
+            elif any(term in query_lower for term in ['wind', 'air', 'weather']):
+                return 'weather'
+            elif any(term in query_lower for term in ['sound', 'acoustic', 'noise']):
+                return 'hydrophone'
         
         return None
 

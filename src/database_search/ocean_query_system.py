@@ -35,8 +35,8 @@ class OceanQuerySystem:
             llm_wrapper: LLM wrapper for enhanced response formatting
         """
         try:
-            self.extractor = EnhancedParameterExtractor()
             self.api_client = ONCAPIClient(onc_token)
+            self.extractor = EnhancedParameterExtractor(onc_client=self.api_client)
             
             # Initialize enhanced response formatter if LLM wrapper is available
             self.enhanced_formatter = None
@@ -49,19 +49,402 @@ class OceanQuerySystem:
             logger.error(f"Failed to initialize system: {e}")
             raise
 
-    def process_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
+    def process_query(self, query: str, include_metadata: bool = True, 
+                     query_type: str = "data") -> Dict[str, Any]:
         """
         Process a natural language query and return ONC API data
         
         Args:
             query: Natural language query
             include_metadata: Whether to include processing metadata
+            query_type: Type of query - "data" for sensor data, "device_discovery" for device listing
             
         Returns:
             Complete response with data and metadata
         """
         start_time = time.time()
-        logger.info(f"Processing query: '{query}'")
+        logger.info(f"Processing {query_type} query: '{query}'")
+        
+        # Route to appropriate processing method
+        if query_type == "device_discovery":
+            return self.process_device_discovery_query(query, include_metadata)
+        elif query_type == "data_products":
+            return self.process_data_products_query(query, include_metadata)
+        else:
+            return self.process_data_query(query, include_metadata)
+
+    def process_device_discovery_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
+        """
+        Process a device discovery query to find available devices/sensors
+        
+        Args:
+            query: Natural language query about devices
+            include_metadata: Whether to include processing metadata
+            
+        Returns:
+            Response with device information
+        """
+        start_time = time.time()
+        logger.info(f"Processing device discovery query: '{query}'")
+        
+        # Step 1: Extract location and device type from query
+        logger.info("Step 1: Extracting parameters for device discovery...")
+        extraction_result = self.extractor.extract_parameters(query)
+        
+        if extraction_result["status"] != "success":
+            return {
+                "status": "error",
+                "stage": "parameter_extraction", 
+                "message": extraction_result.get("message", "Parameter extraction failed"),
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "device_discovery",
+                    "extraction_result": extraction_result,
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+        
+        params = extraction_result["parameters"]
+        logger.info(f"Extracted parameters for device discovery: {params}")
+        
+        # Step 2: Discover devices using ONC API
+        logger.info("Step 2: Discovering devices...")
+        
+        try:
+            # Use device discovery methods instead of data search
+            location_code = params["location_code"]
+            device_category = params.get("device_category")
+            property_code = params.get("property_code")
+            
+            # Search devices with property code filtering if available
+            devices = self.api_client.find_cambridge_bay_devices(
+                device_category=device_category,
+                property_code=property_code
+            )
+            
+            # Filter by location if not all Cambridge Bay
+            if location_code != "CBYIP":
+                devices = [d for d in devices if d.get('_location_info', {}).get('locationCode') == location_code]
+            
+            total_time = time.time() - start_time
+            
+            if devices:
+                return {
+                    "status": "success",
+                    "message": f"Found {len(devices)} devices",
+                    "data": devices,
+                    "metadata": {
+                        "query": query,
+                        "query_type": "device_discovery",
+                        "location_code": location_code,
+                        "device_category": device_category,
+                        "property_code": property_code,
+                        "devices_found": len(devices),
+                        "execution_time": round(total_time, 2)
+                    } if include_metadata else None
+                }
+            else:
+                return {
+                    "status": "no_devices",
+                    "message": f"No devices found for the specified criteria",
+                    "data": [],
+                    "metadata": {
+                        "query": query,
+                        "query_type": "device_discovery", 
+                        "location_code": location_code,
+                        "device_category": device_category,
+                        "property_code": property_code,
+                        "execution_time": round(total_time, 2)
+                    } if include_metadata else None
+                }
+                
+        except Exception as e:
+            logger.error(f"Device discovery failed: {e}")
+            return {
+                "status": "error",
+                "stage": "device_discovery",
+                "message": f"Device discovery failed: {str(e)}",
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "device_discovery",
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+
+    def process_data_products_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
+        """
+        Process a data products discovery or download query
+        
+        Args:
+            query: Natural language query
+            include_metadata: Whether to include processing metadata
+            
+        Returns:
+            Dictionary with data products information or download status
+        """
+        start_time = time.time()
+        logger.info(f"Processing data products query: {query}")
+        
+        # Step 1: Extract parameters from query
+        logger.info("Step 1: Extracting parameters...")
+        extraction_result = self.extractor.extract_parameters(query)
+        
+        if extraction_result["status"] != "success":
+            return {
+                "status": "error", 
+                "stage": "parameter_extraction",
+                "message": extraction_result["message"],
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_products",
+                    "extraction_result": extraction_result,
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+        
+        params = extraction_result["parameters"]
+        logger.info(f"Extracted parameters for data products: {params}")
+        
+        # Step 2: Determine if this is discovery or download request
+        logger.info("Step 2: Processing data products request...")
+        
+        try:
+            location_code = params["location_code"]
+            device_category = params.get("device_category")
+            property_code = params.get("property_code")
+            temporal_reference = params.get("temporal_reference")
+            
+            # Check if this is a download request or discovery based on query intent and temporal reference
+            download_keywords = ['download', 'export', 'get data', 'retrieve data', 'order']
+            discovery_keywords = ['what', 'available', 'show me', 'list', 'find', 'discover']
+            
+            has_download_intent = any(keyword in query.lower() for keyword in download_keywords)
+            has_discovery_intent = any(keyword in query.lower() for keyword in discovery_keywords)
+            has_specific_date = temporal_reference and temporal_reference != "latest" and len(temporal_reference) >= 10
+            
+            # Download request if: explicit download keywords OR specific date mentioned
+            is_download_request = has_download_intent or (has_specific_date and not has_discovery_intent)
+            
+            if is_download_request:
+                # This is a data product download request
+                return self._process_data_product_download(
+                    query, params, include_metadata, start_time
+                )
+            else:
+                # This is a data products discovery request
+                return self._process_data_products_discovery(
+                    query, params, include_metadata, start_time
+                )
+                
+        except Exception as e:
+            logger.error(f"Data products processing failed: {e}")
+            return {
+                "status": "error",
+                "stage": "data_products_processing",
+                "message": f"Data products processing failed: {str(e)}",
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_products",
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+    
+    def _process_data_products_discovery(self, query: str, params: Dict[str, Any], 
+                                       include_metadata: bool, start_time: float) -> Dict[str, Any]:
+        """Process data products discovery request"""
+        location_code = params["location_code"]
+        device_category = params.get("device_category")
+        property_code = params.get("property_code")
+        
+        # Map property code to common data product codes
+        data_product_mapping = {
+            'seawatertemperature': 'TSSD',  # Time Series Scalar Data
+            'salinity': 'TSSD',
+            'pressure': 'TSSD',
+            'conductivity': 'TSSD',
+            'ph': 'TSSD',
+            'oxygen': 'TSSD'
+        }
+        
+        data_product_code = data_product_mapping.get(property_code) if property_code else None
+        
+        # Discover data products
+        if location_code == "CBYIP" or location_code.startswith("CBYSS"):
+            # Use Cambridge Bay specific method
+            data_products = self.api_client.discover_cambridge_bay_data_products(
+                device_category=device_category,
+                data_product_code=data_product_code
+            )
+        else:
+            # Use general method
+            data_products = self.api_client.get_data_products(
+                location_code=location_code,
+                device_category=device_category,
+                data_product_code=data_product_code
+            )
+        
+        total_time = time.time() - start_time
+        
+        if data_products:
+            return {
+                "status": "success",
+                "message": f"Found {len(data_products)} available data products",
+                "data": data_products,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_products_discovery",
+                    "location_code": location_code,
+                    "device_category": device_category,
+                    "property_code": property_code,
+                    "data_product_code": data_product_code,
+                    "products_found": len(data_products),
+                    "execution_time": round(total_time, 2)
+                } if include_metadata else None
+            }
+        else:
+            return {
+                "status": "no_products",
+                "message": "No data products found for the specified criteria",
+                "data": [],
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_products_discovery",
+                    "location_code": location_code,
+                    "device_category": device_category,
+                    "property_code": property_code,
+                    "execution_time": round(total_time, 2)
+                } if include_metadata else None
+            }
+    
+    def _process_data_product_download(self, query: str, params: Dict[str, Any], 
+                                     include_metadata: bool, start_time: float) -> Dict[str, Any]:
+        """Process data product download request"""
+        location_code = params["location_code"]
+        device_category = params.get("device_category")
+        property_code = params.get("property_code")
+        temporal_reference = params.get("temporal_reference")
+        
+        # Map property code to data product code
+        data_product_mapping = {
+            'seawatertemperature': 'TSSD',
+            'salinity': 'TSSD',
+            'pressure': 'TSSD',
+            'conductivity': 'TSSD',
+            'ph': 'TSSD',
+            'oxygen': 'TSSD'
+        }
+        
+        data_product_code = data_product_mapping.get(property_code, 'TSSD')
+        
+        # Parse temporal reference to date range
+        # This is a simplified implementation - you may want to enhance this
+        from datetime import datetime, timedelta
+        
+        if temporal_reference and temporal_reference != "latest":
+            try:
+                # Try to parse as a specific date
+                if len(temporal_reference) == 10:  # YYYY-MM-DD format
+                    date_from = f"{temporal_reference}T00:00:00.000Z"
+                    # Default to next day for single date queries
+                    date_obj = datetime.fromisoformat(temporal_reference)
+                    next_day = date_obj + timedelta(days=1)
+                    date_to = f"{next_day.strftime('%Y-%m-%d')}T00:00:00.000Z"
+                else:
+                    # Default to last 24 hours if we can't parse
+                    end_time = datetime.now()
+                    start_time_dt = end_time - timedelta(hours=24)
+                    date_from = start_time_dt.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+                    date_to = end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+            except:
+                # Fallback to last 24 hours
+                end_time = datetime.now()
+                start_time_dt = end_time - timedelta(hours=24)
+                date_from = start_time_dt.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+                date_to = end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+        else:
+            # Default to last 24 hours
+            end_time = datetime.now()
+            start_time_dt = end_time - timedelta(hours=24)
+            date_from = start_time_dt.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+            date_to = end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+        
+        # Order the data product
+        order_result = self.api_client.order_data_product(
+            location_code=location_code,
+            device_category=device_category,
+            data_product_code=data_product_code,
+            date_from=date_from,
+            date_to=date_to,
+            extension='csv'
+        )
+        
+        total_time = time.time() - start_time
+        
+        if 'error' not in order_result:
+            # Extract download information
+            dp_request_id = order_result.get('dpRequestId')
+            estimated_size = order_result.get('estimatedFileSize', 'Unknown')
+            estimated_time = order_result.get('estimatedProcessingTime', 'Unknown')
+            
+            # Generate download status URL
+            download_status_url = self.api_client.generate_download_status_url(str(dp_request_id)) if dp_request_id else None
+            
+            # Enhanced result with download information
+            enhanced_result = order_result.copy()
+            enhanced_result['download_info'] = {
+                'dp_request_id': dp_request_id,
+                'estimated_file_size': estimated_size,
+                'estimated_processing_time': estimated_time,
+                'status_check_url': download_status_url,
+                'instructions': 'Data product is being processed. Check the status URL for download links when ready.'
+            }
+            
+            return {
+                "status": "success",
+                "message": f"Data product download initiated successfully (Request ID: {dp_request_id})",
+                "data": enhanced_result,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_product_download",
+                    "location_code": location_code,
+                    "device_category": device_category,
+                    "property_code": property_code,
+                    "data_product_code": data_product_code,
+                    "date_from": date_from,
+                    "date_to": date_to,
+                    "dp_request_id": dp_request_id,
+                    "execution_time": round(total_time, 2)
+                } if include_metadata else None
+            }
+        else:
+            return {
+                "status": "error",
+                "message": f"Failed to initiate data product download: {order_result.get('error', 'Unknown error')}",
+                "data": order_result,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_product_download",
+                    "execution_time": round(total_time, 2)
+                } if include_metadata else None
+            }
+
+    def process_data_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
+        """
+        Process a sensor data query to download actual measurements
+        
+        Args:
+            query: Natural language query
+            include_metadata: Whether to include processing metadata
+            
+        Returns:
+            Complete response with sensor data and metadata
+        """
+        start_time = time.time()
+        logger.info(f"Processing data query: '{query}'")
         
         # Step 1: Extract parameters from natural language
         logger.info("Step 1: Extracting parameters...")
@@ -75,6 +458,7 @@ class OceanQuerySystem:
                 "data": None,
                 "metadata": {
                     "query": query,
+                    "query_type": "data",
                     "extraction_result": extraction_result,
                     "execution_time": time.time() - start_time
                 } if include_metadata else None
@@ -255,7 +639,35 @@ class OceanQuerySystem:
         if response["status"] != "success" or not response["data"]:
             return f"WARNING: {response.get('message', 'Unknown status')}"
         
-        # Format successful response
+        # Check if this is a device discovery response before trying to format as sensor data
+        metadata = response.get("metadata", {})
+        if metadata.get("query_type") == "device_discovery":
+            # This is a device discovery response - format it appropriately
+            devices = response["data"]
+            if not devices:
+                return "INFO: No devices found"
+            
+            device_count = len(devices)
+            device_categories = {}
+            for device in devices:
+                category = device.get('deviceCategoryCode', 'Unknown')
+                if category not in device_categories:
+                    device_categories[category] = []
+                device_categories[category].append(device)
+            
+            lines = [f"Found {device_count} device{'s' if device_count != 1 else ''}:"]
+            for category, category_devices in device_categories.items():
+                lines.append(f"\n{category}: {len(category_devices)} device{'s' if len(category_devices) != 1 else ''}")
+                for device in category_devices[:3]:  # Show first 3 devices per category
+                    device_name = device.get('deviceName', 'Unknown Device')
+                    device_code = device.get('deviceCode', 'N/A')
+                    lines.append(f"  • {device_name} (Code: {device_code})")
+                if len(category_devices) > 3:
+                    lines.append(f"  ... and {len(category_devices) - 3} more")
+            
+            return "\n".join(lines)
+        
+        # Format successful sensor data response (not device discovery)
         formatted_data = self.api_client.format_sensor_data(response["data"])
         
         if not formatted_data:
@@ -265,28 +677,8 @@ class OceanQuerySystem:
         lines = [self._format_summary_sentence(response, formatted_data)]
         lines.append("")
         
-        # Add data details
-        lines.append("DATA RETRIEVED:")
-        lines.append("=" * 60)
-        
-        for i, sensor in enumerate(formatted_data, 1):
-            lines.append(f"\n{i}. {sensor['sensor_name']}")
-            lines.append(f"   Latest Value: {sensor['latest_value']} {sensor['unit']}")
-            lines.append(f"   Time: {sensor['latest_time']}")
-            lines.append(f"   QA/QC Status: {sensor['qaqc_status']}")
-            lines.append(f"   Total Readings: {sensor['total_readings']}")
-        
-        # Add detailed query information
-        lines.append("")
-        lines.append(self._format_query_details(response))
-        
-        # Add API calls information
-        lines.append("")
+        # Add API calls information only
         lines.append(self._format_api_calls(response))
-        
-        # Add suggestions
-        lines.append("")
-        lines.append(self._format_suggestions(response))
         
         return "\n".join(lines)
 
@@ -313,7 +705,7 @@ class OceanQuerySystem:
             except:
                 time_str = time
             
-            return f"RESULT: The latest {property_code} at {location} was {value} {unit} on {time_str}."
+            return f"**RESULT:** The latest {property_code} at {location} was **{value} {unit}** on {time_str}."
         
         return f"RESULT: Found {property_code} data from {location}."
 
@@ -360,8 +752,9 @@ class OceanQuerySystem:
         
         raw_responses = response["raw_api_responses"]
         lines = [
-            "OCEAN NETWORKS CANADA API CALLS:",
-            "=" * 60
+            "",
+            "## OCEAN NETWORKS CANADA API CALLS:",
+            ""
         ]
         
         # Show devices API call
@@ -373,11 +766,11 @@ class OceanQuerySystem:
                 clean_params = {k: v for k, v in params.items() if k != 'token'}
                 
                 lines.extend([
-                    "",
-                    "1. Get Available Devices:",
-                    f"   URL: {debug_info.get('url', 'Unknown')}",
-                    f"   Parameters: {clean_params}",
-                    f"   Response: Found {len(devices_req.get('data', []))} available devices"
+                    "**1. Get Available Devices:**",
+                    f"   - **URL:** `{debug_info.get('url', 'Unknown')}`",
+                    f"   - **Parameters:** `{clean_params}`",
+                    f"   - **Response:** Found {len(devices_req.get('data', []))} available devices",
+                    ""
                 ])
         
         # Show sensor data API calls
@@ -388,8 +781,7 @@ class OceanQuerySystem:
                 device_name = req.get('device_name', 'Unknown')
                 
                 lines.extend([
-                    "",
-                    f"{i}. Get Sensor Data - {device_name}:",
+                    f"**{i}. Get Sensor Data - {device_name}:**",
                 ])
                 
                 if "_debug_info" in response_data:
@@ -398,16 +790,16 @@ class OceanQuerySystem:
                     clean_params = {k: v for k, v in params.items() if k != 'token'}
                     
                     lines.extend([
-                        f"   URL: {debug_info.get('url', 'Unknown')}",
-                        f"   Parameters: {clean_params}",
+                        f"   - **URL:** `{debug_info.get('url', 'Unknown')}`",
+                        f"   - **Parameters:** `{clean_params}`",
                     ])
                 
                 if sensor_data:
-                    lines.append(f"   Response: SUCCESS - Found {len(sensor_data)} sensors with data")
+                    lines.append(f"   - **Response:** SUCCESS - Found {len(sensor_data)} sensors with data")
                     if response["status"] == "success":
                         break  # Stop showing after successful device
                 else:
-                    lines.append("   Response: NO DATA - No data found")
+                    lines.append("   - **Response:** NO DATA - No data found")
         
         return "\n".join(lines)
 

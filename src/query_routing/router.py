@@ -94,7 +94,8 @@ class QueryRouter:
             # Location terms
             "cambridge bay", "station", "location", "coordinates", "site",
             # Time terms  
-            "time series", "when", "since", "from", "to", "between",
+            "time series", "when", "since", "from", "to", "between", "at", "pm", "am", 
+            "o'clock", "hour", "minute", "morning", "afternoon", "evening", "night",
             # Request patterns
             "get", "show", "find", "retrieve", "what is the", "how much",
             "give me", "tell me"
@@ -269,6 +270,94 @@ class QueryRouter:
                 return "observation_query"
         
         return predicted_label
+
+    def _is_device_discovery_query(self, query: str) -> bool:
+        """
+        Check if a deployment_info query is specifically about device discovery
+        
+        Args:
+            query: User query string
+            
+        Returns:
+            True if query is about device discovery, False otherwise
+        """
+        if not query:
+            return False
+        
+        query_lower = query.lower()
+        
+        # Device discovery indicators
+        device_terms = [
+            'device', 'sensor', 'instrument', 'equipment',
+            'ctd', 'hydrophone', 'oxygen sensor', 'ph sensor',
+            'weather station', 'ice profiler', 'camera', 'fluorometer'
+        ]
+        
+        device_discovery_patterns = [
+            'what devices', 'what sensors', 'what instruments',
+            'show me devices', 'show me sensors', 'show me instruments',
+            'find devices', 'find sensors', 'find instruments',
+            'list devices', 'list sensors', 'list instruments',
+            'hydrophone devices', 'ctd sensors', 'oxygen sensors',
+            'devices are at', 'sensors are at', 'instruments are at',
+            'devices at cambridge bay', 'sensors at cambridge bay'
+        ]
+        
+        # Check for device discovery patterns
+        if any(pattern in query_lower for pattern in device_discovery_patterns):
+            return True
+        
+        # Check for device terms combined with location/deployment context
+        has_device_term = any(term in query_lower for term in device_terms)
+        has_location_context = any(term in query_lower for term in [
+            'cambridge bay', 'cambridge', 'at', 'deployed', 'location'
+        ])
+        
+        # If query has both device terms and location context, likely device discovery
+        if has_device_term and has_location_context:
+            return True
+        
+        return False
+    
+    def _is_data_products_query(self, query: str) -> bool:
+        """
+        Check if a query is about data products discovery or download
+        
+        Args:
+            query: User query string
+            
+        Returns:
+            True if query is about data products, False otherwise
+        """
+        if not query:
+            return False
+        
+        query_lower = query.lower()
+        
+        # Data products discovery patterns
+        data_products_patterns = [
+            'data products', 'available data products', 'what data products',
+            'data product', 'download data', 'data download', 'get data',
+            'data files', 'download files', 'csv data', 'data export',
+            'export data', 'data formats', 'file formats'
+        ]
+        
+        # Check for data products patterns
+        if any(pattern in query_lower for pattern in data_products_patterns):
+            return True
+        
+        # Check for download-related terms with data context
+        download_terms = ['download', 'export', 'get', 'file', 'csv', 'format']
+        data_terms = ['data', 'measurements', 'readings', 'values']
+        
+        has_download_term = any(term in query_lower for term in download_terms)
+        has_data_term = any(term in query_lower for term in data_terms)
+        
+        # If query has both download and data terms, likely data products
+        if has_download_term and has_data_term:
+            return True
+        
+        return False
     
     def _map_bert_classification_to_route(self, classification: str, confidence: float, 
                                         context: Dict[str, Any], query: str) -> Dict[str, Any]:
@@ -291,28 +380,77 @@ class QueryRouter:
         confidence_level = 'high' if confidence > 0.8 else 'medium' if confidence > 0.6 else 'low'
         
         if classification == "observation_query" and has_database:
-            return {
-                'type': QueryType.DATABASE_SEARCH,
-                'classification': classification,
-                'confidence': confidence_level,
-                'bert_confidence': confidence,
-                'parameters': {
-                    'search_type': 'structured',
-                    'bert_classified': True
+            # Check if this is actually a data products query
+            if self._is_data_products_query(query):
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'data_products',
+                        'bert_classified': True
+                    }
                 }
-            }
+            else:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'structured',
+                        'bert_classified': True
+                    }
+                }
         
-        elif classification == "deployment_info" and has_vector_store:
-            return {
-                'type': QueryType.VECTOR_SEARCH,
-                'classification': classification,
-                'confidence': confidence_level,
-                'bert_confidence': confidence,
-                'parameters': {
-                    'search_type': 'semantic',
-                    'bert_classified': True
+        elif classification == "deployment_info":
+            # Check if this is a data products query that should go to database
+            if self._is_data_products_query(query) and has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'data_products',
+                        'bert_classified': True
+                    }
                 }
-            }
+            # Check if this is a device discovery query that should go to database
+            elif self._is_device_discovery_query(query) and has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'device_discovery',
+                        'bert_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'bert_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'structured',
+                        'bert_classified': True
+                    }
+                }
         
         elif classification == "document_search" and has_vector_store:
             return {
@@ -497,16 +635,38 @@ Respond with ONLY the category name: deployment_info, observation_query, general
                 }
             }
         
-        elif classification == "deployment_info" and has_vector_store:
-            return {
-                'type': QueryType.VECTOR_SEARCH,
-                'classification': classification,
-                'confidence': 'high',
-                'parameters': {
-                    'search_type': 'semantic',
-                    'llm_classified': True
+        elif classification == "deployment_info":
+            # Check if this is a device discovery query that should go to database
+            if self._is_device_discovery_query(query) and has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'high',
+                    'parameters': {
+                        'search_type': 'device_discovery',
+                        'llm_classified': True
+                    }
                 }
-            }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'high',
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'llm_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'high',
+                    'parameters': {
+                        'search_type': 'structured',
+                        'llm_classified': True
+                    }
+                }
         
         elif classification == "document_search" and has_vector_store:
             return {
@@ -654,13 +814,17 @@ Respond with ONLY the category name: deployment_info, observation_query, general
         if 'route_type' in last_metadata:
             last_route = last_metadata['route_type']
             
-            # Apply follow-up bias - slightly favor the same route type
-            bias_strength = confidence * 0.3  # Up to 30% boost
+            # Apply follow-up bias - favor the same route type more strongly
+            bias_strength = confidence * 0.5  # Up to 50% boost
             
             if last_route == 'vector_search':
                 vector_score += bias_strength
             elif last_route == 'database_search':
                 database_score += bias_strength
+                # Extra boost for database search follow-ups with time references
+                if any(time_word in follow_up_info.get('context_info', {}).get('last_query', '').lower() 
+                       for time_word in ['time', 'data', 'temperature', 'oxygen', 'sensor']):
+                    database_score += 0.3  # Additional boost for data-related follow-ups
             elif last_route in ['hybrid_search']:
                 # For hybrid, boost both slightly
                 vector_score += bias_strength * 0.5
