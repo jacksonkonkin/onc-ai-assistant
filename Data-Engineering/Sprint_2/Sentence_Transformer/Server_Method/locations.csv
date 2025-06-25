@@ -1,0 +1,301 @@
+question,label
+What is a Ocean Networks Canada?,general_knowledge
+Why is underwater hydrophone important in oceanography?,general_knowledge
+Can you explain dissolved oxygen?,general_knowledge
+What is the purpose of a buoy?,general_knowledge
+Can you explain scientific buoy?,general_knowledge
+How does a PH sensor work?,general_knowledge
+Can you explain deployment?,general_knowledge
+What does mooring mean?,general_knowledge
+Describe the concept of mooring.,general_knowledge
+Why is underwater hydrophone important in oceanography?,general_knowledge
+What role does mooring play in marine science?,general_knowledge
+Can you explain conductivity sensor?,general_knowledge
+What role does marine observatories play in marine science?,general_knowledge
+What is the purpose of a deployment?,general_knowledge
+Describe the concept of underwater hydrophone.,general_knowledge
+What is the purpose of a mooring?,general_knowledge
+Why is buoy important in oceanography?,general_knowledge
+Why is turbidity important in oceanography?,general_knowledge
+What role does salinity play in marine science?,general_knowledge
+Can you explain scientific buoy?,general_knowledge
+Give an overview of CTD.,general_knowledge
+Describe the concept of conductivity sensor.,general_knowledge
+Tell me more about marine observatories.,general_knowledge
+What role does PH sensor play in marine science?,general_knowledge
+Why is CTD important in oceanography?,general_knowledge
+Describe the concept of CTD.,general_knowledge
+Can you explain CTD?,general_knowledge
+What is a marine observatories?,general_knowledge
+What is a buoy?,general_knowledge
+Why is deployment important in oceanography?,general_knowledge
+Can you explain CTD?,general_knowledge
+How does a Ocean Networks Canada work?,general_knowledge
+How does a Ocean Networks Canada work?,general_knowledge
+What role does deployment play in marine science?,general_knowledge
+What does conductivity sensor mean?,general_knowledge
+Tell me more about scientific buoy.,general_knowledge
+Give an overview of underwater hydrophone.,general_knowledge
+What is the purpose of a deployment?,general_knowledge
+Tell me more about underwater hydrophone.,general_knowledge
+Why is underwater hydrophone important in oceanography?,general_knowledge
+How does a PH sensor work?,general_knowledge
+Why is CTD important in oceanography?,general_knowledge
+Describe the concept of deployment.,general_knowledge
+Give an overview of Ocean Networks Canada.,general_knowledge
+Can you explain dissolved oxygen?,general_knowledge
+What does salinity mean?,general_knowledge
+Why is conductivity sensor important in oceanography?,general_knowledge
+Give an overview of PH sensor.,general_knowledge
+How does a mooring work?,general_knowledge
+Give an overview of PH sensor.,general_knowledge
+Why is deployment important in oceanography?,general_knowledge
+Tell me more about scientific buoy.,general_knowledge
+What role does ocean acidification play in marine science?,general_knowledge
+What is a deployment?,general_knowledge
+Tell me more about Ocean Networks Canada.,general_knowledge
+Describe the concept of Ocean Networks Canada.,general_knowledge
+Why is dissolved oxygen important in oceanography?,general_knowledge
+Give an overview of underwater hydrophone.,general_knowledge
+Can you explain buoy?,general_knowledge
+Can you explain conductivity sensor?,general_knowledge
+What role does data logger play in marine science?,general_knowledge
+Why is marine observatories important in oceanography?,general_knowledge
+Can you explain PH sensor?,general_knowledge
+Describe the concept of mooring.,general_knowledge
+Can you explain scientific buoy?,general_knowledge
+Give an overview of CTD.,general_knowledge
+What is a turbidity?,general_knowledge
+What does marine observatories mean?,general_knowledge
+What is the purpose of a data logger?,general_knowledge
+Can you explain underwater hydrophone?,general_knowledge
+What is the purpose of a conductivity sensor?,general_knowledge
+Tell me more about underwater hydrophone.,general_knowledge
+Give an overview of CTD.,general_knowledge
+Tell me more about dissolved oxygen.,general_knowledge
+Tell me more about scientific buoy.,general_knowledge
+What is the purpose of a deployment?,general_knowledge
+How does a Ocean Networks Canada work?,general_knowledge
+Can you explain mooring?,general_knowledge
+How does a deployment work?,general_knowledge
+Can you explain Ocean Networks Canada?,general_knowledge
+Tell me more about buoy.,general_knowledge
+What role does marine observatories play in marine science?,general_knowledge
+What does ocean acidification mean?,general_knowledge
+What does mooring mean?,general_knowledge
+Can you explain dissolved oxygen?,general_knowledge
+Tell me more about Ocean Networks Canada.,general_knowledge
+Tell me more about CTD.,general_knowledge
+Tell me more about mooring.,general_knowledge
+How does a conductivity sensor work?,general_knowledge
+What role does ocean acidification play in marine science?,general_knowledge
+Give an overview of turbidity.,general_knowledge
+Tell me more about turbidity.,general_knowledge
+Describe the concept of deployment.,general_knowledge
+Describe the concept of salinity.,general_knowledge
+What is the purpose of a CTD?,general_knowledge
+Give an overview of PH sensor.,general_knowledge
+What is a buoy?,general_knowledge
+What does turbidity mean?,general_knowledge
+What role does conductivity sensor play in marine science?,general_knowledge
+What is a turbidity?,general_knowledge
+Does Safe Passage Buoy have device data?,deployment_info
+How many deployments are at CF240 (CBO-1)?,deployment_info
+How many deployments are at MOXA Relay 2?,deployment_info
+How many deployments are at MOXA Relay 2?,deployment_info
+Does Signal Combiner Unit have device data?,deployment_info
+What kind of equipment is used at Signal Combiner Unit?,deployment_info
+What is the depth at MOXA Relay 3?,deployment_info
+What is the depth at MOXA Relay?,deployment_info
+Are there any sensors at Cambridge Bay?,deployment_info
+What kind of equipment is used at Underwater Network?,deployment_info
+List all the deployments at CO2 - Pro-Oceanus Secondary Device.,deployment_info
+What devices are deployed at MOXA ioLogik 1242?,deployment_info
+Are there any sensors at Signal Combiner Unit?,deployment_info
+What devices are deployed at MOXA Relay 2?,deployment_info
+How many deployments are at Diver Data?,deployment_info
+What kind of equipment is used at Safe Passage Buoy?,deployment_info
+What kind of equipment is used at Junction Box - Daisy Chained?,deployment_info
+Give deployment info for Secondary CTD.,deployment_info
+What is the depth at MOXA ioLogik E1242 1?,deployment_info
+List all the deployments at CO2 - Aanderaa.,deployment_info
+List all the deployments at CF240 (CBO-1).,deployment_info
+What kind of equipment is used at Junction Box - Daisy Chained?,deployment_info
+What type of data is available at Diver Data?,deployment_info
+Is there any property data available at MOXA Relay?,deployment_info
+What kind of equipment is used at MOXA Relay 3?,deployment_info
+Is there any property data available at Junction Box - Daisy Chained?,deployment_info
+What is the depth at CO2 - Pro-Oceanus?,deployment_info
+What is the depth at Diver Data?,deployment_info
+What type of data is available at CF240 (CBO-1)?,deployment_info
+Does Light - 2 have device data?,deployment_info
+What devices are deployed at MOXA ioLogik E1242 1?,deployment_info
+What devices are deployed at Diver Data?,deployment_info
+What kind of equipment is used at Junction Box - Primary?,deployment_info
+What kind of equipment is used at Underwater Network?,deployment_info
+Are there any sensors at MOXA ioLogik E1242 1?,deployment_info
+Is there any property data available at MOXA Relay 2?,deployment_info
+What devices are deployed at Light - 1?,deployment_info
+What kind of equipment is used at Diver Data?,deployment_info
+Is there any property data available at Junction Box - Daisy Chained?,deployment_info
+What devices are deployed at Secondary CTD?,deployment_info
+What devices are deployed at Underwater Network?,deployment_info
+Give deployment info for Secondary CTD.,deployment_info
+Give deployment info for MOXA Relay 1.,deployment_info
+List all the deployments at CO2 - Pro-Oceanus Secondary Device.,deployment_info
+Is there any property data available at Cambridge Bay?,deployment_info
+How many deployments are at MOXA ioLogik E1242 2?,deployment_info
+Does Light - 1 have device data?,deployment_info
+Give deployment info for Meteorological Station - Davis.,deployment_info
+What devices are deployed at Light - 3?,deployment_info
+What kind of equipment is used at Junction Box - Daisy Chained?,deployment_info
+What type of data is available at CO2 - Pro-Oceanus?,deployment_info
+List all the deployments at Diver Data.,deployment_info
+List all the deployments at MOXA Relay 2.,deployment_info
+Give deployment info for MOXA ioLogik E1242 2.,deployment_info
+Are there any sensors at Meteorological Station - Lufft?,deployment_info
+Give deployment info for Cambridge Bay.,deployment_info
+List all the deployments at Diver Data.,deployment_info
+What devices are deployed at Junction Box - Daisy Chained?,deployment_info
+Does Secondary CTD have device data?,deployment_info
+Give deployment info for CO2 - Aanderaa.,deployment_info
+How many deployments are at Light - 1?,deployment_info
+What is the depth at Meteorological Station - Lufft?,deployment_info
+What kind of equipment is used at Signal Combiner Unit?,deployment_info
+What is the depth at Light - 3?,deployment_info
+What kind of equipment is used at MOXA ioLogik 1242?,deployment_info
+What type of data is available at Light - 3?,deployment_info
+Is there any property data available at MOXA Relay?,deployment_info
+What type of data is available at Junction Box - Daisy Chained?,deployment_info
+What kind of equipment is used at CO2 - Aanderaa?,deployment_info
+What devices are deployed at MOXA Relay 2?,deployment_info
+Are there any sensors at Signal Combiner Unit?,deployment_info
+Are there any sensors at MOXA Relay 2?,deployment_info
+What type of data is available at Light - 1?,deployment_info
+What type of data is available at MOXA ioLogik 1242?,deployment_info
+List all the deployments at Meteorological Station - Davis.,deployment_info
+Are there any sensors at Safe Passage Buoy?,deployment_info
+List all the deployments at CO2 - Pro-Oceanus Secondary Device.,deployment_info
+List all the deployments at Meteorological Station - Lufft.,deployment_info
+What devices are deployed at Shore Station?,deployment_info
+What kind of equipment is used at CO2 - Pro-Oceanus Secondary Device?,deployment_info
+What kind of equipment is used at Diver Data?,deployment_info
+What devices are deployed at Diver Data?,deployment_info
+Give deployment info for Cambridge Bay.,deployment_info
+How many deployments are at Diver Data?,deployment_info
+Are there any sensors at Diver Data?,deployment_info
+Give deployment info for MOXA Relay.,deployment_info
+Are there any sensors at MOXA Relay?,deployment_info
+How many deployments are at Cambridge Bay?,deployment_info
+Are there any sensors at Junction Box - Primary?,deployment_info
+List all the deployments at Junction Box - Primary.,deployment_info
+Does CO2 - Pro-Oceanus Secondary Device have device data?,deployment_info
+What type of data is available at MOXA ioLogik E1242 2?,deployment_info
+Give deployment info for Junction Box - Daisy Chained.,deployment_info
+Give deployment info for Safe Passage Buoy.,deployment_info
+What type of data is available at Cambridge Bay?,deployment_info
+Give deployment info for CO2 - Pro-Oceanus Secondary Device.,deployment_info
+What is the depth at Light - 2?,deployment_info
+Is there any property data available at Meteorological Station - Lufft?,deployment_info
+Does MOXA ioLogik E1242 2 have device data?,deployment_info
+Does MOXA ioLogik E1242 1 have device data?,deployment_info
+"Show turbidity values at Signal Combiner Unit on June 6, 2024 at 1 PM.",observation_query
+"Show turbidity values at Secondary CTD on June 6, 2024 at 1 PM.",observation_query
+"What was the temperature at CO2 - Aanderaa on August 10, 2024 at 5 PM?",observation_query
+"Give me the oxygen levels at MOXA ioLogik E1242 1 on September 1, 2022 at 4 PM.",observation_query
+"Show turbidity values at MOXA ioLogik 1242 on June 6, 2024 at 1 PM.",observation_query
+"Provide the CO2 readings at Light - 3 for May 10, 2021 at 3 PM.",observation_query
+"Retrieve conductivity data from MOXA ioLogik 1242 on February 14, 2022 at 8 AM.",observation_query
+"What was the salinity at Safe Passage Buoy on March 2, 2023 at 6 AM?",observation_query
+"Provide the CO2 readings at Diver Data for May 10, 2021 at 3 PM.",observation_query
+"Give me the oxygen levels at Junction Box - Daisy Chained on September 1, 2022 at 4 PM.",observation_query
+"Provide the CO2 readings at CO2 - Pro-Oceanus for May 10, 2021 at 3 PM.",observation_query
+"What were the light levels at CO2 - Pro-Oceanus Secondary Device on January 5, 2022 at 9 PM?",observation_query
+"Show turbidity values at CF240 (CBO-1) on June 6, 2024 at 1 PM.",observation_query
+"What was the temperature at CO2 - Aanderaa on August 10, 2024 at 5 PM?",observation_query
+"What were the light levels at Secondary CTD on January 5, 2022 at 9 PM?",observation_query
+"What was the salinity at Shore Station on March 2, 2023 at 6 AM?",observation_query
+"Retrieve conductivity data from MOXA Relay 1 on February 14, 2022 at 8 AM.",observation_query
+"What were the light levels at MOXA Relay 3 on January 5, 2022 at 9 PM?",observation_query
+"What were the light levels at Light - 2 on January 5, 2022 at 9 PM?",observation_query
+"What were the light levels at CO2 - Pro-Oceanus on January 5, 2022 at 9 PM?",observation_query
+"Show the water level at Junction Box - Daisy Chained on July 15, 2023 at noon.",observation_query
+"Show turbidity values at Light - 2 on June 6, 2024 at 1 PM.",observation_query
+"What was the salinity at Light - 1 on March 2, 2023 at 6 AM?",observation_query
+"What was the temperature at Shore Station on August 10, 2024 at 5 PM?",observation_query
+"Give me the oxygen levels at MOXA Relay 2 on September 1, 2022 at 4 PM.",observation_query
+"What was the temperature at Light - 3 on August 10, 2024 at 5 PM?",observation_query
+"Give temperature and salinity at Meteorological Station - Lufft on December 25, 2023 at 11 AM.",observation_query
+"Provide the CO2 readings at Meteorological Station - Lufft for May 10, 2021 at 3 PM.",observation_query
+"What was the salinity at Safe Passage Buoy on March 2, 2023 at 6 AM?",observation_query
+"Show turbidity values at Shore Station on June 6, 2024 at 1 PM.",observation_query
+"Give me the oxygen levels at Secondary CTD on September 1, 2022 at 4 PM.",observation_query
+"Show the water level at Diver Data on July 15, 2023 at noon.",observation_query
+"What was the temperature at CO2 - Pro-Oceanus on August 10, 2024 at 5 PM?",observation_query
+"Give me the oxygen levels at Safe Passage Buoy on September 1, 2022 at 4 PM.",observation_query
+"Give temperature and salinity at Signal Combiner Unit on December 25, 2023 at 11 AM.",observation_query
+"What was the temperature at Safe Passage Buoy on August 10, 2024 at 5 PM?",observation_query
+"Provide the CO2 readings at Secondary CTD for May 10, 2021 at 3 PM.",observation_query
+"Give temperature and salinity at Meteorological Station - Lufft on December 25, 2023 at 11 AM.",observation_query
+"Give temperature and salinity at Safe Passage Buoy on December 25, 2023 at 11 AM.",observation_query
+"What was the temperature at Signal Combiner Unit on August 10, 2024 at 5 PM?",observation_query
+"Give me the oxygen levels at Junction Box - Daisy Chained on September 1, 2022 at 4 PM.",observation_query
+"Give me the oxygen levels at MOXA ioLogik 1242 on September 1, 2022 at 4 PM.",observation_query
+"What was the salinity at Diver Data on March 2, 2023 at 6 AM?",observation_query
+"What were the light levels at Safe Passage Buoy on January 5, 2022 at 9 PM?",observation_query
+"Give temperature and salinity at Light - 2 on December 25, 2023 at 11 AM.",observation_query
+"Show the water level at Meteorological Station - Lufft on July 15, 2023 at noon.",observation_query
+"What was the salinity at Underwater Network on March 2, 2023 at 6 AM?",observation_query
+"What was the temperature at MOXA Relay 1 on August 10, 2024 at 5 PM?",observation_query
+"Show turbidity values at Junction Box - Primary on June 6, 2024 at 1 PM.",observation_query
+"What was the salinity at CO2 - Pro-Oceanus Secondary Device on March 2, 2023 at 6 AM?",observation_query
+"What were the light levels at Shore Station on January 5, 2022 at 9 PM?",observation_query
+"Give temperature and salinity at Shore Station on December 25, 2023 at 11 AM.",observation_query
+"Provide the CO2 readings at Meteorological Station - Davis for May 10, 2021 at 3 PM.",observation_query
+"Provide the CO2 readings at MOXA Relay 3 for May 10, 2021 at 3 PM.",observation_query
+"Show turbidity values at Junction Box - Primary on June 6, 2024 at 1 PM.",observation_query
+"What was the salinity at Shore Station on March 2, 2023 at 6 AM?",observation_query
+"Retrieve conductivity data from Safe Passage Buoy on February 14, 2022 at 8 AM.",observation_query
+"Give temperature and salinity at CF240 (CBO-1) on December 25, 2023 at 11 AM.",observation_query
+"What was the salinity at CO2 - Pro-Oceanus Secondary Device on March 2, 2023 at 6 AM?",observation_query
+"Give temperature and salinity at Cambridge Bay on December 25, 2023 at 11 AM.",observation_query
+"What was the salinity at MOXA ioLogik 1242 on March 2, 2023 at 6 AM?",observation_query
+"Show turbidity values at Junction Box - Primary on June 6, 2024 at 1 PM.",observation_query
+"Show the water level at CO2 - Aanderaa on July 15, 2023 at noon.",observation_query
+"What was the pressure at Junction Box - Primary on October 18, 2020 at midnight?",observation_query
+"Show the water level at Light - 3 on July 15, 2023 at noon.",observation_query
+"Provide the CO2 readings at Shore Station for May 10, 2021 at 3 PM.",observation_query
+"Show the water level at Safe Passage Buoy on July 15, 2023 at noon.",observation_query
+"What was the temperature at Signal Combiner Unit on August 10, 2024 at 5 PM?",observation_query
+"What were the light levels at CO2 - Aanderaa on January 5, 2022 at 9 PM?",observation_query
+"What was the pressure at Light - 2 on October 18, 2020 at midnight?",observation_query
+"What was the pressure at CO2 - Pro-Oceanus on October 18, 2020 at midnight?",observation_query
+"Show the water level at Cambridge Bay on July 15, 2023 at noon.",observation_query
+"Show the water level at Safe Passage Buoy on July 15, 2023 at noon.",observation_query
+"Provide the CO2 readings at Cambridge Bay for May 10, 2021 at 3 PM.",observation_query
+"What were the light levels at Meteorological Station - Lufft on January 5, 2022 at 9 PM?",observation_query
+"Show turbidity values at Signal Combiner Unit on June 6, 2024 at 1 PM.",observation_query
+"What were the light levels at Light - 3 on January 5, 2022 at 9 PM?",observation_query
+"What was the pressure at MOXA Relay 3 on October 18, 2020 at midnight?",observation_query
+"Provide the CO2 readings at Underwater Network for May 10, 2021 at 3 PM.",observation_query
+"What was the salinity at Shore Station on March 2, 2023 at 6 AM?",observation_query
+"Show turbidity values at Diver Data on June 6, 2024 at 1 PM.",observation_query
+"Provide the CO2 readings at MOXA Relay 1 for May 10, 2021 at 3 PM.",observation_query
+"What were the light levels at Junction Box - Primary on January 5, 2022 at 9 PM?",observation_query
+"What was the salinity at MOXA Relay 1 on March 2, 2023 at 6 AM?",observation_query
+"What was the salinity at Underwater Network on March 2, 2023 at 6 AM?",observation_query
+"What was the pressure at CF240 (CBO-1) on October 18, 2020 at midnight?",observation_query
+"What was the salinity at CO2 - Aanderaa on March 2, 2023 at 6 AM?",observation_query
+"What were the light levels at Secondary CTD on January 5, 2022 at 9 PM?",observation_query
+"Show the water level at CF240 (CBO-1) on July 15, 2023 at noon.",observation_query
+"What was the salinity at Meteorological Station - Lufft on March 2, 2023 at 6 AM?",observation_query
+"Show the water level at Junction Box - Primary on July 15, 2023 at noon.",observation_query
+"Show the water level at CO2 - Pro-Oceanus Secondary Device on July 15, 2023 at noon.",observation_query
+"What were the light levels at Safe Passage Buoy on January 5, 2022 at 9 PM?",observation_query
+"Show turbidity values at Safe Passage Buoy on June 6, 2024 at 1 PM.",observation_query
+"What were the light levels at MOXA ioLogik E1242 2 on January 5, 2022 at 9 PM?",observation_query
+"Retrieve conductivity data from MOXA ioLogik E1242 1 on February 14, 2022 at 8 AM.",observation_query
+"What was the pressure at MOXA Relay 3 on October 18, 2020 at midnight?",observation_query
+"Give me the oxygen levels at Secondary CTD on September 1, 2022 at 4 PM.",observation_query
+"What was the temperature at Signal Combiner Unit on August 10, 2024 at 5 PM?",observation_query
+"Give temperature and salinity at MOXA ioLogik E1242 1 on December 25, 2023 at 11 AM.",observation_query
