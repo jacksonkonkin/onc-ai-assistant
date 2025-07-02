@@ -426,9 +426,9 @@ Return ONLY the JSON object."""
         # For single dates, create time range
         if temporal_type == "single_date":
             if specific_time is not None:
-                # If specific time is found, create a 2-hour window around it
+                # Use exact timestamp for precise time queries
                 start_time = datetime.combine(date, specific_time)
-                end_time = start_time + timedelta(hours=2)
+                end_time = start_time + timedelta(minutes=1)  # 1-minute window for exact match
             else:
                 # Default to 12-hour window from midnight
                 start_time = datetime.combine(date, datetime.min.time())
