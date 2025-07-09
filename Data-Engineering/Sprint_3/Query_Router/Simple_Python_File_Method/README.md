@@ -33,6 +33,12 @@ NOTE: Make sure to keep the csv files along with script as they are needed when 
 ├── property.csv
 ├── device_category.csv
 ├── locations.csv
+├── deployments_2.csv
+├── device_info_2.csv
+├── property_2.csv
+├── device_category_2.csv
+├── locations_2.csv
+├── data_and_knowledge_queries.csv
 ## To Run
 
 ```bash

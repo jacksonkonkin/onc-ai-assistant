@@ -11,7 +11,13 @@ file_paths = [
     "device_info.csv",
     "property.csv",
     "device_category.csv",
-    "locations.csv"
+    "locations.csv",
+    "deployments_2.csv",
+    "device_info_2.csv",
+    "property_2.csv",
+    "device_category_2.csv",
+    "locations_2.csv",
+    "data_and_knowledge_queries.csv"
 ]
 
 dfs = [pd.read_csv(path) for path in file_paths]

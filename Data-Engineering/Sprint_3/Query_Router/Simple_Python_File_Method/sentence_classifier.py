@@ -21,6 +21,12 @@ CSV_FILES = [
     "property.csv",
     "device_category.csv",
     "locations.csv",
+    "deployments_2.csv",
+    "device_info_2.csv",
+    "property_2.csv",
+    "device_category_2.csv",
+    "locations_2.csv",
+    "data_and_knowledge_queries.csv"
 ]
 
 MODEL_NAME = "all-MiniLM-L6-v2"
