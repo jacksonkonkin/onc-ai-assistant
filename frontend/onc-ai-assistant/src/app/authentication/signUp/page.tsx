@@ -37,6 +37,23 @@ export default function SignupPage() {
             <input type="email" id="email" placeholder="Enter your email" />
           </div>
           <div className="form-group">
+            <label htmlFor="userType">User Type</label>
+            <select id="userType" className="form-select" defaultValue="">
+              <option value="" disabled>Select user type</option>
+              <option value="general">General</option>
+              <option value="student">Student</option>
+              <option value="researcher">Researcher</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="indigenous">Do you identify as Indigenous?</label>
+            <select id="indigenous" className="form-select" defaultValue="">
+              <option value="" disabled>Please select</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
