@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.routes import api
+from app.routes import api
+from app.routes import auth
 
 origins = [
     "http://localhost:3000",
@@ -16,3 +17,4 @@ app.add_middleware(
    )
 
 app.include_router(api.router)
+app.include_router(auth.router)
