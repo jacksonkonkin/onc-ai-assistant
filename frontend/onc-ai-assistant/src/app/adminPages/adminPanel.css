@@ -56,7 +56,7 @@
     font-family: "Open Sans", sans-serif;
 }
 
-.upload {
+.fileDrop {
     border: 2px dashed #7F7F7F;
     height: 60%;
     margin: auto;
@@ -67,14 +67,20 @@
     justify-content: center;
 }
 
-.upload p {
+.fileDrop p {
     text-align: center;
     color: #7F7F7F;
     font-family: "Open Sans", sans-serif;
 }
 
-.upload label {
+.upload {
+    margin: 10px auto;
+    width: fit-content;
+}
+
+.upload button {
     padding: 12px 24px;
+    margin: 0 10px;
     align-self: center;
     background-color: #129DC0;
     color: white;
