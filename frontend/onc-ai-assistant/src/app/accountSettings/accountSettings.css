@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+.settings-container {
+  min-height: 100vh;
+  background-color: white;
+  padding: 2rem;
+  font-family: "Arial", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 700px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.back-button,
+.logout-button-header {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.back-button:hover,
+.logout-button-header:hover {
+  background-color: #333;
+}
+
+.settings-form-container {
+  width: 100%;
+  max-width: 700px;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  padding: 3rem 2rem;
+}
+
+.settings-form {
+  width: 100%;
+}
+
+.settings-section {
+  margin-bottom: 2rem;
+}
+
+.settings-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.settings-input,
+.settings-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  outline: none;
+  background-color: white;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.settings-input:focus,
+.settings-select:focus {
+  border-color: #999;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.save-button,
+.cancel-button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  min-width: 140px;
+  text-align: center;
+}
+
+.save-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #0056b3;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.cancel-button.has-changes {
+  background-color: #dc3545;
+}
+
+.cancel-button.has-changes:hover {
+  background-color: #c82333;
+}

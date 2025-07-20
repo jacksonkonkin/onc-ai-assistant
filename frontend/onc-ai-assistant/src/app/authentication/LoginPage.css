@@ -41,12 +41,16 @@
   margin-bottom: 0.5rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 0.5rem;
   outline: none;
+  background-color: white;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .form-footer {
