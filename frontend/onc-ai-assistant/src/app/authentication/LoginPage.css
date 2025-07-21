@@ -85,3 +85,282 @@
   pointer-events: none;
 }
 
+/* Multi-step form styles */
+.multi-step-form {
+  max-width: 500px;
+  padding: 2rem;
+}
+
+.progress-container {
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.progress-step-container {
+  display: flex;
+  align-items: center;
+}
+
+.progress-step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5e5e5;
+  color: #666;
+  font-weight: bold;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.progress-step.completed {
+  background-color: #28a745;
+  color: white;
+}
+
+.progress-line {
+  width: 60px;
+  height: 2px;
+  background-color: #e5e5e5;
+  transition: all 0.3s ease;
+}
+
+.progress-line.completed {
+  background-color: #28a745;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #666;
+  padding: 0 20px;
+}
+
+.progress-labels span {
+  flex: 1;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.progress-labels span.active-label {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.step-content {
+  min-height: 300px;
+}
+
+.step-content h3 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.btn-secondary {
+  background: linear-gradient(to right, #129dc0, #123253) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.75rem !important;
+  border-radius: 9999px !important;
+  font-weight: bold !important;
+  font-size: 1rem !important;
+  cursor: pointer !important;
+  transition: opacity 0.3s ease !important;
+  flex: 1 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  width: auto !important;
+  margin-bottom: 0 !important;
+}
+
+.btn-secondary:hover {
+  opacity: 0.9 !important;
+}
+
+.btn-rounded-gradient {
+  background: linear-gradient(to right, #129dc0, #123253) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.75rem !important;
+  border-radius: 9999px !important;
+  font-weight: bold !important;
+  font-size: 1rem !important;
+  cursor: pointer !important;
+  transition: opacity 0.3s ease !important;
+  flex: 1 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  width: auto !important;
+  margin-bottom: 0 !important;
+}
+
+.btn-rounded-gradient:hover {
+  opacity: 0.9 !important;
+}
+
+.error {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.helper-text {
+  color: #666;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Tooltip styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.question-mark {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 16px;
+  cursor: help;
+  font-weight: bold;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: 250px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -125px;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.review-section {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.review-section h4 {
+  color: #495057;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.review-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.review-value {
+  color: #212529;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.confirmation-text {
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+/* Responsive adjustments for multi-step form */
+@media (max-width: 768px) {
+  .multi-step-form {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+  
+  .progress-step {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  
+  .progress-line {
+    width: 40px;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+  
+  .step-content {
+    min-height: 250px;
+  }
+}
+
