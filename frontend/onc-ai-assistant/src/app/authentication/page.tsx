@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/authService";
-import { DevCredentialsHelper } from "../components/DevCredentialsHelper";
 import "./LoginPage.css";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -85,7 +84,6 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      <DevCredentialsHelper />
       <Image
         src="/authPageArt.jpg"
         alt="Background"

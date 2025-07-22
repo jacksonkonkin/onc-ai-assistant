@@ -1,8 +1,6 @@
 // API service for authentication
-import { devConfig } from '../config/devConfig';
-import { mockAuthService } from './mockAuthService';
 
-const API_BASE_URL = devConfig.apiBaseUrl;
+const API_BASE_URL = 'http://localhost:8000';
 
 export interface SignupData {
   username: string;
@@ -30,11 +28,6 @@ export interface SignupResponse {
 
 export const authService = {
   async signup(data: SignupData): Promise<SignupResponse> {
-    // Use mock service in development mode
-    if (devConfig.useMockAuth) {
-      return mockAuthService.signup(data);
-    }
-
     const response = await fetch(`${API_BASE_URL}/signup`, {
       method: 'POST',
       headers: {
@@ -52,11 +45,6 @@ export const authService = {
   },
 
   async login(data: LoginData): Promise<AuthResponse> {
-    // Use mock service in development mode
-    if (devConfig.useMockAuth) {
-      return mockAuthService.login(data);
-    }
-
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
@@ -75,11 +63,6 @@ export const authService = {
 
   // Helper function to decode JWT and extract user info
   decodeToken(token: string) {
-    // Use mock decoder when in mock mode
-    if (devConfig.useMockAuth) {
-      return mockAuthService.decodeToken(token);
-    }
-
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
