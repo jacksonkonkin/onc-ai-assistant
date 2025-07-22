@@ -84,3 +84,11 @@
     font-weight: bold;
     font-family: "Open Sans", sans-serif;
 }
+
+.rating-filter {
+    padding: 10px;
+}
+
+.rating-filter label {
+    padding: 0 10px 0 5px;
+}
