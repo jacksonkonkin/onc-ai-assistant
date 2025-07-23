@@ -33,6 +33,25 @@ def process_location_node(location):
     
     return current_data
 
+def discover_locations_tree(**filters):
+    """Find locations tree"""
+    all_locations = []
+    data, error = _call_onc_api('locations/tree', **filters)
+    result = ""
+    if data:
+        for location in data:
+            locations = process_location_node(location)
+            all_locations.extend(locations)
+        for location in all_locations:
+            result += f"Location name: {location.get('locationName', 'Unknown')}\n"
+            result += f"Location code: {location.get('locationCode', 'Unknown')}\n"
+            result += f"Description: {location.get('description', 'No description')}\n"
+            result += f"Has device data: {location.get('hasDeviceData', 'Unknown')}\n"
+            result += f"Has property data: {location.get('hasPropertyData', 'Unknown')}\n"
+            result += "-" * 50 + "\n\n"
+        return result
+    
+    return None
 
 def get_location_and_children(location_code: str):
     """
@@ -214,13 +233,14 @@ def discover_device_categories(**filters):
     seen_category_codes = set()
     for cat in all_categories:
         category_code = cat.get('deviceCategoryCode')
+        # print(category_code)
         if category_code not in seen_category_codes:
             unique_categories.append(cat)
             seen_category_codes.add(category_code)
     
     result = f"Found {len(unique_categories)} unique device categories:\n"
     for cat in unique_categories:
-        result += f"- {cat.get('deviceCategoryName')}\n"
+        result += f"{cat.get('deviceCategoryCode')} - {cat.get('deviceCategoryName')}\n"
     
     return result.strip()
 
@@ -336,27 +356,13 @@ def discover_locations(**filters):
     return result.strip()
 
 
-def discover_locations_tree(**filters):
-    """Find locations tree"""
-    all_locations = []
-    data, error = _call_onc_api('locations/tree', **filters)
-    
-    if data:
-        for location in data:
-            locations = process_location_node(location)
-            all_locations.extend(locations)
-        return all_locations
-    
-    return []
-
-
 def discover_onc_data(query_type: str, **filters):
     """
     Main function to discover ONC data. Returns simple plaintext.
     
     Args:
         query_type: 'devices', 'properties', 'device_categories', 'deployments', 'data_products', 'locations'
-        **filters: locationCode, deviceCategoryCode, propertyCode, etc.
+        **filters: locationCode, deviceCategoryCode, propertyCode, deviceCode
     
     Returns:
         Simple plaintext string
@@ -368,8 +374,7 @@ def discover_onc_data(query_type: str, **filters):
         'device_categories': discover_device_categories,
         'deployments': discover_deployments,
         'data_products': discover_data_products,
-        'locations': discover_locations,
-        'location_tree': discover_locations_tree
+        'locations': discover_locations_tree,
     }
     
     if query_type not in functions:
@@ -380,9 +385,7 @@ def discover_onc_data(query_type: str, **filters):
 
 if __name__ == "__main__":
     
-    # locations = discover_onc_data('location_tree', locationCode='CBY')
-    # for location in locations:
-    #     print(json.dumps(location, indent=2))
-    #     print("\n" + "="*50 + "\n")
+    print(discover_onc_data('locations', locationCode='CBY'))
+
     # print("\n" + "="*50 + "\n")
-    print(discover_onc_data('devices', locationCode='CBYIP'))
+    # print(discover_onc_data('device_categories', locationCode="CBY"))
