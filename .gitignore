@@ -36,3 +36,6 @@ logs/
 
 .claude
 
+# Vector store database files
+onc_vectorstore/
+

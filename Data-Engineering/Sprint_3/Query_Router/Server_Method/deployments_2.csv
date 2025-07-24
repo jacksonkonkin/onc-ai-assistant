@@ -1,0 +1,201 @@
+question,label
+"Show me the maximum pressure for CBYIP.K3 between March 24, 2023 and April 21, 2023.",data_download_interval
+"What is the lowest oxygen at CBYIP from October 07, 2023 to November 08, 2023?",data_download_interval
+"What is the most frequent conductivity at CBYDS from April 07, 2023 to April 16, 2023?",data_download_interval
+"How many pressure readings were recorded at CBYIP.K2 from November 10, 2023 to December 16, 2023?",data_download_interval
+"What is the highest temperature at CBYIP.K2 from August 16, 2023 to August 25, 2023?",data_download_interval
+"What is the difference between highest and lowest of oxygen in CBYIP.K2 between October 16, 2023 and November 10, 2023?",data_download_interval
+"What is the mean conductivity at CBYIP.D4 from January 20, 2023 to February 27, 2023?",data_download_interval
+"What is the average temperature at CBYIP.D1 from August 14, 2023 to August 18, 2023?",data_download_interval
+"Show me the greatest oxygen for CBYIP.D1 between October 11, 2023 and October 27, 2023.",data_download_interval
+"What is the highest pressure at CBYIP.K1 from September 23, 2023 to October 20, 2023?",data_download_interval
+"What is the least oxygen at CBYDS from November 26, 2023 to January 13, 2024?",data_download_interval
+"What is the sum of conductivity values in CBYIP from January 02, 2023 to February 02, 2023?",data_download_interval
+"How many temperature readings were recorded at CBYIP.D1 from June 24, 2023 to July 08, 2023?",data_download_interval
+"What is the largest pressure at CBYIP.D1 from April 03, 2023 to April 19, 2023?",data_download_interval
+"What is the how many of pressure measurements at CBYIU between June 07, 2023 and July 06, 2023?",data_download_interval
+"How many oxygen readings were recorded at CBYIJ.J1 from August 12, 2023 to September 12, 2023?",data_download_interval
+"What is the difference between highest and lowest of temperature in CBYIP.D3 between June 10, 2023 and July 23, 2023?",data_download_interval
+"Show me the greatest conductivity for CBYIP between September 28, 2023 and October 26, 2023.",data_download_interval
+"What is the average salinity at CBYIP.D2 from December 23, 2023 to December 26, 2023?",data_download_interval
+"What is the count of salinity measurements at CBYIJ.J2 between October 26, 2023 and December 14, 2023?",data_download_interval
+"What is the greatest conductivity at CBYIP.D3 from June 28, 2023 to August 21, 2023?",data_download_interval
+"How many pressure readings were recorded at CBYIP.D2 from October 18, 2023 to November 01, 2023?",data_download_interval
+"How many oxygen readings were recorded at CBYIP.K1 from May 07, 2023 to July 05, 2023?",data_download_interval
+"What is the least pressure at CBYIP.K3 from January 07, 2023 to January 25, 2023?",data_download_interval
+"What is the difference between highest and lowest of salinity in CBYIP.D4 between September 30, 2023 and October 05, 2023?",data_download_interval
+"What is the spread of salinity in CBYIP.K1 between December 20, 2023 and January 20, 2024?",data_download_interval
+"What is the most frequent pressure at CBYIP.D4 from October 10, 2023 to October 20, 2023?",data_download_interval
+"What is the how many of salinity measurements at CBYIP.K3 between September 15, 2023 and October 17, 2023?",data_download_interval
+"What is the mean temperature at CBYIP from July 04, 2023 to July 31, 2023?",data_download_interval
+"What is the average salinity at CBY from August 08, 2023 to August 31, 2023?",data_download_interval
+"What is the total of conductivity values in CBYDS from January 22, 2023 to January 28, 2023?",data_download_interval
+"What is the minimum salinity at CBYIP.K3 from October 31, 2023 to December 07, 2023?",data_download_interval
+"What is the mean oxygen at CBYIP.D3 from June 02, 2023 to June 10, 2023?",data_download_interval
+"What is the highest conductivity at CBYIP.D2 from January 16, 2023 to January 22, 2023?",data_download_interval
+"How many salinity readings were recorded at CBYIP from February 09, 2023 to March 02, 2023?",data_download_interval
+"What is the average salinity at CBYIP from April 26, 2023 to May 29, 2023?",data_download_interval
+"What is the highest conductivity at CBYIP.D4 from October 16, 2023 to November 07, 2023?",data_download_interval
+"What is the count of temperature measurements at CBYIP.D2 between August 13, 2023 and October 02, 2023?",data_download_interval
+"What is the range of temperature in CBYIU between February 15, 2023 and April 06, 2023?",data_download_interval
+"Show me the smallest conductivity for CBYIJ.J1 between March 30, 2023 and May 10, 2023.",data_download_interval
+"What is the range of oxygen in CBYIJ.J2 between September 01, 2023 and October 24, 2023?",data_download_interval
+"What is the minimum conductivity at CBYIP.K2 from March 12, 2023 to April 01, 2023?",data_download_interval
+"What is the average temperature at CBY from March 23, 2023 to May 03, 2023?",data_download_interval
+"What is the greatest temperature at CBYIP.K2 from October 25, 2023 to November 05, 2023?",data_download_interval
+"What is the greatest conductivity at CBYIP.K3 from October 20, 2023 to December 09, 2023?",data_download_interval
+"Show me the mean conductivity for CBYIP.D2 between August 30, 2023 and October 23, 2023.",data_download_interval
+"What is the most common salinity at CBYIP.D2 from December 06, 2023 to December 28, 2023?",data_download_interval
+"What is the largest salinity at CBYIP.K3 from February 10, 2023 to April 10, 2023?",data_download_interval
+"Show me the minimum conductivity for CBYIP between February 24, 2023 and April 15, 2023.",data_download_interval
+"What is the mode conductivity at CBYDS from March 13, 2023 to May 09, 2023?",data_download_interval
+"What is the sum of oxygen values in CBYIP.D4 from April 15, 2023 to May 15, 2023?",data_download_interval
+"What is the sum of temperature values in CBYIP.D1 from January 14, 2023 to January 28, 2023?",data_download_interval
+"What is the sum of salinity values in CBYIP from September 16, 2023 to October 13, 2023?",data_download_interval
+"Show me the average temperature for CBYIU between November 02, 2023 and November 26, 2023.",data_download_interval
+"What is the sum of temperature values in CBYIJ.J2 from November 21, 2023 to November 27, 2023?",data_download_interval
+"What is the minimum oxygen at CBYIU from March 30, 2023 to May 17, 2023?",data_download_interval
+"Show me the average oxygen for CBYIP between September 15, 2023 and September 20, 2023.",data_download_interval
+"What is the range of pressure in CBYIP.K1 between February 02, 2023 and February 20, 2023?",data_download_interval
+"What is the number of of oxygen measurements at CBYIP.D1 between April 26, 2023 and April 29, 2023?",data_download_interval
+"What is the lowest salinity at CBYIJ.J2 from March 13, 2023 to March 19, 2023?",data_download_interval
+"What is the least temperature at CBYIJ.J2 from February 09, 2023 to March 26, 2023?",data_download_interval
+"What is the spread of temperature in CBYIP between November 03, 2023 and November 13, 2023?",data_download_interval
+"What is the difference between highest and lowest of pressure in CBYIP.D2 between July 27, 2023 and August 10, 2023?",data_download_interval
+"What is the mean temperature at CBYIP.D4 from March 15, 2023 to March 28, 2023?",data_download_interval
+"What is the most frequent conductivity at CBYIP.K1 from February 13, 2023 to February 27, 2023?",data_download_interval
+"What is the most frequent conductivity at CBYIP.D1 from October 01, 2023 to October 19, 2023?",data_download_interval
+"What is the least conductivity at CBY from August 19, 2023 to August 31, 2023?",data_download_interval
+"What is the highest oxygen at CBYIU from October 18, 2023 to October 30, 2023?",data_download_interval
+"What is the spread of salinity in CBYIP.D1 between November 03, 2023 and November 27, 2023?",data_download_interval
+"Show me the largest salinity for CBYIP.K1 between June 25, 2023 and August 06, 2023.",data_download_interval
+"What is the most frequent conductivity at CBYIP.D3 from March 06, 2023 to March 28, 2023?",data_download_interval
+"What is the number of of conductivity measurements at CBY between August 11, 2023 and September 30, 2023?",data_download_interval
+"What is the mean temperature at CBYIP.D4 from September 20, 2023 to November 15, 2023?",data_download_interval
+"What is the greatest oxygen at CBYIJ.J1 from August 20, 2023 to September 07, 2023?",data_download_interval
+"What is the minimum pressure at CBYIP.K3 from April 14, 2023 to June 08, 2023?",data_download_interval
+"Show me the maximum pressure for CBYIJ.J1 between August 09, 2023 and September 14, 2023.",data_download_interval
+"What is the number of of oxygen measurements at CBYIP.K3 between November 19, 2023 and January 11, 2024?",data_download_interval
+"What is the lowest salinity at CBYIJ.J2 from April 18, 2023 to June 15, 2023?",data_download_interval
+"Show me the least temperature for CBYIP.K1 between January 14, 2023 and February 12, 2023.",data_download_interval
+"What is the number of of temperature measurements at CBYIU between December 25, 2023 and February 19, 2024?",data_download_interval
+"Show me the lowest conductivity for CBYIJ.J1 between August 18, 2023 and October 12, 2023.",data_download_interval
+"What is the aggregate of salinity values in CBYIP.D3 from December 08, 2023 to January 27, 2024?",data_download_interval
+"What is the aggregate of pressure values in CBYIP.K3 from March 09, 2023 to April 22, 2023?",data_download_interval
+"What is the spread of salinity in CBY between January 27, 2023 and March 18, 2023?",data_download_interval
+"Show me the minimum salinity for CBYIP.K2 between April 19, 2023 and June 02, 2023.",data_download_interval
+"What is the largest pressure at CBYIJ.J2 from January 01, 2024 to February 22, 2024?",data_download_interval
+"Show me the largest oxygen for CBYIP.D2 between October 01, 2023 and October 28, 2023.",data_download_interval
+"What is the sum of salinity values in CBYDS from April 22, 2023 to May 18, 2023?",data_download_interval
+"Show me the greatest pressure for CBYIP.D1 between December 11, 2023 and January 19, 2024.",data_download_interval
+"What is the highest conductivity at CBYIP from December 16, 2023 to January 06, 2024?",data_download_interval
+"What is the total of oxygen values in CBYIP.D4 from July 08, 2023 to July 23, 2023?",data_download_interval
+"What is the aggregate of pressure values in CBYDS from February 22, 2023 to April 17, 2023?",data_download_interval
+"How many pressure readings were recorded at CBY from November 30, 2023 to December 12, 2023?",data_download_interval
+"Show me the lowest oxygen for CBY between December 12, 2023 and January 10, 2024.",data_download_interval
+"Show me the mean salinity for CBYIP.D3 between August 08, 2023 and August 15, 2023.",data_download_interval
+"What is the count of oxygen measurements at CBYIP between July 26, 2023 and August 20, 2023?",data_download_interval
+"What is the aggregate of pressure values in CBYIP.D1 from February 13, 2023 to March 11, 2023?",data_download_interval
+"What is the average oxygen at CBYIJ.J2 from August 18, 2023 to September 21, 2023?",data_download_interval
+"What is the largest conductivity at CBYIP.K2 from July 17, 2023 to July 26, 2023?",data_download_interval
+"What is the spread of oxygen in CBY between July 03, 2023 and July 15, 2023?",data_download_interval
+"What is the minimum pressure at CBYIP.K1 from November 16, 2023 to December 30, 2023?",data_download_interval
+"What is the mode salinity at CBYIJ.J2 from May 31, 2023 to June 21, 2023?",data_download_interval
+"What is the how many of conductivity measurements at CBYIJ.J1 between October 02, 2023 and November 11, 2023?",data_download_interval
+"Show me the largest salinity for CBYIJ.J2 between April 14, 2023 and May 18, 2023.",data_download_interval
+"Show me the average pressure for CBYIP between February 12, 2023 and April 01, 2023.",data_download_interval
+"What is the mode salinity at CBYIP from April 20, 2023 to June 19, 2023?",data_download_interval
+"What is the most common pressure at CBYIP.K1 from November 20, 2023 to January 07, 2024?",data_download_interval
+"What is the average oxygen at CBYIJ.J2 from March 28, 2023 to May 02, 2023?",data_download_interval
+"What is the sum of salinity values in CBYDS from April 19, 2023 to April 26, 2023?",data_download_interval
+"Show me the lowest temperature for CBYIP between November 04, 2023 and November 20, 2023.",data_download_interval
+"What is the total of temperature values in CBYIP.D2 from October 07, 2023 to October 11, 2023?",data_download_interval
+"What is the average oxygen at CBYIP from September 23, 2023 to November 06, 2023?",data_download_interval
+"What is the aggregate of conductivity values in CBYIP.D2 from October 02, 2023 to November 03, 2023?",data_download_interval
+"What is the total of pressure values in CBYDS from October 22, 2023 to November 25, 2023?",data_download_interval
+"What is the aggregate of salinity values in CBYIP.K1 from September 29, 2023 to November 15, 2023?",data_download_interval
+"What is the range of conductivity in CBYDS between August 27, 2023 and September 07, 2023?",data_download_interval
+"Show me the least salinity for CBYDS between July 14, 2023 and August 05, 2023.",data_download_interval
+"Show me the smallest pressure for CBYIP between March 21, 2023 and May 11, 2023.",data_download_interval
+"What is the average temperature at CBYIJ.J2 from September 17, 2023 to October 14, 2023?",data_download_interval
+"Show me the maximum temperature for CBYIP.K1 between November 29, 2023 and December 30, 2023.",data_download_interval
+"What is the how many of pressure measurements at CBYIP.D1 between August 02, 2023 and September 05, 2023?",data_download_interval
+"What is the total of oxygen values in CBYIU from November 17, 2023 to December 25, 2023?",data_download_interval
+"What is the mode oxygen at CBYIU from February 22, 2023 to February 26, 2023?",data_download_interval
+"How many pressure readings were recorded at CBY from October 25, 2023 to November 28, 2023?",data_download_interval
+"Show me the smallest oxygen for CBYIP between June 11, 2023 and July 02, 2023.",data_download_interval
+"What is the average salinity at CBYIP.K2 from January 28, 2023 to March 14, 2023?",data_download_interval
+"Show me the mean salinity for CBYIP.D2 between April 28, 2023 and May 20, 2023.",data_download_interval
+"What is the least pressure at CBYIP.K3 from August 14, 2023 to September 22, 2023?",data_download_interval
+"Show me the average conductivity for CBYIP between August 20, 2023 and October 06, 2023.",data_download_interval
+"What is the total of pressure values in CBYIP.K3 from August 06, 2023 to September 22, 2023?",data_download_interval
+"How many pressure readings were recorded at CBYIP.D4 from January 17, 2023 to March 02, 2023?",data_download_interval
+"What is the most common conductivity at CBYIP.K2 from February 23, 2023 to March 05, 2023?",data_download_interval
+"What is the count of temperature measurements at CBYIP.D1 between January 31, 2023 and March 31, 2023?",data_download_interval
+"What is the most frequent conductivity at CBYIP.D2 from December 25, 2023 to January 23, 2024?",data_download_interval
+"How many conductivity readings were recorded at CBYIP.D1 from March 12, 2023 to April 20, 2023?",data_download_interval
+"What is the difference between highest and lowest of pressure in CBYIP between March 26, 2023 and May 14, 2023?",data_download_interval
+"What is the how many of conductivity measurements at CBYIJ.J2 between January 12, 2023 and January 29, 2023?",data_download_interval
+"What is the difference between highest and lowest of pressure in CBYIP.K3 between February 14, 2023 and February 24, 2023?",data_download_interval
+"Show me the largest pressure for CBYIP.D3 between July 09, 2023 and August 07, 2023.",data_download_interval
+"Show me the smallest oxygen for CBYIP.D4 between January 01, 2023 and February 03, 2023.",data_download_interval
+"Show me the greatest salinity for CBYIP.D4 between January 20, 2023 and February 20, 2023.",data_download_interval
+"What is the mode salinity at CBYIP from August 18, 2023 to October 16, 2023?",data_download_interval
+"What is the mode salinity at CBYDS from December 06, 2023 to January 20, 2024?",data_download_interval
+"What is the aggregate of pressure values in CBYIP.D4 from June 29, 2023 to August 02, 2023?",data_download_interval
+"What is the average oxygen at CBYIJ.J2 from June 17, 2023 to June 23, 2023?",data_download_interval
+"Show me the least conductivity for CBYDS between May 31, 2023 and June 03, 2023.",data_download_interval
+"What is the aggregate of oxygen values in CBYIP.D2 from July 20, 2023 to August 05, 2023?",data_download_interval
+"How many salinity readings were recorded at CBYIP.K2 from March 27, 2023 to May 05, 2023?",data_download_interval
+"What is the total of temperature values in CBYIP.D1 from October 14, 2023 to November 20, 2023?",data_download_interval
+"What is the aggregate of pressure values in CBYIP.D2 from July 23, 2023 to August 29, 2023?",data_download_interval
+"What is the how many of conductivity measurements at CBYIP.K2 between June 25, 2023 and July 04, 2023?",data_download_interval
+"What is the lowest temperature at CBYDS from May 02, 2023 to May 18, 2023?",data_download_interval
+"What is the how many of pressure measurements at CBYIP.K2 between March 16, 2023 and April 13, 2023?",data_download_interval
+"Show me the minimum salinity for CBYIJ.J1 between February 10, 2023 and March 30, 2023.",data_download_interval
+"What is the mode conductivity at CBYIU from September 12, 2023 to September 24, 2023?",data_download_interval
+"What is the how many of oxygen measurements at CBYIP.D2 between September 19, 2023 and October 30, 2023?",data_download_interval
+"What is the sum of conductivity values in CBYIP.K2 from March 20, 2023 to March 26, 2023?",data_download_interval
+"What is the aggregate of temperature values in CBYIP.D3 from May 07, 2023 to June 25, 2023?",data_download_interval
+"What is the most common temperature at CBYIP.K3 from January 26, 2023 to February 02, 2023?",data_download_interval
+"What is the total of pressure values in CBYIU from April 10, 2023 to May 27, 2023?",data_download_interval
+"Show me the highest pressure for CBY between June 02, 2023 and July 04, 2023.",data_download_interval
+"What is the smallest oxygen at CBYIP.D3 from May 11, 2023 to May 31, 2023?",data_download_interval
+"What is the aggregate of temperature values in CBYIP.D2 from December 23, 2023 to February 06, 2024?",data_download_interval
+"What is the mean oxygen at CBYIP.K2 from August 08, 2023 to September 24, 2023?",data_download_interval
+"What is the count of salinity measurements at CBYIP.D2 between May 14, 2023 and May 23, 2023?",data_download_interval
+"What is the mode salinity at CBYIP.K3 from February 18, 2023 to March 11, 2023?",data_download_interval
+"What is the mean oxygen at CBYIP.D2 from March 10, 2023 to May 04, 2023?",data_download_interval
+"What is the difference between highest and lowest of oxygen in CBYIP between October 19, 2023 and December 17, 2023?",data_download_interval
+"What is the least pressure at CBYIJ.J1 from September 28, 2023 to November 21, 2023?",data_download_interval
+"Show me the lowest pressure for CBYIP.D1 between September 30, 2023 and November 20, 2023.",data_download_interval
+"What is the total of oxygen values in CBYIP.D3 from April 03, 2023 to May 01, 2023?",data_download_interval
+"What is the aggregate of oxygen values in CBYIP.D1 from September 16, 2023 to October 10, 2023?",data_download_interval
+"What is the highest oxygen at CBY from March 28, 2023 to May 26, 2023?",data_download_interval
+"What is the most frequent pressure at CBYIP.D4 from November 05, 2023 to November 08, 2023?",data_download_interval
+"What is the most frequent temperature at CBYIJ.J2 from March 19, 2023 to March 26, 2023?",data_download_interval
+"Show me the largest temperature for CBYIP.K1 between September 18, 2023 and October 27, 2023.",data_download_interval
+"What is the spread of temperature in CBYIP.K1 between September 14, 2023 and October 05, 2023?",data_download_interval
+"What is the range of conductivity in CBYIP.K1 between June 02, 2023 and June 06, 2023?",data_download_interval
+"What is the spread of temperature in CBYIP.K1 between May 08, 2023 and June 04, 2023?",data_download_interval
+"What is the most frequent oxygen at CBYIP.K1 from October 24, 2023 to November 21, 2023?",data_download_interval
+"Show me the mean oxygen for CBYDS between August 24, 2023 and September 02, 2023.",data_download_interval
+"What is the most frequent pressure at CBYIU from October 17, 2023 to October 24, 2023?",data_download_interval
+"What is the average salinity at CBYIP.K1 from March 11, 2023 to April 20, 2023?",data_download_interval
+"How many conductivity readings were recorded at CBYIP.D4 from February 10, 2023 to February 13, 2023?",data_download_interval
+"What is the most frequent salinity at CBYIJ.J1 from April 26, 2023 to May 22, 2023?",data_download_interval
+"Show me the minimum salinity for CBYIP.D3 between August 25, 2023 and September 13, 2023.",data_download_interval
+"What is the how many of pressure measurements at CBYDS between July 06, 2023 and August 15, 2023?",data_download_interval
+"What is the mode oxygen at CBYIP.D4 from October 20, 2023 to October 27, 2023?",data_download_interval
+"What is the smallest oxygen at CBYIU from February 08, 2023 to March 10, 2023?",data_download_interval
+"What is the aggregate of temperature values in CBYIJ.J1 from July 25, 2023 to August 15, 2023?",data_download_interval
+"What is the number of of conductivity measurements at CBYIJ.J2 between March 16, 2023 and April 19, 2023?",data_download_interval
+"How many oxygen readings were recorded at CBYIP.D3 from November 03, 2023 to December 15, 2023?",data_download_interval
+"What is the count of oxygen measurements at CBYIP.K3 between August 01, 2023 and August 18, 2023?",data_download_interval
+"How many salinity readings were recorded at CBYIP.D3 from March 14, 2023 to March 27, 2023?",data_download_interval
+"What is the mean salinity at CBY from October 11, 2023 to October 14, 2023?",data_download_interval
+"Show me the average pressure for CBYIJ.J2 between July 22, 2023 and August 24, 2023.",data_download_interval
+"What is the sum of temperature values in CBYIP.D1 from March 09, 2023 to March 28, 2023?",data_download_interval
+"What is the sum of oxygen values in CBYIP.D2 from October 25, 2023 to December 23, 2023?",data_download_interval
+"What is the aggregate of salinity values in CBYDS from September 22, 2023 to October 10, 2023?",data_download_interval
+"What is the how many of oxygen measurements at CBYIP.K3 between August 14, 2023 and August 29, 2023?",data_download_interval

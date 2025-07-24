@@ -4,8 +4,14 @@ Teams: All teams (integration point)
 """
 
 import logging
+import numpy as np
 from typing import Dict, Any, List, Optional
 from pathlib import Path
+from sentence_transformers import CrossEncoder
+import os 
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 
 from ..config.settings import ConfigManager
 from ..document_processing import DocumentProcessor, DocumentLoader
@@ -340,9 +346,28 @@ class ONCPipeline:
         
         # Retrieve documents
         documents = self.vector_store_manager.retrieve_documents(question)
+
+        num_of_documents = len(documents)
         
+        if num_of_documents <= 1:
+            top_k = num_of_documents
+        else:
+            top_k = num_of_documents // 2
+
+        model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', max_length=512)
+        # rerank the results with original query and documents returned from Chroma
+        scores = model.predict([(question, doc.page_content) for doc in documents])
+        # get the highest scoring document
+        doc_score_pairs = list(zip(documents, scores))
+
+        # Sort the pairs by score in descending order
+        sorted_doc_score_pairs = sorted(doc_score_pairs, key=lambda x: x[1], reverse=True)
+
+        # Select the top 5 documents
+        top_k_documents = [pair[0] for pair in sorted_doc_score_pairs[:top_k]]
+
         # Generate response with conversation context
-        return self.rag_engine.process_rag_query(question, documents, conversation_context)
+        return self.rag_engine.process_rag_query(question, top_k_documents, conversation_context)
     
     def _process_database_query(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> str:
         """Process query using database search."""
