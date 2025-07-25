@@ -1,2 +1,7 @@
 fastapi
-uvicorn[standard]
+uvicorn
+motor
+python-dotenv
+bcrypt
+passlib[bcrypt]
+python-jose
