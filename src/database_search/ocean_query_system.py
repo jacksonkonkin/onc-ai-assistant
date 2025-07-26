@@ -136,10 +136,22 @@ class OceanQuerySystem:
             device_category = params.get("device_category")
             property_code = params.get("property_code")
             
-            # Search devices with property code filtering if available
+            # For device discovery queries, don't filter by property unless specifically requested
+            # If the user asks "what CTD devices are available", they want all CTD devices,
+            # not CTD devices that measure a specific property
+            device_discovery_keywords = ['devices', 'sensors', 'instruments', 'available', 'deployed', 'what']
+            original_query = params.get("original_query", "").lower() if "original_query" in params else query.lower()
+            
+            # If this is clearly a device discovery query, ignore property filtering
+            is_device_discovery = any(keyword in original_query for keyword in device_discovery_keywords)
+            use_property_filter = property_code if not is_device_discovery else None
+            
+            logger.info(f"Device discovery mode: {is_device_discovery}, using property filter: {use_property_filter}")
+            
+            # Search devices with optional property code filtering
             devices = self.api_client.find_cambridge_bay_devices(
                 device_category=device_category,
-                property_code=property_code
+                property_code=use_property_filter
             )
             
             # Filter by location if not all Cambridge Bay
@@ -782,29 +794,7 @@ class OceanQuerySystem:
         metadata = response.get("metadata", {})
         if metadata.get("query_type") == "device_discovery":
             # This is a device discovery response - format it appropriately
-            devices = response["data"]
-            if not devices:
-                return "INFO: No devices found"
-            
-            device_count = len(devices)
-            device_categories = {}
-            for device in devices:
-                category = device.get('deviceCategoryCode', 'Unknown')
-                if category not in device_categories:
-                    device_categories[category] = []
-                device_categories[category].append(device)
-            
-            lines = [f"Found {device_count} device{'s' if device_count != 1 else ''}:"]
-            for category, category_devices in device_categories.items():
-                lines.append(f"\n{category}: {len(category_devices)} device{'s' if len(category_devices) != 1 else ''}")
-                for device in category_devices[:3]:  # Show first 3 devices per category
-                    device_name = device.get('deviceName', 'Unknown Device')
-                    device_code = device.get('deviceCode', 'N/A')
-                    lines.append(f"  • {device_name} (Code: {device_code})")
-                if len(category_devices) > 3:
-                    lines.append(f"  ... and {len(category_devices) - 3} more")
-            
-            return "\n".join(lines)
+            return self._format_device_discovery_response(response)
         
         # Format successful sensor data response (not device discovery)
         formatted_data = self.api_client.format_sensor_data(response["data"])
@@ -994,6 +984,171 @@ class OceanQuerySystem:
             'CBYSS.M2': 'Cambridge Bay Weather Station 2'
         }
         return location_names.get(location_code, location_code)
+
+    def _format_device_discovery_response(self, response: Dict[str, Any]) -> str:
+        """
+        Format device discovery response with enhanced information
+        
+        Args:
+            response: Device discovery response dictionary
+            
+        Returns:
+            Formatted device discovery response string
+        """
+        devices = response["data"]
+        metadata = response.get("metadata", {})
+        
+        if not devices:
+            location_code = metadata.get("location_code", "Unknown")
+            device_category = metadata.get("device_category")
+            property_code = metadata.get("property_code")
+            
+            lines = ["🔍 **DEVICE DISCOVERY RESULT**", ""]
+            lines.append("❌ **No devices found**")
+            lines.append("")
+            lines.append("**Search criteria:**")
+            lines.append(f"  • Location: {location_code}")
+            if device_category:
+                lines.append(f"  • Device type: {device_category}")
+            if property_code:
+                lines.append(f"  • Property: {property_code}")
+            
+            lines.extend(["", "**Suggestions:**"])
+            lines.append("  • Try searching without specific device type filters")
+            lines.append("  • Check if the location code is correct")
+            lines.append("  • Try 'What devices are at Cambridge Bay?' for broader search")
+            
+            return "\n".join(lines)
+        
+        # Group devices by location and category
+        location_groups = {}
+        category_totals = {}
+        
+        for device in devices:
+            location_info = device.get('_location_info', {})
+            location_code = location_info.get('locationCode', 'Unknown')
+            location_name = location_info.get('locationName', location_code)
+            category = device.get('deviceCategoryCode', 'Unknown')
+            
+            if location_code not in location_groups:
+                location_groups[location_code] = {
+                    'name': location_name,
+                    'devices': {},
+                    'total': 0
+                }
+            
+            if category not in location_groups[location_code]['devices']:
+                location_groups[location_code]['devices'][category] = []
+            
+            location_groups[location_code]['devices'][category].append(device)
+            location_groups[location_code]['total'] += 1
+            
+            # Track category totals
+            category_totals[category] = category_totals.get(category, 0) + 1
+        
+        # Build response
+        lines = ["🔍 **DEVICE DISCOVERY RESULT**", ""]
+        
+        # Summary
+        total_devices = len(devices)
+        total_locations = len(location_groups)
+        total_categories = len(category_totals)
+        
+        lines.append(f"✅ **Found {total_devices} device{'s' if total_devices != 1 else ''} across {total_locations} location{'s' if total_locations != 1 else ''} ({total_categories} device type{'s' if total_categories != 1 else ''})**")
+        lines.append("")
+        
+        # Category summary
+        lines.append("📊 **Device Types Summary:**")
+        for category, count in sorted(category_totals.items()):
+            device_type_name = self._get_device_type_description(category)
+            lines.append(f"  • **{category}** ({device_type_name}): {count} device{'s' if count != 1 else ''}")
+        lines.append("")
+        
+        # Detailed breakdown by location
+        lines.append("📍 **By Location:**")
+        
+        for location_code, location_data in sorted(location_groups.items()):
+            location_name = location_data['name']
+            device_count = location_data['total']
+            
+            lines.append(f"\n**{location_name} ({location_code})** - {device_count} device{'s' if device_count != 1 else ''}")
+            
+            for category, category_devices in sorted(location_data['devices'].items()):
+                device_type_name = self._get_device_type_description(category)
+                lines.append(f"  🔧 **{category}** ({device_type_name}) - {len(category_devices)} device{'s' if len(category_devices) != 1 else ''}")
+                
+                # Show up to 3 devices per category per location
+                for i, device in enumerate(category_devices[:3]):
+                    device_name = device.get('deviceName', 'Unknown Device')
+                    device_code = device.get('deviceCode', 'N/A')
+                    supported_props = device.get('_supported_properties', [])
+                    
+                    lines.append(f"    • {device_name}")
+                    lines.append(f"      Code: {device_code}")
+                    if supported_props:
+                        props_display = ", ".join(supported_props[:4])
+                        if len(supported_props) > 4:
+                            props_display += f", +{len(supported_props) - 4} more"
+                        lines.append(f"      Measures: {props_display}")
+                    
+                if len(category_devices) > 3:
+                    lines.append(f"    ... and {len(category_devices) - 3} more {category} device{'s' if len(category_devices) - 3 != 1 else ''}")
+        
+        # Add helpful footer
+        lines.extend(["", "💡 **Next Steps:**"])
+        lines.append("  • Ask for specific measurements: 'What is the temperature at Cambridge Bay?'")
+        lines.append("  • Get device details: 'Tell me about CTD sensors at CBYIP'")
+        lines.append("  • Download data: 'Download temperature data from Cambridge Bay'")
+        
+        # Add search metadata
+        query_info = []
+        if metadata.get("device_category"):
+            query_info.append(f"Device type: {metadata['device_category']}")
+        if metadata.get("property_code"):
+            query_info.append(f"Property: {metadata['property_code']}")
+        if metadata.get("execution_time"):
+            query_info.append(f"Search time: {metadata['execution_time']}s")
+        
+        if query_info:
+            lines.extend(["", f"ℹ️  Search details: {' • '.join(query_info)}"])
+        
+        return "\n".join(lines)
+
+    def _get_device_type_description(self, device_category: str) -> str:
+        """
+        Get human-readable description for device category
+        
+        Args:
+            device_category: Device category code
+            
+        Returns:
+            Human-readable device description
+        """
+        descriptions = {
+            'CTD': 'Conductivity-Temperature-Depth sensor',
+            'HYDROPHONE': 'Underwater acoustic sensor',
+            'OXYSENSOR': 'Dissolved oxygen sensor',
+            'PHSENSOR': 'pH level sensor',
+            'METSTN': 'Meteorological weather station',
+            'ICEPROFILER': 'Ice-profiling sonar',
+            'ADCP1200KHZ': 'Acoustic Doppler Current Profiler (1200kHz)',
+            'BARPRESS': 'Barometric pressure sensor',
+            'FLUOROMETER': 'Fluorescence measurement sensor',
+            'FLNTU': 'Fluorescence and turbidity sensor',
+            'TURBIDITYMETER': 'Water turbidity sensor',
+            'RADIOMETER': 'Solar irradiance sensor',
+            'NITRATESENSOR': 'Nitrate concentration sensor',
+            'WETLABS_WQM': 'Water Quality Monitor',
+            'VIDEOCAM': 'Underwater video camera',
+            'CAMLIGHTS': 'Camera with lighting system',
+            'PLANKTONSAMPLER': 'Plankton sampling device',
+            'ACOUSTICRECEIVER': 'Acoustic tag receiver',
+            'AISRECEIVER': 'Automatic Identification System receiver',
+            'ICE_BUOY': 'Ice monitoring buoy',
+            'ADCP': 'Acoustic Doppler Current Profiler',
+            'CAMERA': 'Underwater camera system'
+        }
+        return descriptions.get(device_category, 'Ocean monitoring device')
 
     def _get_device_info(self, response: Dict[str, Any]) -> Dict[str, str]:
         """Extract device information from successful API response"""

@@ -231,6 +231,95 @@ class QueryRouter:
             ]
         }
     
+    def _detect_greeting_or_social(self, query: str) -> bool:
+        """
+        Detect greetings and social queries that should bypass classification.
+        
+        Args:
+            query: User query string
+            
+        Returns:
+            True if query is a greeting/social interaction, False otherwise
+        """
+        query_lower = query.lower().strip()
+        
+        # Exact matches for common greetings and social interactions
+        exact_greetings = {
+            'hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening',
+            'thanks', 'thank you', 'bye', 'goodbye', 'see you', 'how are you',
+            "what's up", "how's it going", 'nice to meet you', 'pleased to meet you',
+            'good day', 'good night', 'howdy', 'greetings', 'salutations'
+        }
+        
+        # Check for exact matches
+        if query_lower in exact_greetings:
+            return True
+        
+        # Check for greeting patterns in short queries (≤4 words)
+        words = query_lower.split()
+        if len(words) <= 4:
+            greeting_words = {'hello', 'hi', 'hey', 'thanks', 'thank', 'bye', 'goodbye', 'morning', 'afternoon', 'evening'}
+            if any(word in greeting_words for word in words):
+                return True
+        
+        # Very short non-technical queries (1-2 words)
+        if len(words) <= 2:
+            # Technical keywords that indicate oceanographic queries
+            tech_keywords = {
+                'temperature', 'data', 'sensor', 'pressure', 'oxygen', 'depth', 'salinity',
+                'conductivity', 'ph', 'turbidity', 'chlorophyll', 'fluorescence', 'density',
+                'ctd', 'hydrophone', 'adcp', 'cambridge', 'bay', 'cby', 'onc', 'ocean',
+                'marine', 'underwater', 'deployment', 'device', 'instrument', 'measurement'
+            }
+            
+            # If no technical keywords in very short query, likely greeting/social
+            if not any(tech_word in query_lower for tech_word in tech_keywords):
+                return True
+        
+        # Check for common social question patterns
+        social_patterns = [
+            'how are you', 'what\'s up', 'how\'s it going', 'how do you do',
+            'what time is it', 'what\'s the weather', 'tell me a joke',
+            'who are you', 'what are you', 'how old are you'
+        ]
+        
+        if any(pattern in query_lower for pattern in social_patterns):
+            return True
+        
+        return False
+
+    def _log_routing_decision(self, query: str, routing_decision: Dict[str, Any], method: str) -> None:
+        """
+        Log detailed routing decision for debugging and monitoring.
+        
+        Args:
+            query: Original user query
+            routing_decision: The routing decision made
+            method: Classification method used (e.g., "Greeting Filter", "Sprint 3", "LLM")
+        """
+        route_type = routing_decision['type'].value if hasattr(routing_decision['type'], 'value') else str(routing_decision['type'])
+        classification = routing_decision.get('classification', 'N/A')
+        confidence = routing_decision.get('confidence', 'N/A')
+        
+        logger.info(f"🎯 {method} Routing Decision:")
+        logger.info(f"   Query: '{query[:80]}{'...' if len(query) > 80 else ''}'")
+        logger.info(f"   📍 Route: {route_type.upper()}")
+        logger.info(f"   🏷️  Classification: {classification}")
+        logger.info(f"   📊 Confidence: {confidence}")
+        
+        # Add specific confidence scores if available
+        if 'sprint3_confidence' in routing_decision:
+            logger.info(f"   🎯 Sprint 3 confidence: {routing_decision['sprint3_confidence']:.3f}")
+        if 'bert_confidence' in routing_decision:
+            logger.info(f"   🧠 BERT confidence: {routing_decision['bert_confidence']:.3f}")
+        
+        # Add parameters info
+        params = routing_decision.get('parameters', {})
+        if params:
+            key_params = {k: v for k, v in params.items() if k in ['reason', 'search_type', 'download_type', 'fallback_applied']}
+            if key_params:
+                logger.info(f"   ⚙️  Key parameters: {key_params}")
+
     def route_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Route a query to the appropriate processing pipeline.
@@ -243,6 +332,21 @@ class QueryRouter:
             Dict: Routing decision with type and parameters
         """
         context = context or {}
+        
+        # PRE-ROUTING FILTER: Handle greetings and social queries first
+        if self._detect_greeting_or_social(query):
+            routing_decision = {
+                'type': QueryType.DIRECT_LLM,
+                'classification': 'social_greeting',
+                'confidence': 'high',
+                'parameters': {
+                    'reason': 'Greeting or social query detected',
+                    'bypass_classification': True,
+                    'greeting_detected': True
+                }
+            }
+            self._log_routing_decision(query, routing_decision, "Greeting Filter")
+            return routing_decision
         
         # Check for conversation context and follow-up detection
         conversation_context = context.get('conversation_context', '')
@@ -275,7 +379,7 @@ class QueryRouter:
                         routing_decision, query, context
                     )
                 
-                logger.info(f"Sprint 3 routed query to: {routing_decision['type']}")
+                self._log_routing_decision(query, routing_decision, "Sprint 3")
                 return routing_decision
             except Exception as e:
                 logger.warning(f"Sprint 3 routing failed, falling back to LLM: {e}")
@@ -291,7 +395,7 @@ class QueryRouter:
                         routing_decision, query, context
                     )
                 
-                logger.info(f"LLM routed query to: {routing_decision['type']}")
+                self._log_routing_decision(query, routing_decision, "LLM")
                 return routing_decision
             except Exception as e:
                 logger.warning(f"LLM routing failed, falling back to keyword-based: {e}")
@@ -311,7 +415,7 @@ class QueryRouter:
             vector_score, database_score, context
         )
         
-        logger.info(f"Keyword routed query to: {routing_decision['type']}")
+        self._log_routing_decision(query, routing_decision, "Keyword-based")
         return routing_decision
     
     def _bert_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -703,7 +807,30 @@ class QueryRouter:
         
         logger.debug(f"Sprint 3 classified query as: {classification} (confidence: {confidence:.3f})")
         
-        # Map Sprint 3 classification to routing decision
+        # CONFIDENCE THRESHOLD CHECK: Reject low-confidence classifications
+        MIN_CONFIDENCE_THRESHOLD = self.config.get('sprint3_min_confidence', 0.25)
+        
+        if confidence < MIN_CONFIDENCE_THRESHOLD:
+            logger.warning(f"⚠️  Low Sprint 3 confidence ({confidence:.3f}) for query: '{query[:50]}{'...' if len(query) > 50 else ''}'")
+            logger.info(f"   Original classification: {classification}")
+            logger.info(f"   Top matches: {[match['label'] for match in sprint3_result.get('top_matches', [])[:3]]}")
+            
+            # Fall back to Direct LLM for low-confidence cases
+            return {
+                'type': QueryType.DIRECT_LLM,
+                'classification': 'low_confidence_fallback',
+                'confidence': 'low',
+                'sprint3_confidence': confidence,
+                'parameters': {
+                    'reason': f'Sprint 3 confidence ({confidence:.3f}) below threshold ({MIN_CONFIDENCE_THRESHOLD})',
+                    'original_classification': classification,
+                    'top_matches': sprint3_result.get('top_matches', [])[:3],
+                    'sprint3_classified': True,
+                    'fallback_applied': True
+                }
+            }
+        
+        # Map Sprint 3 classification to routing decision if confidence is acceptable
         return self._map_sprint3_classification_to_route(classification, confidence, context, query)
     
     def _map_sprint3_classification_to_route(self, classification: str, confidence: float, 

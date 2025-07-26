@@ -159,7 +159,13 @@ class ONCAPIClient:
             logger.error(f"Failed to get devices: {response}")
             return []
         
-        devices = response if isinstance(response, list) else []
+        # Extract devices from response data
+        if isinstance(response, dict) and 'data' in response:
+            devices = response['data'] if isinstance(response['data'], list) else []
+        elif isinstance(response, list):
+            devices = response
+        else:
+            devices = []
         
         # Filter by device category if specified and not already filtered by API
         if device_category and not any('deviceCategoryCode' in p for p in [params]):
@@ -708,6 +714,294 @@ class ONCAPIClient:
             },
             "raw_responses": all_responses
         }
+
+    def find_cambridge_bay_devices(self, device_category: str = None, property_code: str = None) -> List[Dict[str, Any]]:
+        """
+        Find devices at Cambridge Bay locations with optional filtering
+        
+        Args:
+            device_category: Optional device category filter (e.g., 'CTD', 'HYDROPHONE')
+            property_code: Optional property code filter (e.g., 'seawatertemperature')
+            
+        Returns:
+            List of device dictionaries with enhanced location information
+        """
+        # Accurate Cambridge Bay location to device mapping based on ONC API
+        location_device_mapping = {
+            'CBYIP': ['ACOUSTICRECEIVER', 'ADCP1200KHZ', 'CAMLIGHTS', 'CTD', 'FLNTU', 
+                     'FLUOROMETER', 'HYDROPHONE', 'ICEPROFILER', 'NITRATESENSOR', 
+                     'OXYSENSOR', 'PHSENSOR', 'PLANKTONSAMPLER', 'RADIOMETER', 
+                     'TURBIDITYMETER', 'VIDEOCAM', 'WETLABS_WQM'],
+            'CBYSP': ['ICE_BUOY'],
+            'CBYSS': ['AISRECEIVER', 'BARPRESS', 'VIDEOCAM'],
+            'CBYSS.M1': ['METSTN'],
+            'CBYSS.M2': ['METSTN']
+        }
+        
+        # Property to device category mapping for filtering
+        property_device_mapping = {
+            'seawatertemperature': ['CTD', 'OXYSENSOR', 'PHSENSOR', 'ADCP1200KHZ'],
+            'salinity': ['CTD'],
+            'pressure': ['CTD'],
+            'conductivity': ['CTD'],
+            'depth': ['CTD'],
+            'oxygen': ['OXYSENSOR'],
+            'ph': ['PHSENSOR'], 
+            'soundpressurelevel': ['HYDROPHONE', 'ICEPROFILER'],
+            'amperage': ['HYDROPHONE'],
+            'batterycharge': ['HYDROPHONE'],
+            'voltage': ['HYDROPHONE'],
+            'internaltemperature': ['HYDROPHONE'],
+            'airtemperature': ['METSTN'],
+            'windspeed': ['METSTN'],
+            'humidity': ['METSTN'],
+            'absolutebarometricpressure': ['METSTN', 'BARPRESS'],
+            'icedraft': ['ICEPROFILER'],
+            'pingtime': ['ICEPROFILER']
+        }
+        
+        all_devices = []
+        locations_to_search = []
+        
+        # Determine which locations to search based on device category filter
+        if device_category:
+            # Only search locations that have the requested device category
+            for location, devices in location_device_mapping.items():
+                if device_category in devices:
+                    locations_to_search.append(location)
+            logger.info(f"Searching for {device_category} devices at locations: {locations_to_search}")
+        else:
+            # Search all Cambridge Bay locations
+            locations_to_search = list(location_device_mapping.keys())
+            logger.info(f"Searching all Cambridge Bay locations: {locations_to_search}")
+        
+        # If property filter is specified, further narrow down locations
+        if property_code:
+            compatible_device_categories = property_device_mapping.get(property_code, [])
+            if compatible_device_categories:
+                # Only search locations that have devices compatible with the property
+                filtered_locations = []
+                for location, available_devices in location_device_mapping.items():
+                    if any(dev_cat in available_devices for dev_cat in compatible_device_categories):
+                        filtered_locations.append(location)
+                
+                # Intersect with device category filtered locations
+                locations_to_search = list(set(locations_to_search) & set(filtered_locations))
+                logger.info(f"After property filter ({property_code}), searching locations: {locations_to_search}")
+        
+        if not locations_to_search:
+            logger.info("No locations found matching the search criteria")
+            return []
+        
+        for location_code in locations_to_search:
+            try:
+                available_devices_at_location = location_device_mapping.get(location_code, [])
+                
+                # If device_category is specified, only search for that category if it exists at this location
+                search_device_category = None
+                if device_category and device_category in available_devices_at_location:
+                    search_device_category = device_category
+                elif device_category and device_category not in available_devices_at_location:
+                    # Skip this location since it doesn't have the requested device category
+                    continue
+                
+                # Get devices for this location
+                location_devices = self.get_devices(location_code, search_device_category)
+                
+                # Enhance each device with location info and filter by property if needed
+                for device in location_devices:
+                    # Add enhanced location information
+                    device['_location_info'] = {
+                        'locationCode': location_code,
+                        'locationName': self._get_location_name(location_code),
+                        'region': 'Cambridge Bay'
+                    }
+                    
+                    # Filter by property code if specified
+                    if property_code:
+                        device_cat = device.get('deviceCategoryCode', '')
+                        compatible_devices = property_device_mapping.get(property_code, [])
+                        
+                        if device_cat in compatible_devices:
+                            device['_property_compatible'] = True
+                            device['_supported_properties'] = self._get_device_properties(device_cat)
+                            all_devices.append(device)
+                        # Skip devices that don't support the requested property
+                    else:
+                        # No property filter, add all devices
+                        device['_supported_properties'] = self._get_device_properties(
+                            device.get('deviceCategoryCode', '')
+                        )
+                        all_devices.append(device)
+                        
+            except Exception as e:
+                logger.warning(f"Failed to get devices for location {location_code}: {e}")
+                continue
+        
+        # Sort devices by location and then by device category
+        all_devices.sort(key=lambda x: (
+            x.get('_location_info', {}).get('locationCode', ''),
+            x.get('deviceCategoryCode', ''),
+            x.get('deviceName', '')
+        ))
+        
+        logger.info(f"Found {len(all_devices)} devices across Cambridge Bay locations")
+        
+        return all_devices
+
+    def discover_cambridge_bay_data_products(self, device_category: str = None, 
+                                           data_product_code: str = None) -> List[Dict[str, Any]]:
+        """
+        Discover available data products at Cambridge Bay locations
+        
+        Args:
+            device_category: Optional device category filter
+            data_product_code: Optional data product code filter
+            
+        Returns:
+            List of available data products
+        """
+        cambridge_locations = ["CBYIP", "CBYSS.M1", "CBYSS.M2", "CBYDS", "CBYSP"]
+        all_products = []
+        
+        for location_code in cambridge_locations:
+            try:
+                products = self.get_data_products(location_code, device_category, data_product_code)
+                
+                # Enhance with location info
+                for product in products:
+                    product['_location_info'] = {
+                        'locationCode': location_code,
+                        'locationName': self._get_location_name(location_code),
+                        'region': 'Cambridge Bay'
+                    }
+                    all_products.append(product)
+                    
+            except Exception as e:
+                logger.warning(f"Failed to get data products for {location_code}: {e}")
+                continue
+        
+        return all_products
+
+    def get_data_products(self, location_code: str, device_category: str = None, 
+                         data_product_code: str = None) -> List[Dict[str, Any]]:
+        """
+        Get available data products for a location
+        
+        Args:
+            location_code: ONC location code
+            device_category: Optional device category filter
+            data_product_code: Optional data product code filter
+            
+        Returns:
+            List of data product information
+        """
+        params = {'locationCode': location_code}
+        
+        if device_category:
+            params['deviceCategoryCode'] = device_category
+        if data_product_code:
+            params['dataProductCode'] = data_product_code
+            
+        response = self._make_request('dataProducts', params)
+        
+        if 'error' in response:
+            logger.error(f"Failed to get data products: {response}")
+            return []
+            
+        products = response if isinstance(response, list) else []
+        logger.info(f"Found {len(products)} data products for {location_code}")
+        
+        return products
+
+    def generate_download_status_url(self, request_id: str) -> str:
+        """
+        Generate URL to check download status for a data product request
+        
+        Args:
+            request_id: Data product request ID
+            
+        Returns:
+            URL to check download status
+        """
+        return f"{self.base_url}/dataProductDelivery?token={self.token}&dpRequestId={request_id}"
+
+    def _get_location_name(self, location_code: str) -> str:
+        """
+        Convert location code to human-readable name
+        
+        Args:
+            location_code: ONC location code
+            
+        Returns:
+            Human-readable location name
+        """
+        location_names = {
+            'CBYIP': 'Cambridge Bay Inshore',
+            'CBYSS.M1': 'Cambridge Bay Shore Station Meteorological 1', 
+            'CBYSS.M2': 'Cambridge Bay Shore Station Meteorological 2',
+            'CBYDS': 'Cambridge Bay Deep Station',
+            'CBYSP': 'Cambridge Bay Shallow Profiler',
+            'CBYSS': 'Cambridge Bay Shore Station'
+        }
+        return location_names.get(location_code, location_code)
+
+    def _get_device_properties(self, device_category: str) -> List[str]:
+        """
+        Get list of properties supported by a device category
+        
+        Args:
+            device_category: Device category code
+            
+        Returns:
+            List of supported property codes
+        """
+        # Extended device properties based on ONC API documentation
+        device_properties = {
+            "CTD": ["seawatertemperature", "salinity", "pressure", "depth", "conductivity"],
+            "OXYSENSOR": ["oxygen", "seawatertemperature"],
+            "PHSENSOR": ["ph", "seawatertemperature"],
+            "METSTN": ["airtemperature", "windspeed", "humidity", "absolutebarometricpressure"],
+            "ICEPROFILER": ["soundpressurelevel", "seawatertemperature", "icedraft", "pingtime"],
+            "HYDROPHONE": ["soundpressurelevel", "amperage", "batterycharge", "voltage", "internaltemperature"],
+            "ADCP1200KHZ": ["magneticheading", "pitch", "roll", "seawatertemperature", "soundspeed"],
+            "BARPRESS": ["absolutebarometricpressure"],
+            "FLUOROMETER": ["fluorescence", "seawatertemperature"],
+            "FLNTU": ["turbidity", "fluorescence"],
+            "TURBIDITYMETER": ["turbidity"],
+            "RADIOMETER": ["irradiance"],
+            "NITRATESENSOR": ["nitrate", "seawatertemperature"],
+            "WETLABS_WQM": ["chlorophyll", "turbidity", "fluorescence"],
+            "VIDEOCAM": ["imagery"],
+            "CAMLIGHTS": ["imagery"],
+            "PLANKTONSAMPLER": ["particlecount"],
+            "ACOUSTICRECEIVER": ["detections"],
+            "AISRECEIVER": ["aisdata"],
+            "ICE_BUOY": ["icethickness", "airtemperature", "position"]
+        }
+        return device_properties.get(device_category, [])
+
+    def get_device_deployments(self, device_code: str) -> List[Dict[str, Any]]:
+        """
+        Get deployment information for a specific device
+        
+        Args:
+            device_code: Device code to get deployments for
+            
+        Returns:
+            List of deployment information
+        """
+        params = {'deviceCode': device_code}
+        response = self._make_request('deployments', params)
+        
+        if 'error' in response:
+            logger.error(f"Failed to get deployments for {device_code}: {response}")
+            return []
+            
+        deployments = response if isinstance(response, list) else []
+        logger.info(f"Found {len(deployments)} deployments for device {device_code}")
+        
+        return deployments
 
     def close(self):
         """Close the session"""
