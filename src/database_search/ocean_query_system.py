@@ -14,6 +14,7 @@ from typing import Dict, Any, Optional, List
 from .enhanced_parameter_extractor import EnhancedParameterExtractor
 from .onc_api_client import ONCAPIClient
 from .enhanced_response_formatter import EnhancedResponseFormatter
+from .advanced_data_downloader import AdvancedDataDownloader
 
 # Setup logging
 logging.basicConfig(
@@ -43,6 +44,10 @@ class OceanQuerySystem:
             if llm_wrapper:
                 self.enhanced_formatter = EnhancedResponseFormatter(llm_wrapper)
                 logger.info("Enhanced response formatting enabled")
+            
+            # Initialize advanced data downloader
+            self.data_downloader = AdvancedDataDownloader(onc_token)
+            logger.info("Advanced data downloader enabled")
             
             logger.info("Ocean Query System initialized successfully")
         except Exception as e:
@@ -79,6 +84,10 @@ class OceanQuerySystem:
             return self.process_device_discovery_query(query, include_metadata)
         elif query_type == "data_products":
             return self.process_data_products_query(query, include_metadata)
+        elif query_type == "data_download":
+            return self.process_data_download_query(query, include_metadata, row_limit)
+        elif query_type == "data_preview":
+            return self.process_data_preview_query(query, include_metadata, row_limit)
         else:
             return self.process_data_query(query, include_metadata, row_limit, max_devices, 
                                          parallel, use_pagination, page_size, max_pages)
@@ -382,29 +391,31 @@ class OceanQuerySystem:
             date_from = start_time_dt.strftime('%Y-%m-%dT%H:%M:%S.000Z')
             date_to = end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         
-        # Order the data product
-        order_result = self.api_client.order_data_product(
+        # Use data downloader to get CSV data
+        download_result = self.data_downloader.download_csv_data(
             location_code=location_code,
             device_category=device_category,
-            data_product_code=data_product_code,
             date_from=date_from,
             date_to=date_to,
-            extension='csv'
+            output_dir="csv_downloads",
+            quality_control=True,
+            resample="none"
         )
         
         total_time = time.time() - start_time
         
-        if 'error' not in order_result:
-            # Extract download information
-            dp_request_id = order_result.get('dpRequestId')
-            estimated_size = order_result.get('estimatedFileSize', 'Unknown')
-            estimated_time = order_result.get('estimatedProcessingTime', 'Unknown')
+        if download_result.get('status') == 'success':
+            # Extract download information from download_result
+            download_data = download_result.get('download_result', {})
+            dp_request_id = download_data.get('dpRequestId')
+            estimated_size = download_data.get('estimatedFileSize', 'Unknown')
+            estimated_time = download_data.get('estimatedProcessingTime', 'Unknown')
             
             # Generate download status URL
             download_status_url = self.api_client.generate_download_status_url(str(dp_request_id)) if dp_request_id else None
             
             # Enhanced result with download information
-            enhanced_result = order_result.copy()
+            enhanced_result = download_data.copy() if download_data else {}
             enhanced_result['download_info'] = {
                 'dp_request_id': dp_request_id,
                 'estimated_file_size': estimated_size,
@@ -433,8 +444,8 @@ class OceanQuerySystem:
         else:
             return {
                 "status": "error",
-                "message": f"Failed to initiate data product download: {order_result.get('error', 'Unknown error')}",
-                "data": order_result,
+                "message": f"Failed to initiate data product download: {download_result.get('message', 'Unknown error')}",
+                "data": download_result,
                 "metadata": {
                     "query": query,
                     "query_type": "data_product_download",
@@ -554,6 +565,101 @@ class OceanQuerySystem:
             }
         
         return response
+
+    def process_data_preview_query(self, query: str, include_metadata: bool = True, 
+                                  row_limit: int = 1000) -> Dict[str, Any]:
+        """
+        Process a data preview query - show data first, then offer download option
+        OR handle actual download if download flag is detected
+        
+        Args:
+            query: Natural language query
+            include_metadata: Whether to include processing metadata
+            row_limit: Maximum rows for data preview
+            
+        Returns:
+            Response with data preview and download offer OR actual download
+        """
+        start_time = time.time()
+        logger.info(f"Processing data preview query: '{query}'")
+        
+        # Step 1: Extract parameters to check download flag
+        logger.info("Step 1: Extracting parameters...")
+        extraction_result = self.extractor.extract_parameters(query)
+        
+        if extraction_result["status"] != "success":
+            return {
+                "status": "error",
+                "stage": "parameter_extraction",
+                "message": extraction_result["message"],
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_preview",
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+        
+        params = extraction_result["parameters"]
+        download_requested = params.get("download_requested", False)
+        
+        # Step 2: Route based on download flag
+        if download_requested:
+            logger.info("Download requested - routing to CSV download")
+            return self._process_csv_download(query, params, include_metadata, start_time)
+        else:
+            logger.info("No download requested - showing data preview")
+            return self._process_data_preview_only(query, params, include_metadata, start_time, row_limit)
+    
+    def _process_data_preview_only(self, query: str, params: Dict[str, Any], 
+                                  include_metadata: bool, start_time: float, 
+                                  row_limit: int) -> Dict[str, Any]:
+        """Process data preview without download."""
+        
+        # Get the data (same as regular data query but limited)
+        data_result = self.process_data_query(
+            query, 
+            include_metadata=False,  # We'll add our own metadata
+            row_limit=min(row_limit, 100),  # Limit preview to 100 rows max
+            max_devices=3,  # Limit to 3 devices for preview
+            parallel=False,
+            use_pagination=False
+        )
+        
+        if data_result["status"] != "success":
+            # If data query failed, return the failure
+            return data_result
+        
+        # Modify the response to include download offer
+        total_time = time.time() - start_time
+        
+        # Create enhanced response with download offer
+        enhanced_response = {
+            "status": "success",
+            "message": data_result["message"],
+            "data": data_result["data"],
+            "preview_info": {
+                "is_preview": True,
+                "preview_rows": len(data_result.get("data", [])),
+                "download_available": True,
+                "download_offer": "Would you like me to download this data as CSV files for you?"
+            }
+        }
+        
+        # Copy over raw API responses for formatting
+        if "raw_api_responses" in data_result:
+            enhanced_response["raw_api_responses"] = data_result["raw_api_responses"]
+        
+        if include_metadata:
+            enhanced_response["metadata"] = {
+                "query": query,
+                "query_type": "data_preview",
+                "execution_time": round(total_time, 2),
+                "original_metadata": data_result.get("metadata", {}),
+                "download_requested": False
+            }
+        
+        return enhanced_response
 
     def get_latest_data(self, query: str, hours_back: int = 24) -> Dict[str, Any]:
         """
@@ -915,6 +1021,221 @@ class OceanQuerySystem:
         """Clean up resources"""
         self.api_client.close()
         logger.info("Ocean Query System closed")
+
+    def process_data_download_query(self, query: str, include_metadata: bool = True, 
+                                   row_limit: int = 1000) -> Dict[str, Any]:
+        """
+        Process a data download query for CSV export or data product downloads
+        
+        Args:
+            query: Natural language query about data downloads
+            include_metadata: Whether to include processing metadata
+            row_limit: Maximum rows for data downloads
+            
+        Returns:
+            Response with download information and file paths
+        """
+        start_time = time.time()
+        logger.info(f"Processing data download query: '{query}'")
+        
+        # Step 1: Extract parameters from query
+        logger.info("Step 1: Extracting parameters...")
+        extraction_result = self.extractor.extract_parameters(query)
+        
+        if extraction_result["status"] != "success":
+            return {
+                "status": "error",
+                "stage": "parameter_extraction",
+                "message": extraction_result["message"],
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_download",
+                    "extraction_result": extraction_result,
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+        
+        params = extraction_result["parameters"]
+        logger.info(f"Extracted parameters for data download: {params}")
+        
+        # Step 2: Determine download type and process
+        try:
+            location_code = params["location_code"]
+            device_category = params.get("device_category")
+            property_code = params.get("property_code")
+            temporal_reference = params.get("temporal_reference")
+            
+            # Check for specific date range or instance
+            download_type = self._determine_download_type(query, temporal_reference)
+            
+            if download_type == "csv_export":
+                return self._process_csv_download(query, params, include_metadata, start_time)
+            elif download_type == "data_product":
+                return self._process_data_product_download(query, params, include_metadata, start_time)
+            else:
+                # Default to CSV export for data downloads
+                return self._process_csv_download(query, params, include_metadata, start_time)
+                
+        except Exception as e:
+            logger.error(f"Data download processing failed: {e}")
+            return {
+                "status": "error",
+                "stage": "data_download_processing",
+                "message": f"Data download processing failed: {str(e)}",
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "data_download",
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+    
+    def _determine_download_type(self, query: str, temporal_reference: str) -> str:
+        """Determine the type of download requested"""
+        query_lower = query.lower()
+        
+        # CSV export indicators
+        csv_keywords = ['csv', 'export', 'download data', 'spreadsheet', 'excel']
+        if any(keyword in query_lower for keyword in csv_keywords):
+            return "csv_export"
+        
+        # Data product indicators
+        product_keywords = ['plot', 'graph', 'visualization', 'png', 'pdf', 'image']
+        if any(keyword in query_lower for keyword in product_keywords):
+            return "data_product"
+        
+        # Default to CSV for data downloads
+        return "csv_export"
+    
+    def _process_csv_download(self, query: str, params: Dict[str, Any], 
+                             include_metadata: bool, start_time: float) -> Dict[str, Any]:
+        """Process CSV data download request using query routing"""
+        try:
+            location_code = params["location_code"]
+            device_category = params.get("device_category", "CTD")  # Default to CTD
+            temporal_reference = params.get("temporal_reference")
+            
+            # Parse temporal reference for date range
+            date_from, date_to = self._parse_temporal_reference(temporal_reference)
+            
+            if not date_from or not date_to:
+                # Default to last 24 hours if no specific dates
+                from datetime import datetime, timedelta
+                date_to = datetime.utcnow()
+                date_from = date_to - timedelta(days=1)
+                date_from = date_from.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                date_to = date_to.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            
+            # Use advanced data downloader for CSV export
+            logger.info(f"Downloading CSV data for {device_category} at {location_code}")
+            download_result = self.data_downloader.download_csv_data(
+                location_code=location_code,
+                device_category=device_category,
+                date_from=date_from,
+                date_to=date_to,
+                output_dir="csv_downloads",
+                quality_control=True,
+                resample="none"
+            )
+            
+            if download_result['status'] == 'success':
+                return {
+                    "status": "success",
+                    "message": f"CSV data downloaded successfully",
+                    "data": download_result,
+                    "download_info": {
+                        "csv_files": download_result.get('csv_files', []),
+                        "download_directory": download_result.get('output_directory', 'csv_downloads'),
+                        "file_count": len(download_result.get('csv_files', [])),
+                        "location_code": location_code,
+                        "device_category": device_category,
+                        "date_range": f"{date_from} to {date_to}"
+                    },
+                    "metadata": {
+                        "query": query,
+                        "query_type": "csv_download",
+                        "download_requested": True,
+                        "execution_time": time.time() - start_time
+                    } if include_metadata else None
+                }
+            else:
+                return {
+                    "status": "error",
+                    "message": f"CSV download failed: {download_result.get('message', 'Unknown error')}",
+                    "data": None,
+                    "metadata": {
+                        "query": query,
+                        "query_type": "csv_download",
+                        "download_requested": True,
+                        "execution_time": time.time() - start_time
+                    } if include_metadata else None
+                }
+                
+        except Exception as e:
+            logger.error(f"CSV download failed: {e}")
+            return {
+                "status": "error",
+                "stage": "csv_download",
+                "message": f"CSV download failed: {str(e)}",
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "csv_download",
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+    
+    def _parse_temporal_reference(self, temporal_reference: str) -> tuple:
+        """Parse temporal reference into date from and date to"""
+        if not temporal_reference or temporal_reference == "latest":
+            return None, None
+        
+        try:
+            from datetime import datetime, timedelta
+            import re
+            
+            # Handle specific date patterns
+            if "to" in temporal_reference or "-" in temporal_reference:
+                # Date range: "2023-01-01 to 2023-01-02" or "2023-01-01 - 2023-01-02"
+                parts = re.split(r'\s+to\s+|\s*-\s*', temporal_reference)
+                if len(parts) == 2:
+                    date_from = parts[0].strip()
+                    date_to = parts[1].strip()
+                    
+                    # Convert to ISO format if needed
+                    if not date_from.endswith('Z'):
+                        date_from = f"{date_from}T00:00:00.000Z"
+                    if not date_to.endswith('Z'):
+                        date_to = f"{date_to}T23:59:59.999Z"
+                    
+                    return date_from, date_to
+            
+            # Single date - use as start date with 24-hour range
+            elif len(temporal_reference) >= 10:  # Looks like a date
+                base_date = temporal_reference.strip()
+                
+                # Handle future dates by using a reasonable date range for demo
+                if "2025" in base_date:
+                    logger.warning(f"Future date {base_date} detected, using 2023 data instead for demo")
+                    base_date = base_date.replace("2025", "2023")
+                
+                if not base_date.endswith('Z'):
+                    date_from = f"{base_date}T00:00:00.000Z"
+                    date_to = f"{base_date}T23:59:59.999Z"
+                else:
+                    # Parse and add 24 hours
+                    dt = datetime.fromisoformat(base_date.replace('Z', '+00:00'))
+                    date_from = base_date
+                    date_to = (dt + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                
+                return date_from, date_to
+            
+            return None, None
+            
+        except Exception as e:
+            logger.warning(f"Could not parse temporal reference '{temporal_reference}': {e}")
+            return None, None
 
 
 def main():

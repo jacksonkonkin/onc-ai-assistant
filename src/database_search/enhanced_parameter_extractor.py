@@ -205,6 +205,13 @@ IMPORTANT: Current date is {current_date}. When extracting dates:
 - Only use different years if explicitly mentioned in the query
 - For dates like "April 12" without year, extract as "{current_year}-04-12"
 
+CRITICAL: For download_requested field - look for ANY download intent:
+- "Can you download it?" → download_requested: true
+- "download temperature data" → download_requested: true  
+- "export data as CSV" → download_requested: true
+- "save data to file" → download_requested: true
+- "what is the temperature" → download_requested: false
+
 Return ONLY a JSON object with these exact fields:
 {{
     "location_code": "exact ONC location code (e.g. CBYIP, CBYSS.M1)",
@@ -212,7 +219,8 @@ Return ONLY a JSON object with these exact fields:
     "property_code": "exact ONC property code (e.g. seawatertemperature, windspeed)",
     "temporal_reference": "the exact date/time reference from query (use {current_year} for unspecified years)",
     "temporal_type": "single_date or date_range",
-    "depth_meters": null or numeric depth if mentioned
+    "depth_meters": null or numeric depth if mentioned,
+    "download_requested": boolean indicating if user wants to download/export data to files
 }}
 
 Mapping rules:
@@ -225,6 +233,13 @@ Mapping rules:
 - Always use exact codes from the available options
 - If location unclear, default to "CBYIP"
 - If device unclear for property, pick the most appropriate device that has that property
+
+Download detection rules (IMPORTANT - check carefully):
+- Set "download_requested": true if query contains ANY of these keywords: download, export, save, CSV, file, "get data files", "retrieve files"
+- Set "download_requested": true if user asks "Can you download it?", "download it", "export it", "save it as file", "save to file"
+- Set "download_requested": true for "download [parameter] data", "export [parameter] data", "get CSV data"
+- Set "download_requested": false ONLY for queries asking about data values, latest readings, or just showing/displaying data
+- When in doubt about download intent, prefer "download_requested": true if ANY download-related words are present
 
 Return ONLY the JSON object."""
 
@@ -340,7 +355,8 @@ Return ONLY the JSON object."""
                 "temporal_type": temporal_type,
                 "start_time": start_time.strftime('%Y-%m-%dT%H:%M:%S.000Z') if start_time else None,
                 "end_time": end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z') if end_time else None,
-                "depth_meters": depth
+                "depth_meters": depth,
+                "download_requested": raw_params.get("download_requested", self._fallback_download_detection(original_query))
             },
             "metadata": {
                 "original_query": original_query,
@@ -352,6 +368,37 @@ Return ONLY the JSON object."""
         }
         
         return result
+
+    def _fallback_download_detection(self, query: str) -> bool:
+        """
+        Fallback method to detect download intent if LLM missed it
+        """
+        query_lower = query.lower()
+        
+        # Download keywords
+        download_keywords = [
+            'download', 'export', 'save', 'csv', 'file', 'files',
+            'retrieve files', 'get data files', 'save to file',
+            'export data', 'download data', 'save data'
+        ]
+        
+        # Download phrases
+        download_phrases = [
+            'can you download', 'download it', 'export it', 
+            'save it', 'get csv', 'as csv', 'to file'
+        ]
+        
+        # Check for download keywords
+        for keyword in download_keywords:
+            if keyword in query_lower:
+                return True
+        
+        # Check for download phrases
+        for phrase in download_phrases:
+            if phrase in query_lower:
+                return True
+        
+        return False
 
     def _find_device_for_property(self, property_code: str, available_devices: List[str]) -> str:
         """Find appropriate device that has the requested property"""

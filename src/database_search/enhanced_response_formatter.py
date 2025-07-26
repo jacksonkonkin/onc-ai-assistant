@@ -47,6 +47,11 @@ class EnhancedResponseFormatter:
         if response["status"] != "success" or not response["data"]:
             return f"I encountered an issue retrieving the data you requested. {response.get('message', '')}"
         
+        # Check if this is a data preview query first
+        preview_info = response.get("preview_info", {})
+        if preview_info.get("is_preview", False):
+            return self._format_data_preview_response(response, conversation_context, original_query)
+        
         # Format successful data response
         return self._format_success_response(response, conversation_context, original_query)
     
@@ -408,6 +413,105 @@ Sensor {i}: {sensor_name}
         return f"""Based on the ocean sensor data, the {property_name.lower()} at {location} was {value} {unit} as of {time_str}.
 
 This measurement provides valuable information about current ocean conditions in the area. {self._get_educational_context(extracted_params.get('property_code', '')).strip()}"""
+    
+    def _format_data_preview_response(self, response: Dict[str, Any], 
+                                     conversation_context: str, original_query: str) -> str:
+        """Format a data preview response with or without download offer."""
+        try:
+            # Check if this was a download request that was processed
+            metadata = response.get("metadata", {})
+            download_requested = metadata.get("download_requested", False)
+            
+            # If download was requested and processed, format as download response
+            if download_requested and response.get("download_info"):
+                return self._format_download_response(response, conversation_context, original_query)
+            
+            # Otherwise, format as preview with download offer
+            preview_info = response.get("preview_info", {})
+            preview_rows = preview_info.get("preview_rows", 0)
+            
+            # Get the regular formatted response first
+            formatted_data = self._extract_formatted_data(response)
+            if not formatted_data:
+                return "I found some data but couldn't format it properly for preview."
+            
+            original_metadata = metadata.get("original_metadata", {})
+            extracted_params = original_metadata.get('extracted_parameters', {})
+            
+            location = self._get_friendly_location_name(extracted_params.get('location_code', ''))
+            property_name = self._get_friendly_property_name(extracted_params.get('property_code', ''))
+            
+            # Start with the data preview
+            if preview_rows > 0:
+                sensor = formatted_data[0]  # Show first sensor's data
+                value = sensor.get('latest_value', 'N/A')
+                unit = sensor.get('unit', '')
+                time_str = self._format_time_for_display(sensor.get('latest_time', ''))
+                
+                preview_text = f"""Here's a preview of the {property_name.lower()} data from {location}:
+
+**Latest Reading:** {value} {unit} (as of {time_str})
+
+I found {preview_rows} data points from the Ocean Networks Canada sensors."""
+            else:
+                preview_text = f"I found {property_name.lower()} data from {location}, but there were no recent readings to preview."
+            
+            # Add the download offer
+            download_offer = preview_info.get("download_offer", "Would you like me to download this data as CSV files for you?")
+            
+            return f"""{preview_text}
+
+📥 **{download_offer}**
+
+Just let me know if you'd like the full dataset downloaded, and I'll prepare CSV files with all available data for the time period you specified."""
+            
+        except Exception as e:
+            logger.error(f"Error formatting data preview response: {e}")
+            return "I found some ocean data for your query. Would you like me to download it as CSV files for you?"
+    
+    def _format_download_response(self, response: Dict[str, Any], 
+                                 conversation_context: str, original_query: str) -> str:
+        """Format a successful download response."""
+        try:
+            download_info = response.get("download_info", {})
+            csv_files = download_info.get("csv_files", [])
+            file_count = download_info.get("file_count", 0)
+            location = download_info.get("location_code", "")
+            device = download_info.get("device_category", "")
+            date_range = download_info.get("date_range", "")
+            download_dir = download_info.get("download_directory", "")
+            
+            location_name = self._get_friendly_location_name(location)
+            
+            if file_count > 0:
+                response_text = f"""✅ **Data download completed successfully!**
+
+I've downloaded {file_count} CSV file{'s' if file_count != 1 else ''} with {device} sensor data from {location_name}.
+
+📁 **Download Details:**
+• Location: {location_name}
+• Device type: {device}
+• Date range: {date_range}
+• Output directory: {download_dir}
+
+📄 **CSV Files Created:**"""
+                
+                for csv_file in csv_files[:5]:  # Show first 5 files
+                    filename = csv_file.split('/')[-1] if '/' in csv_file else csv_file
+                    response_text += f"\n• {filename}"
+                
+                if len(csv_files) > 5:
+                    response_text += f"\n• ... and {len(csv_files) - 5} more files"
+                
+                response_text += f"\n\nYou can now use these CSV files for further analysis or import them into your preferred data analysis tools."
+                
+                return response_text
+            else:
+                return f"The download was initiated but no CSV files were created. Please check the download directory: {download_dir}"
+                
+        except Exception as e:
+            logger.error(f"Error formatting download response: {e}")
+            return "The data download was completed, but there was an error formatting the response."
     
     def _format_error_response(self, response: Dict[str, Any], original_query: str) -> str:
         """Format error responses in natural language."""

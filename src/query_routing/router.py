@@ -13,6 +13,8 @@ from transformers import BertForSequenceClassification, BertTokenizer
 from huggingface_hub import hf_hub_download
 import torch
 import pickle
+import pandas as pd
+from sentence_transformers import SentenceTransformer, util
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,7 @@ class QueryType(Enum):
     DATABASE_SEARCH = "database_search"
     HYBRID_SEARCH = "hybrid_search"
     DIRECT_LLM = "direct_llm"
+    DATA_DOWNLOAD = "data_download"  # New type for data download queries
 
 
 class QueryRouter:
@@ -44,6 +47,12 @@ class QueryRouter:
         self.bert_tokenizer = None
         self.label_encoder = None
         
+        # Initialize Sprint 3 Sentence Transformer classifier as fallback
+        self.sentence_model = None
+        self.sprint3_questions = None
+        self.sprint3_labels = None
+        self.sprint3_embeddings = None
+        
         try:
             repo_id = "kgosal03/bert-query-classifier"
             self.bert_model = BertForSequenceClassification.from_pretrained(repo_id)
@@ -60,6 +69,13 @@ class QueryRouter:
         except Exception as e:
             logger.warning(f"Failed to initialize BERT model: {e}")
         
+        # Initialize Sprint 3 Sentence Transformer classifier
+        try:
+            self._initialize_sprint3_classifier()
+            logger.info("Sprint 3 Sentence Transformer classifier enabled")
+        except Exception as e:
+            logger.warning(f"Failed to initialize Sprint 3 classifier: {e}")
+        
         # Initialize LLM client for fallback routing
         self.groq_client = None
         if os.getenv('GROQ_API_KEY'):
@@ -69,9 +85,18 @@ class QueryRouter:
             except Exception as e:
                 logger.warning(f"Failed to initialize LLM client: {e}")
         
-        # Enable/disable BERT routing (prefer BERT over LLM)
-        self.use_bert_routing = self.config.get('use_bert_routing', True) and self.bert_model is not None
+        # Enable/disable routing methods (order of preference: BERT > Sprint3 > LLM > Keyword)
+        # Disable BERT routing to prioritize Sprint 3 classifier
+        self.use_bert_routing = self.config.get('use_bert_routing', False) and self.bert_model is not None
+        self.use_sprint3_routing = self.config.get('use_sprint3_routing', True) and self.sentence_model is not None
         self.use_llm_routing = self.config.get('use_llm_routing', True) and self.groq_client is not None
+        
+        # Debug logging for classifier priority
+        logger.info(f"🔧 Query Router Configuration:")
+        logger.info(f"   BERT routing: {'ENABLED' if self.use_bert_routing else 'DISABLED'}")
+        logger.info(f"   Sprint3 routing: {'ENABLED' if self.use_sprint3_routing else 'DISABLED'}")
+        logger.info(f"   LLM routing: {'ENABLED' if self.use_llm_routing else 'DISABLED'}")
+        logger.info(f"   Primary classifier: {'Sprint 3 Sentence Transformer' if self.use_sprint3_routing else 'LLM' if self.use_llm_routing else 'Keyword-based'}")
     
     def _load_vector_keywords(self) -> List[str]:
         """Load keywords that indicate vector search should be used."""
@@ -102,6 +127,110 @@ class QueryRouter:
         ]
         return self.config.get('database_keywords', default_keywords)
     
+    def _initialize_sprint3_classifier(self):
+        """Initialize Sprint 3 Sentence Transformer classifier."""
+        # Load Sprint 3 training data from CSV files
+        csv_files = [
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/deployments.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_info.csv", 
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/property.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_category.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/locations.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/deployments_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_info_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/property_2.csv", 
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_category_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/locations_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/data_and_knowledge_queries.csv"
+        ]
+        
+        # Try to load CSV files from current directory or absolute paths
+        dfs = []
+        for csv_file in csv_files:
+            try:
+                # Try relative path first, then absolute
+                if os.path.exists(csv_file):
+                    df = pd.read_csv(csv_file)
+                    dfs.append(df)
+                else:
+                    # Try from project root
+                    root_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), csv_file)
+                    if os.path.exists(root_path):
+                        df = pd.read_csv(root_path)  
+                        dfs.append(df)
+            except Exception as e:
+                logger.debug(f"Could not load Sprint 3 CSV file {csv_file}: {e}")
+        
+        if not dfs:
+            raise Exception("No Sprint 3 training data found")
+        
+        # Combine all dataframes
+        df_all = pd.concat(dfs, ignore_index=True)
+        self.sprint3_questions = df_all["question"].tolist()
+        self.sprint3_labels = df_all["label"].tolist()
+        
+        # Load sentence transformer model
+        self.sentence_model = SentenceTransformer("all-MiniLM-L6-v2")
+        
+        # Pre-compute embeddings for Sprint 3 questions
+        self.sprint3_embeddings = self.sentence_model.encode(
+            self.sprint3_questions, 
+            normalize_embeddings=True
+        )
+        self.sprint3_embeddings = torch.tensor(self.sprint3_embeddings)
+        
+        logger.info(f"Loaded {len(self.sprint3_questions)} Sprint 3 training examples")
+    
+    def _sprint3_classify_query(self, query: str, top_k: int = 3) -> Dict[str, Any]:
+        """
+        Classify query using Sprint 3 Sentence Transformer approach.
+        
+        Args:
+            query: User query
+            top_k: Number of top matches to consider
+            
+        Returns:
+            Classification result with confidence
+        """
+        if not self.sentence_model:
+            raise Exception("Sprint 3 classifier not initialized")
+        
+        # Encode the query
+        query_embedding = self.sentence_model.encode(query, normalize_embeddings=True)
+        query_tensor = torch.tensor(query_embedding)
+        
+        # Calculate similarities
+        similarities = util.cos_sim(query_tensor, self.sprint3_embeddings)[0]
+        
+        # Get top matches
+        top_results = similarities.topk(top_k)
+        top_indices = top_results.indices
+        top_scores = top_results.values
+        
+        # Get the top classification
+        best_index = top_indices[0].item()
+        best_score = top_scores[0].item()
+        classification = self.sprint3_labels[best_index]
+        
+        # Calculate confidence based on score difference and absolute score
+        confidence = float(best_score)
+        if len(top_scores) > 1:
+            score_gap = float(top_scores[0] - top_scores[1])
+            confidence = (confidence + score_gap) / 2  # Balance absolute score and gap
+        
+        return {
+            'classification': classification,
+            'confidence': confidence,
+            'top_matches': [
+                {
+                    'question': self.sprint3_questions[idx.item()],
+                    'label': self.sprint3_labels[idx.item()],
+                    'similarity': float(score)
+                }
+                for idx, score in zip(top_indices, top_scores)
+            ]
+        }
+    
     def route_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Route a query to the appropriate processing pipeline.
@@ -119,7 +248,7 @@ class QueryRouter:
         conversation_context = context.get('conversation_context', '')
         follow_up_info = context.get('follow_up_info', {})
         
-        # Use BERT-based routing if available, otherwise fall back to LLM, then keyword-based
+        # Use BERT-based routing if available, otherwise fall back to Sprint 3, then LLM, then keyword-based
         if self.use_bert_routing:
             try:
                 routing_decision = self._bert_route_query(query, context)
@@ -133,9 +262,25 @@ class QueryRouter:
                 logger.info(f"BERT routed query to: {routing_decision['type']}")
                 return routing_decision
             except Exception as e:
-                logger.warning(f"BERT routing failed, falling back to LLM: {e}")
+                logger.warning(f"BERT routing failed, falling back to Sprint 3: {e}")
         
-        # Fallback to LLM-based routing if BERT fails
+        # Fallback to Sprint 3 Sentence Transformer routing
+        if self.use_sprint3_routing:
+            try:
+                routing_decision = self._sprint3_route_query(query, context)
+                
+                # Enhance routing decision with conversation context
+                if conversation_context or follow_up_info.get('is_follow_up'):
+                    routing_decision = self._enhance_routing_with_context(
+                        routing_decision, query, context
+                    )
+                
+                logger.info(f"Sprint 3 routed query to: {routing_decision['type']}")
+                return routing_decision
+            except Exception as e:
+                logger.warning(f"Sprint 3 routing failed, falling back to LLM: {e}")
+        
+        # Fallback to LLM-based routing if Sprint 3 fails
         if self.use_llm_routing:
             try:
                 routing_decision = self._llm_route_query(query, context)
@@ -537,6 +682,214 @@ class QueryRouter:
                     'parameters': {
                         'reason': f'No data sources available, classification: {classification}',
                         'bert_classified': True
+                    }
+                }
+    
+    def _sprint3_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Use Sprint 3 Sentence Transformer to classify and route the query.
+        
+        Args:
+            query: User query
+            context: Additional context for routing
+            
+        Returns:
+            Dict: Routing decision with type and parameters
+        """
+        # Classify using Sprint 3 approach
+        sprint3_result = self._sprint3_classify_query(query)
+        classification = sprint3_result['classification']
+        confidence = sprint3_result['confidence']
+        
+        logger.debug(f"Sprint 3 classified query as: {classification} (confidence: {confidence:.3f})")
+        
+        # Map Sprint 3 classification to routing decision
+        return self._map_sprint3_classification_to_route(classification, confidence, context, query)
+    
+    def _map_sprint3_classification_to_route(self, classification: str, confidence: float, 
+                                           context: Dict[str, Any], query: str) -> Dict[str, Any]:
+        """
+        Map Sprint 3 classification to routing decision.
+        
+        Args:
+            classification: Sprint 3 classification result
+            confidence: Classification confidence score
+            context: Context information
+            query: Original query
+            
+        Returns:
+            Dict: Routing decision
+        """
+        has_vector_store = context.get('has_vector_store', True)
+        has_database = context.get('has_database', False)
+        
+        # Determine confidence level
+        confidence_level = 'high' if confidence > 0.8 else 'medium' if confidence > 0.6 else 'low'
+        
+        # Map Sprint 3 categories to route types
+        if classification == "data_download_instance" or classification == "data_download_interval":
+            # These are data requests - first show data, then offer download
+            if has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,  # Changed from DATA_DOWNLOAD to DATABASE_SEARCH
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'download_type': 'instance' if classification == "data_download_instance" else 'interval',
+                        'search_type': 'structured',
+                        'show_data_first': True,  # New flag to indicate data preview flow
+                        'sprint3_classified': True
+                    }
+                }
+            else:
+                # Fallback to direct LLM if no database
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'reason': 'Data download request but no database available',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        elif classification == "data_discovery":
+            # Device/sensor discovery queries
+            if has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'device_discovery',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        elif classification == "general_knowledge":
+            # General knowledge queries
+            if has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'sprint3_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'reason': 'General knowledge query without vector store',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        elif classification == "data_and_knowledge_query":
+            # Complex queries requiring both data and knowledge
+            if has_database and has_vector_store:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'vector_weight': 0.4,
+                        'database_weight': 0.6,
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'structured',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        # Fallback for unknown classifications
+        else:
+            if has_database and has_vector_store:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'vector_weight': 0.5,
+                        'database_weight': 0.5,
+                        'reason': f'Unknown Sprint 3 classification: {classification}',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Unknown Sprint 3 classification: {classification}',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Unknown Sprint 3 classification: {classification}',
+                        'sprint3_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'reason': f'No data sources available, classification: {classification}',
+                        'sprint3_classified': True
                     }
                 }
     

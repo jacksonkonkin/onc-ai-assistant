@@ -4,11 +4,11 @@ Teams: All teams (integration point)
 """
 
 import logging
+import os
 import numpy as np
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 from sentence_transformers import CrossEncoder
-import os 
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -186,11 +186,14 @@ class ONCPipeline:
         ocean_config = self.config_manager.get('ocean_responses', {})
         enhanced_formatting_enabled = ocean_config.get('enhanced_formatting', False)
         
+        # Get ONC API token
+        onc_token = os.getenv('ONC_API_TOKEN', '45b4e105-43ed-411e-bd1b-1d2799eda3c4')
+        
         if enhanced_formatting_enabled:
-            self.ocean_query_system = OceanQuerySystem(llm_wrapper=self.llm_wrapper)
+            self.ocean_query_system = OceanQuerySystem(onc_token=onc_token, llm_wrapper=self.llm_wrapper)
             logger.info("Ocean Query System initialized with enhanced formatting")
         else:
-            self.ocean_query_system = OceanQuerySystem()
+            self.ocean_query_system = OceanQuerySystem(onc_token=onc_token)
             logger.info("Ocean Query System initialized with standard formatting")
         
         # Conversation Manager
@@ -256,24 +259,24 @@ class ONCPipeline:
             
             # Step 1: Analyze query clarity (check for ambiguity) WITH conversation context
             query_analysis = None
-            if self.query_refinement_manager:
-                # Include conversation context in the analysis
-                analysis_context = context or {}
-                analysis_context['conversation_context'] = conversation_context
+            # if self.query_refinement_manager:
+            #     # Include conversation context in the analysis
+            #     analysis_context = context or {}
+            #     analysis_context['conversation_context'] = conversation_context
                 
-                query_analysis = self.query_refinement_manager.analyze_query_clarity(question, analysis_context)
+            #     query_analysis = self.query_refinement_manager.analyze_query_clarity(question, analysis_context)
                 
-                # If query is highly ambiguous, request clarification
-                if self.query_refinement_manager.should_request_clarification(query_analysis):
-                    clarification_request = self.query_refinement_manager.format_clarification_request(query_analysis)
-                    # Add the clarification to conversation history before returning
-                    if self.conversation_manager:
-                        self.conversation_manager.add_assistant_message(clarification_request, {
-                            'type': 'clarification_request',
-                            'clarity_level': query_analysis.clarity_level.value,
-                            'missing_parameters': query_analysis.missing_data_parameters
-                        })
-                    return clarification_request
+            #     # If query is highly ambiguous, request clarification
+            #     if self.query_refinement_manager.should_request_clarification(query_analysis):
+            #         clarification_request = self.query_refinement_manager.format_clarification_request(query_analysis)
+            #         # Add the clarification to conversation history before returning
+            #         if self.conversation_manager:
+            #             self.conversation_manager.add_assistant_message(clarification_request, {
+            #                 'type': 'clarification_request',
+            #                 'clarity_level': query_analysis.clarity_level.value,
+            #                 'missing_parameters': query_analysis.missing_data_parameters
+            #             })
+            #         return clarification_request
             
             # Route the query with conversation context
             routing_context = context or {}
@@ -287,12 +290,55 @@ class ONCPipeline:
             routing_decision = self.query_router.route_query(question, routing_context)
             query_type = routing_decision['type']
             
+            # Print detailed routing debug information
+            classification = routing_decision.get('classification', 'N/A')
+            confidence = routing_decision.get('confidence', 'N/A')
+            parameters = routing_decision.get('parameters', {})
+            
+            # Determine which classifier was used
+            classifier_used = "Unknown"
+            if parameters.get('bert_classified'):
+                classifier_used = "BERT"
+            elif parameters.get('sprint3_classified'):
+                classifier_used = "Sprint3 Sentence Transformer"
+            elif parameters.get('llm_classified'):
+                classifier_used = "LLM (Groq)"
+            else:
+                classifier_used = "Keyword-based"
+                
+            # Force print to stdout with flush
+            import sys
+            debug_info = [
+                f"\n🔍 QUERY ROUTING DEBUG:",
+                f"   Query: '{question[:80]}{'...' if len(question) > 80 else ''}'",
+                f"   📍 Route taken: {query_type.value.upper()}",
+                f"   🏷️  Classification: {classification}",
+                f"   📊 Confidence: {confidence}",
+                f"   🤖 Classifier used: {classifier_used}"
+            ]
+            
+            if parameters.get('search_type'):
+                debug_info.append(f"   🔎 Search type: {parameters['search_type']}")
+            if parameters.get('download_type'):
+                debug_info.append(f"   📥 Download type: {parameters['download_type']}")
+            if parameters.get('is_follow_up'):
+                debug_info.append(f"   🔗 Follow-up detected: Yes (confidence: {parameters.get('follow_up_confidence', 'N/A')})")
+            
+            debug_info.append(f"   ⚙️  Parameters: {parameters}")
+            debug_info.append("─" * 70)
+            
+            for line in debug_info:
+                print(line, file=sys.stdout, flush=True)
+                logger.info(line)
+            
             # Step 2: Process query and get initial results
             initial_results = []
             if query_type.value == 'vector_search':
                 response, initial_results = self._process_vector_query_with_results(question, conversation_context)
             elif query_type.value == 'database_search':
                 response, initial_results = self._process_database_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
+            elif query_type.value == 'data_download':
+                response, initial_results = self._process_data_download_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
             elif query_type.value == 'hybrid_search':
                 response, initial_results = self._process_hybrid_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
             else:  # direct_llm
@@ -375,12 +421,17 @@ class ONCPipeline:
             return self._process_direct_query(question, conversation_context)
         
         try:
+            # Check if this is a data preview request (show data first, offer download)
+            show_data_first = parameters.get('show_data_first', False)
+            
             # Determine query type based on parameters
             search_type = parameters.get('search_type', 'structured')
             if search_type == "device_discovery":
                 query_type = "device_discovery"
             elif search_type == "data_products":
                 query_type = "data_products"
+            elif show_data_first:
+                query_type = "data_preview"  # New query type for data preview
             else:
                 query_type = "data"
             
@@ -458,12 +509,17 @@ class ONCPipeline:
             return self._process_direct_query(question, conversation_context), []
         
         try:
+            # Check if this is a data preview request (show data first, offer download)
+            show_data_first = parameters.get('show_data_first', False)
+            
             # Determine query type based on parameters
             search_type = parameters.get('search_type', 'structured')
             if search_type == "device_discovery":
                 query_type = "device_discovery"
             elif search_type == "data_products":
                 query_type = "data_products"
+            elif show_data_first:
+                query_type = "data_preview"  # New query type for data preview
             else:
                 query_type = "data"
             
@@ -524,6 +580,95 @@ class ONCPipeline:
         else:
             response = self._process_direct_query(question, conversation_context)
             return response, []
+    
+    def _process_data_download_query_with_results(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> tuple[str, List[Any]]:
+        """Process query for data downloads and CSV exports and return both response and raw results."""
+        if not self.ocean_query_system:
+            return self._process_direct_query(question, conversation_context), []
+        
+        try:
+            # Determine download type from parameters
+            download_type = parameters.get('download_type', 'instance')
+            search_type = parameters.get('search_type', 'structured')
+            
+            # Use data download query type
+            query_type = "data_download"
+            
+            # Process the data download query
+            result = self.ocean_query_system.process_query(question, query_type=query_type)
+            
+            if result["status"] in ["success"]:
+                # Format enhanced response for data downloads
+                formatted_response = self._format_data_download_response(result, conversation_context)
+                return formatted_response, result.get("data", [])
+            elif result["status"] == "error":
+                # Handle errors gracefully
+                error_message = f"Data download failed: {result.get('message', 'Unknown error')}"
+                if self.ocean_query_system.enhanced_formatter:
+                    formatted_response = self.ocean_query_system.enhanced_formatter.format_error_response(
+                        error_message, question, conversation_context
+                    )
+                else:
+                    formatted_response = error_message
+                return formatted_response, []
+            else:
+                # Handle other statuses
+                return self._process_direct_query(question, conversation_context), []
+                
+        except Exception as e:
+            logger.error(f"Error in data download query: {e}")
+            return self._process_direct_query(question, conversation_context), []
+    
+    def _format_data_download_response(self, result: Dict[str, Any], conversation_context: str = "") -> str:
+        """Format data download response for user display."""
+        try:
+            if result["status"] == "success":
+                download_info = result.get("download_info", {})
+                message = result.get("message", "Data download completed")
+                
+                # Build response with download details
+                response_parts = [message]
+                
+                # Add file information if available
+                if download_info:
+                    csv_files = download_info.get("csv_files", [])
+                    download_dir = download_info.get("download_directory", "")
+                    file_count = download_info.get("file_count", 0)
+                    location = download_info.get("location_code", "")
+                    device = download_info.get("device_category", "")
+                    date_range = download_info.get("date_range", "")
+                    
+                    if file_count > 0:
+                        response_parts.append(f"\n📁 **Download Details:**")
+                        response_parts.append(f"• Files downloaded: {file_count}")
+                        response_parts.append(f"• Location: {location}")
+                        response_parts.append(f"• Device type: {device}")
+                        response_parts.append(f"• Date range: {date_range}")
+                        response_parts.append(f"• Output directory: {download_dir}")
+                        
+                        if csv_files:
+                            response_parts.append(f"\n📄 **CSV Files:**")
+                            for csv_file in csv_files[:5]:  # Show first 5 files
+                                filename = csv_file.split('/')[-1] if '/' in csv_file else csv_file
+                                response_parts.append(f"• {filename}")
+                            
+                            if len(csv_files) > 5:
+                                response_parts.append(f"• ... and {len(csv_files) - 5} more files")
+                
+                # Use enhanced formatting if available
+                base_response = "\n".join(response_parts)
+                if self.ocean_query_system and self.ocean_query_system.enhanced_formatter:
+                    return self.ocean_query_system.enhanced_formatter.format_download_response(
+                        base_response, result, conversation_context
+                    )
+                else:
+                    return base_response
+            else:
+                return f"Download failed: {result.get('message', 'Unknown error')}"
+                
+        except Exception as e:
+            logger.error(f"Error formatting download response: {e}")
+            return f"Data download completed, but there was an error formatting the response: {str(e)}"
     
     def add_documents(self, file_paths: List[str]) -> bool:
         """
