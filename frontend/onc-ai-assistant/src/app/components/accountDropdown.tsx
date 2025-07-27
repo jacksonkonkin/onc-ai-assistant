@@ -7,12 +7,14 @@ import { FaUserCircle } from "react-icons/fa";
 import "./navbar.css";
 
 export default function AccountDropdown() {
-  const { setIsLoggedIn } = useAuth();
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
+    // Redirect to home page after logout
+    window.location.href = '/';
   };
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -32,6 +34,11 @@ export default function AccountDropdown() {
         <FaUserCircle size={28} />
       </button>
       <div className={`dropdown-menu ${open ? "open" : ""}`}>
+        {user && (
+          <div className="dropdown-item" style={{ fontWeight: 'bold', color: '#129DC0' }}>
+            {user.username} ({user.role})
+          </div>
+        )}
         <Link href="/accountSettings" className="dropdown-item" onClick={() => setOpen(false)}>
           Account Settings
         </Link>

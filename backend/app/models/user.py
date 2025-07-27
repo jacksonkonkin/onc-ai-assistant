@@ -3,6 +3,7 @@ from typing import Optional
 
 class UserCreate(BaseModel):
     username: str
+    email: str
     password: str
     onc_token: Optional[str] = None
     is_indigenous: bool
@@ -11,6 +12,7 @@ class UserCreate(BaseModel):
 class UserInDB(BaseModel):
     id: str
     username: str
+    email: str
     hashed_password: str
     onc_token: str
     is_indigenous: bool
