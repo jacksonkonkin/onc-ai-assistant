@@ -12,6 +12,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "super-secret")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 TOKEN_EXPIRE_MIN = int(os.getenv("TOKEN_EXPIRE_MIN", "1440"))
 
+
+
 def hash_password(password: str):
     return pwd_context.hash(password)
 
@@ -37,3 +39,4 @@ def extract_token_from_header(authorization: str):
     if authorization and authorization.startswith("Bearer "):
         return authorization.split(" ")[1]
     return None
+

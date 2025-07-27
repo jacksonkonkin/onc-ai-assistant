@@ -1,7 +1,9 @@
+
 from fastapi import APIRouter, HTTPException, Header
 from app.models.user import UserCreate
 from app.db.mongo import users_collection
 from app.service_auth import hash_password, verify_password, create_jwt, verify_jwt, extract_token_from_header
+
 from bson import ObjectId
 
 router = APIRouter()
@@ -116,3 +118,6 @@ async def get_admin_stats(authorization: str = Header(None)):
         "regular_users": regular_users,
         "role_breakdown": role_counts
     }
+
+    
+
