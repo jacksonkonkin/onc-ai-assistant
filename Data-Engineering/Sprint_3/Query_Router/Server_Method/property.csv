@@ -1,0 +1,301 @@
+question,label
+Tell me more about Pressure.,general_knowledge
+What is the purpose of a Sigma-theta in marine research?,general_knowledge
+How is Resevoir Volume used in the field?,general_knowledge
+"Provide water level data from CBYSP on May 18, 2023 at 6pm.",data_download_instance
+"What was the recorded radiometer reading at CBYSU.AC2 on July 4, 2022 at 10am?",data_download_instance
+"Provide water level data from CBYIU.AC5 on May 18, 2023 at 6pm.",data_download_instance
+"What was the recorded radiometer reading at CBYIU.AC1 on July 4, 2022 at 10am?",data_download_instance
+Give a list of deployments at CBYSS.M2.,data_discovery
+Tell me more about Wind Chill Temperature.,general_knowledge
+Give an overview of Turbidity NTU.,general_knowledge
+What is the purpose of a Sound Pressure Level in marine research?,general_knowledge
+What devices were deployed at CBYSU.AC1 in 2023?,data_discovery
+Give a list of deployments at CBYSU.AC2.,data_discovery
+Explain the function of a Wet Bulb Temperature.,general_knowledge
+"Show me the pressure values at CBYIU.AC4 on February 14, 2024 at 11am.",data_download_instance
+What categories of instruments are deployed at CBYIP.K3?,data_discovery
+How many deployments are at CBYSS.M1?,data_discovery
+Describe the deployment setup at CBYIP.D2.,data_discovery
+What devices were deployed at CF240 in 2023?,data_discovery
+"Show me the pressure values at CBYIP.D3 on February 14, 2024 at 11am.",data_download_instance
+What is the purpose of a Density in marine research?,general_knowledge
+"Give me the salinity readings at CBYSS.M1 on January 1, 2022 at 8am.",data_download_instance
+How many deployments are at CBY?,data_discovery
+What categories of instruments are deployed at CBYSU.AC1?,data_discovery
+What is the depth of deployments at CBYSS.M2?,data_discovery
+"What was the temperature at CBYIU.AC3 on August 10, 2024 at 5pm?",data_download_instance
+"Display the turbidity at CBYIP on April 20, 2023 at 7am.",data_download_instance
+Describe the deployment setup at CBYIP.D2.,data_discovery
+"What was the CO2 level at CBYSU.AC2 on March 5, 2024 at 3pm?",data_download_instance
+"What was the recorded radiometer reading at CBYIU on July 4, 2022 at 10am?",data_download_instance
+What categories of instruments are deployed at CBYSU.AC1?,data_discovery
+What type of devices are deployed at CBYIU.AC1?,data_discovery
+"Provide water level data from CBYIP.D2 on May 18, 2023 at 6pm.",data_download_instance
+How does a Amperage operate?,general_knowledge
+"Show me the pressure values at CBYIP on February 14, 2024 at 11am.",data_download_instance
+What categories of instruments are deployed at CBYIJ.J1?,data_discovery
+"Give conductivity data from CBYIP.D2 on October 10, 2022 at 2pm.",data_download_instance
+What type of devices are deployed at CBYIU.AC3?,data_discovery
+"Show oxygen level data from CBYSS.M1 on June 15, 2023 at noon.",data_download_instance
+How does a Resevoir Volume operate?,general_knowledge
+Explain the function of a Tilt.,general_knowledge
+What sensors are located at CBYSP?,data_discovery
+How many deployments are at CBYIP.D3?,data_discovery
+"Give conductivity data from CBYSU.AC2 on October 10, 2022 at 2pm.",data_download_instance
+"Retrieve light intensity at CBYSS.M1 on December 25, 2023 at 9am.",data_download_instance
+"Give conductivity data from CBYIU.AC1 on October 10, 2022 at 2pm.",data_download_instance
+What type of devices are deployed at CBYIP.D4?,data_discovery
+What devices were deployed at CBYIP.D2 in 2023?,data_discovery
+Are there any video cameras at CBYIP.K2?,data_discovery
+How is Sea Water Temperature used in the field?,general_knowledge
+What devices were deployed at CF240 in 2023?,data_discovery
+What role does a Micro-g Acceleration play in underwater observation?,general_knowledge
+"Give conductivity data from CBYIU.AC3 on October 10, 2022 at 2pm.",data_download_instance
+Why is a Engineering Count important in oceanography?,general_knowledge
+"Give conductivity data from CBYIU.AC3 on October 10, 2022 at 2pm.",data_download_instance
+"Display the turbidity at CBYDS on April 20, 2023 at 7am.",data_download_instance
+Does CBYIP have active devices?,data_discovery
+What role does a Status Code play in underwater observation?,general_knowledge
+What is a Resevoir Volume?,general_knowledge
+"Give me the salinity readings at CBYSS.M1 on January 1, 2022 at 8am.",data_download_instance
+How many deployments are at CBYIP.K2?,data_discovery
+What sensors are located at CBYIJ.J1?,data_discovery
+What sensors are located at CBY?,data_discovery
+"Give conductivity data from CBYIP on October 10, 2022 at 2pm.",data_download_instance
+Give a list of deployments at CBYIJ.J1.,data_discovery
+Tell me more about Relative Barometric Pressure.,general_knowledge
+How is Target Persistence used in the field?,general_knowledge
+"Provide water level data from CBYSS.M1 on May 18, 2023 at 6pm.",data_download_instance
+Are there any video cameras at CF240?,data_discovery
+How many deployments are at CBYIU.AC5?,data_discovery
+How does a CO2 Partial Pressure operate?,general_knowledge
+What is the purpose of a Internal pH in marine research?,general_knowledge
+"Give conductivity data from CBYSU.AC2 on October 10, 2022 at 2pm.",data_download_instance
+"Display the turbidity at CBYIU.AC2 on April 20, 2023 at 7am.",data_download_instance
+Does CBYSP have active devices?,data_discovery
+"Display the turbidity at CBYIU on April 20, 2023 at 7am.",data_download_instance
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+Does CBYIU.AC2 have active devices?,data_discovery
+How many deployments are at CBYIJ.J2?,data_discovery
+"Provide water level data from CBYIU.AC5 on May 18, 2023 at 6pm.",data_download_instance
+"What was the recorded radiometer reading at CF240 on July 4, 2022 at 10am?",data_download_instance
+Give a list of deployments at CBYIP.,data_discovery
+What devices were deployed at CBYIU.AC4 in 2023?,data_discovery
+"Show oxygen level data from CBYSS.M2 on June 15, 2023 at noon.",data_download_instance
+Describe the deployment setup at CBYSU.AC1.,data_discovery
+What categories of instruments are deployed at CBYIJ.J2?,data_discovery
+"Show me the pressure values at CBYIP on February 14, 2024 at 11am.",data_download_instance
+How does a Camera Tilt operate?,general_knowledge
+Give a list of deployments at CBYIU.AC2.,data_discovery
+Why is a Camera Light important in oceanography?,general_knowledge
+"Retrieve light intensity at CBYIP.D4 on December 25, 2023 at 9am.",data_download_instance
+Give an overview of Focus.,general_knowledge
+Can you describe what a Differential Temperature is used for?,general_knowledge
+Does CBYIP.D3 have active devices?,data_discovery
+What devices were deployed at CBYIP.K1 in 2023?,data_discovery
+"Give me the salinity readings at CBYDS on January 1, 2022 at 8am.",data_download_instance
+Does CBYIU.AC3 have active devices?,data_discovery
+"Give me the salinity readings at CBYIP.K1 on January 1, 2022 at 8am.",data_download_instance
+How does a Focus operate?,general_knowledge
+"Display the turbidity at CBYIU.AC5 on April 20, 2023 at 7am.",data_download_instance
+How does a Specific Enthalpy operate?,general_knowledge
+"Give me the salinity readings at CBYIJ.J2 on January 1, 2022 at 8am.",data_download_instance
+Does CBYIU.AC3 have active devices?,data_discovery
+"Show oxygen level data from CBYIU.AC1 on June 15, 2023 at noon.",data_download_instance
+"Retrieve light intensity at CF240 on December 25, 2023 at 9am.",data_download_instance
+"Provide water level data from CBYSS.M1 on May 18, 2023 at 6pm.",data_download_instance
+Are there any video cameras at CBYIP.D2?,data_discovery
+Why is a Gas Saturation important in oceanography?,general_knowledge
+Can you describe what a Wind Direction is used for?,general_knowledge
+"What was the temperature at CBYDS on August 10, 2024 at 5pm?",data_download_instance
+How does a Rainfall Rate operate?,general_knowledge
+Does CBYIU.AC4 have active devices?,data_discovery
+Give an overview of Micro-g Acceleration.,general_knowledge
+What is the purpose of a Salinity in marine research?,general_knowledge
+What is a Status Code?,general_knowledge
+How many deployments are at CBYSU?,data_discovery
+"Display the turbidity at CBY on April 20, 2023 at 7am.",data_download_instance
+Tell me more about Solar Radiation.,general_knowledge
+"What was the CO2 level at CBY on March 5, 2024 at 3pm?",data_download_instance
+"Show me the pressure values at CBYIP.D4 on February 14, 2024 at 11am.",data_download_instance
+Tell me more about Electric Charge.,general_knowledge
+"What was the temperature at CBYIU.AC4 on August 10, 2024 at 5pm?",data_download_instance
+What categories of instruments are deployed at CBYIP.D4?,data_discovery
+"What was the CO2 level at CBYSP on March 5, 2024 at 3pm?",data_download_instance
+What devices were deployed at CBYIU.AC4 in 2023?,data_discovery
+What role does a Magnetic Heading play in underwater observation?,general_knowledge
+How is Chlorophyll used in the field?,general_knowledge
+What role does a Camera Tilt play in underwater observation?,general_knowledge
+Are there any video cameras at CBYIJ.J2?,data_discovery
+Describe the deployment setup at CBYSU.AC1.,data_discovery
+"Provide water level data from CBYIU on May 18, 2023 at 6pm.",data_download_instance
+Give a list of deployments at CBYIU.AC1.,data_discovery
+What sensors are located at CBYIU.AC2?,data_discovery
+How many deployments are at CBYIP.K3?,data_discovery
+Explain the function of a On/Off Sensor.,general_knowledge
+"Show me the pressure values at CBYIP.K1 on February 14, 2024 at 11am.",data_download_instance
+"What was the temperature at CBYSS on August 10, 2024 at 5pm?",data_download_instance
+"What was the recorded radiometer reading at CBYIP.K1 on July 4, 2022 at 10am?",data_download_instance
+What is the purpose of a Camera Pan in marine research?,general_knowledge
+What devices were deployed at CBYIP.K1 in 2023?,data_discovery
+What role does a Latitude play in underwater observation?,general_knowledge
+Give an overview of SRSL Ice Balance Buoy Temperature.,general_knowledge
+"What was the temperature at CBYSU on August 10, 2024 at 5pm?",data_download_instance
+Explain the function of a Resevoir Volume.,general_knowledge
+Describe the deployment setup at CBYSU.AC2.,data_discovery
+How does a Wind Direction operate?,general_knowledge
+Why is a Sigma-theta important in oceanography?,general_knowledge
+Does CBYSU.AC2 have active devices?,data_discovery
+Explain the function of a Snow Thickness.,general_knowledge
+"Provide water level data from CBYSS on May 18, 2023 at 6pm.",data_download_instance
+"Display the turbidity at CBYIP.K1 on April 20, 2023 at 7am.",data_download_instance
+Explain the function of a Latitude.,general_knowledge
+What role does a Battery Charge play in underwater observation?,general_knowledge
+Can you describe what a GPS Interval Time of Week is used for?,general_knowledge
+How many deployments are at CBYIP?,data_discovery
+What is a Nitrate Concentration?,general_knowledge
+What is the purpose of a Camera Light in marine research?,general_knowledge
+What role does a Electric Charge play in underwater observation?,general_knowledge
+"What was the recorded radiometer reading at CBYIU.AC1 on July 4, 2022 at 10am?",data_download_instance
+"What was the temperature at CBYDS on August 10, 2024 at 5pm?",data_download_instance
+Can you describe what a Electric Charge is used for?,general_knowledge
+"Give me the salinity readings at CBYIU.AC2 on January 1, 2022 at 8am.",data_download_instance
+What sensors are located at CBYIP.D2?,data_discovery
+"Provide water level data from CBYIU on May 18, 2023 at 6pm.",data_download_instance
+"Display the turbidity at CBYSU.AC1 on April 20, 2023 at 7am.",data_download_instance
+Why is a Wind Chill Temperature important in oceanography?,general_knowledge
+What type of devices are deployed at CBYIJ.J2?,data_discovery
+"Retrieve light intensity at CBYIP.D3 on December 25, 2023 at 9am.",data_download_instance
+"What was the CO2 level at CBYIP.D2 on March 5, 2024 at 3pm?",data_download_instance
+How many deployments are at CBYIP?,data_discovery
+What categories of instruments are deployed at CBYSS?,data_discovery
+What sensors are located at CBYIP.K3?,data_discovery
+"Show oxygen level data from CBYIU.AC2 on June 15, 2023 at noon.",data_download_instance
+What categories of instruments are deployed at CBYSP?,data_discovery
+"Show me the pressure values at CBYIP.K1 on February 14, 2024 at 11am.",data_download_instance
+"What was the recorded radiometer reading at CBYIJ.J1 on July 4, 2022 at 10am?",data_download_instance
+What categories of instruments are deployed at CBYSU?,data_discovery
+What devices were deployed at CBYIP.K3 in 2023?,data_discovery
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+Give a list of deployments at CBYIU.AC1.,data_discovery
+"What was the temperature at CBYIU.AC5 on August 10, 2024 at 5pm?",data_download_instance
+How many deployments are at CBY?,data_discovery
+Explain the function of a Micro-g Acceleration.,general_knowledge
+"Show oxygen level data from CBY on June 15, 2023 at noon.",data_download_instance
+"Show me the pressure values at CF240 on February 14, 2024 at 11am.",data_download_instance
+"Give conductivity data from CBYIP.D2 on October 10, 2022 at 2pm.",data_download_instance
+"What was the recorded radiometer reading at CBYIJ.J1 on July 4, 2022 at 10am?",data_download_instance
+What devices were deployed at CBYIU in 2023?,data_discovery
+What type of devices are deployed at CBYIP.K1?,data_discovery
+"Provide water level data from CBYIU.AC1 on May 18, 2023 at 6pm.",data_download_instance
+Tell me more about Magnetic Heading.,general_knowledge
+What type of devices are deployed at CBYSU.AC2?,data_discovery
+How is CDOM used in the field?,general_knowledge
+Are there any video cameras at CBY?,data_discovery
+"Retrieve light intensity at CBYDS on December 25, 2023 at 9am.",data_download_instance
+What is the depth of deployments at CBYIP.K2?,data_discovery
+Describe the deployment setup at CBYSS.,data_discovery
+What type of devices are deployed at CBYIP.D3?,data_discovery
+Can you describe what a Internal Pressure is used for?,general_knowledge
+How does a Salinity operate?,general_knowledge
+What is a Tilt?,general_knowledge
+"Provide water level data from CBYIP.K2 on May 18, 2023 at 6pm.",data_download_instance
+"Display the turbidity at CBYIU.AC2 on April 20, 2023 at 7am.",data_download_instance
+What is the depth of deployments at CBYSP?,data_discovery
+How many deployments are at CBYSP?,data_discovery
+"Retrieve light intensity at CBYIJ.J2 on December 25, 2023 at 9am.",data_download_instance
+Give a list of deployments at CBYIU.AC1.,data_discovery
+"What was the recorded radiometer reading at CBYIJ.J2 on July 4, 2022 at 10am?",data_download_instance
+Give an overview of pH.,general_knowledge
+How does a Sound Pressure Level operate?,general_knowledge
+"What was the recorded radiometer reading at CBYIP.D2 on July 4, 2022 at 10am?",data_download_instance
+Give an overview of Micro-g Acceleration.,general_knowledge
+"Provide water level data from CBYSS on May 18, 2023 at 6pm.",data_download_instance
+What is the purpose of a PAR Photon-based in marine research?,general_knowledge
+Tell me more about Internal Temperature.,general_knowledge
+"What was the temperature at CBYDS on August 10, 2024 at 5pm?",data_download_instance
+Describe the deployment setup at CBYSP.,data_discovery
+Why is a Total Pressure important in oceanography?,general_knowledge
+What is the depth of deployments at CBYIP.K2?,data_discovery
+"What was the temperature at CBYSU on August 10, 2024 at 5pm?",data_download_instance
+"Display the turbidity at CBYIJ.J1 on April 20, 2023 at 7am.",data_download_instance
+What devices were deployed at CBYSP in 2023?,data_discovery
+What is the purpose of a Ice Draft in marine research?,general_knowledge
+"Give conductivity data from CBYIU.AC1 on October 10, 2022 at 2pm.",data_download_instance
+Are there any video cameras at CBYIJ.J2?,data_discovery
+Why is a Chlorophyll important in oceanography?,general_knowledge
+"What was the recorded radiometer reading at CBYIU.AC1 on July 4, 2022 at 10am?",data_download_instance
+Give an overview of Salinity.,general_knowledge
+What is the depth of deployments at CBYIP?,data_discovery
+"Show oxygen level data from CBYIU.AC2 on June 15, 2023 at noon.",data_download_instance
+Why is a Specific Enthalpy important in oceanography?,general_knowledge
+"Show me the pressure values at CBYIU.AC3 on February 14, 2024 at 11am.",data_download_instance
+What sensors are located at CBYIP.D3?,data_discovery
+Are there any video cameras at CBYIP.D3?,data_discovery
+How is Internal Pressure used in the field?,general_knowledge
+Give an overview of CO2 Partial Pressure.,general_knowledge
+"Show oxygen level data from CBY on June 15, 2023 at noon.",data_download_instance
+What categories of instruments are deployed at CBY?,data_discovery
+What type of devices are deployed at CBYIP?,data_discovery
+What is the depth of deployments at CBYIP.K3?,data_discovery
+How is Relative Humidity used in the field?,general_knowledge
+"Give me the salinity readings at CBYIP.K3 on January 1, 2022 at 8am.",data_download_instance
+Why is a Snow Thickness important in oceanography?,general_knowledge
+Are there any video cameras at CBYIP.K1?,data_discovery
+"Show oxygen level data from CBYIP.D4 on June 15, 2023 at noon.",data_download_instance
+"What was the CO2 level at CF240 on March 5, 2024 at 3pm?",data_download_instance
+What is the purpose of a Total Pressure in marine research?,general_knowledge
+"Give me the salinity readings at CBYIU.AC4 on January 1, 2022 at 8am.",data_download_instance
+Does CBYSU.AC2 have active devices?,data_discovery
+How many deployments are at CBYIP.D1?,data_discovery
+What is the purpose of a Ground Fault in marine research?,general_knowledge
+Explain the function of a Chlorophyll.,general_knowledge
+What role does a CO2 Partial Pressure play in underwater observation?,general_knowledge
+"Show oxygen level data from CBYIP.D4 on June 15, 2023 at noon.",data_download_instance
+Explain the function of a Tilt.,general_knowledge
+What role does a Barometric Trend play in underwater observation?,general_knowledge
+Why is a Voltage important in oceanography?,general_knowledge
+Give an overview of PAR Photon-based.,general_knowledge
+How many deployments are at CBYIU?,data_discovery
+Can you describe what a Tilt is used for?,general_knowledge
+Why is a Electric Charge important in oceanography?,general_knowledge
+Are there any video cameras at CBYIP.D2?,data_discovery
+Can you describe what a Voltage is used for?,general_knowledge
+Give an overview of Wind Direction.,general_knowledge
+Explain the function of a Wind Speed.,general_knowledge
+What type of devices are deployed at CBYSU?,data_discovery
+What is the purpose of a Amperage in marine research?,general_knowledge
+Tell me more about Runtime Sensor.,general_knowledge
+What is a Battery Charge?,general_knowledge
+What devices were deployed at CBYIU in 2023?,data_discovery
+Can you describe what a Internal Humidity is used for?,general_knowledge
+How many deployments are at CBYIP.K3?,data_discovery
+"Give me the salinity readings at CBYDS on January 1, 2022 at 8am.",data_download_instance
+Explain the function of a CO2 Concentration Linearized.,general_knowledge
+What role does a Focus play in underwater observation?,general_knowledge
+"Give conductivity data from CBYSU.AC2 on October 10, 2022 at 2pm.",data_download_instance
+What is a Mixing Ratio?,general_knowledge
+Describe the deployment setup at CBYIU.AC5.,data_discovery
+What type of devices are deployed at CBYIP.D3?,data_discovery
+How many deployments are at CBYIJ.J1?,data_discovery
+Does CBYIU.AC5 have active devices?,data_discovery
+What categories of instruments are deployed at CBYDS?,data_discovery
+"Show oxygen level data from CBYSU.AC1 on June 15, 2023 at noon.",data_download_instance
+Tell me more about Compensated Phase Angle.,general_knowledge
+Explain the function of a Resevoir Volume.,general_knowledge
+Describe the deployment setup at CBYSP.,data_discovery
+What is a Sigma-theta?,general_knowledge
+"Show oxygen level data from CBYIP.K2 on June 15, 2023 at noon.",data_download_instance
+"What was the CO2 level at CBYSU.AC1 on March 5, 2024 at 3pm?",data_download_instance
+"Display the turbidity at CBYIJ.J2 on April 20, 2023 at 7am.",data_download_instance
+"Give conductivity data from CBYIP.K2 on October 10, 2022 at 2pm.",data_download_instance
+"Provide water level data from CBYIP.D4 on May 18, 2023 at 6pm.",data_download_instance
+Can you describe what a Specific Enthalpy is used for?,general_knowledge
+Tell me more about Pressure.,general_knowledge
+How many deployments are at CBYSU.AC2?,data_discovery
+"Give conductivity data from CBYIU.AC3 on October 10, 2022 at 2pm.",data_download_instance
+"Retrieve light intensity at CBYIU.AC3 on December 25, 2023 at 9am.",data_download_instance
+Does CBYIJ.J2 have active devices?,data_discovery
+How does a Conductivity operate?,general_knowledge
+How does a Ice Thickness operate?,general_knowledge
