@@ -15,6 +15,7 @@ from .enhanced_parameter_extractor import EnhancedParameterExtractor
 from .onc_api_client import ONCAPIClient
 from .enhanced_response_formatter import EnhancedResponseFormatter
 from .advanced_data_downloader import AdvancedDataDownloader
+from .download_manager import get_download_manager
 
 # Setup logging
 logging.basicConfig(
@@ -58,7 +59,7 @@ class OceanQuerySystem:
                      query_type: str = "data", row_limit: int = 1000, 
                      max_devices: int = None, parallel: bool = False,
                      use_pagination: bool = False, page_size: int = 500, 
-                     max_pages: int = 10) -> Dict[str, Any]:
+                     max_pages: int = 10, concurrent_mode: bool = False) -> Dict[str, Any]:
         """
         Process a natural language query and return ONC API data
         
@@ -72,6 +73,7 @@ class OceanQuerySystem:
             use_pagination: Whether to use time-based pagination
             page_size: Rows per time chunk when using pagination
             max_pages: Maximum number of time chunks
+            concurrent_mode: Enable concurrent preview + background download for data_download queries
             
         Returns:
             Complete response with data and metadata
@@ -85,7 +87,7 @@ class OceanQuerySystem:
         elif query_type == "data_products":
             return self.process_data_products_query(query, include_metadata)
         elif query_type == "data_download":
-            return self.process_data_download_query(query, include_metadata, row_limit)
+            return self.process_data_download_query(query, include_metadata, row_limit, concurrent_mode)
         elif query_type == "data_preview":
             return self.process_data_preview_query(query, include_metadata, row_limit)
         else:
@@ -1178,20 +1180,22 @@ class OceanQuerySystem:
         logger.info("Ocean Query System closed")
 
     def process_data_download_query(self, query: str, include_metadata: bool = True, 
-                                   row_limit: int = 1000) -> Dict[str, Any]:
+                                   row_limit: int = 1000, concurrent_mode: bool = False) -> Dict[str, Any]:
         """
-        Process a data download query for CSV export or data product downloads
+        Process a data download query for any time interval (instant to multi-day)
+        with optional concurrent preview + background download
         
         Args:
             query: Natural language query about data downloads
             include_metadata: Whether to include processing metadata
             row_limit: Maximum rows for data downloads
+            concurrent_mode: Enable concurrent preview + background download
             
         Returns:
             Response with download information and file paths
         """
         start_time = time.time()
-        logger.info(f"Processing data download query: '{query}'")
+        logger.info(f"Processing data download query (interval-based): '{query}'")
         
         # Step 1: Extract parameters from query
         logger.info("Step 1: Extracting parameters...")
@@ -1214,22 +1218,40 @@ class OceanQuerySystem:
         params = extraction_result["parameters"]
         logger.info(f"Extracted parameters for data download: {params}")
         
-        # Step 2: Determine download type and process
+        # Step 2: Process interval-based download (all downloads are now intervals)
         try:
             location_code = params["location_code"]
             device_category = params.get("device_category")
             property_code = params.get("property_code")
-            temporal_reference = params.get("temporal_reference")
+            start_time_param = params.get("start_time")
+            end_time_param = params.get("end_time")
             
-            # Check for specific date range or instance
-            download_type = self._determine_download_type(query, temporal_reference)
-            
-            if download_type == "csv_export":
-                return self._process_csv_download(query, params, include_metadata, start_time)
-            elif download_type == "data_product":
-                return self._process_data_product_download(query, params, include_metadata, start_time)
+            # Determine interval scope for logging
+            if start_time_param and end_time_param:
+                from datetime import datetime
+                try:
+                    start_dt = datetime.fromisoformat(start_time_param.replace('Z', '+00:00'))
+                    end_dt = datetime.fromisoformat(end_time_param.replace('Z', '+00:00'))
+                    duration = end_dt - start_dt
+                    
+                    if duration.total_seconds() <= 300:  # 5 minutes or less
+                        interval_type = "instant"
+                    elif duration.days == 0:  # Less than a day
+                        interval_type = "intraday" 
+                    else:
+                        interval_type = "multi_day"
+                    
+                    logger.info(f"Interval type: {interval_type}, duration: {duration}")
+                except:
+                    interval_type = "unknown"
             else:
-                # Default to CSV export for data downloads
+                interval_type = "default"
+            
+            # Process based on concurrent mode
+            if concurrent_mode:
+                return self._process_concurrent_csv_download(query, params, include_metadata, start_time)
+            else:
+                # Traditional synchronous download
                 return self._process_csv_download(query, params, include_metadata, start_time)
                 
         except Exception as e:
@@ -1265,22 +1287,45 @@ class OceanQuerySystem:
     
     def _process_csv_download(self, query: str, params: Dict[str, Any], 
                              include_metadata: bool, start_time: float) -> Dict[str, Any]:
-        """Process CSV data download request using query routing"""
+        """Process CSV data download request using enhanced interval support"""
         try:
             location_code = params["location_code"]
             device_category = params.get("device_category", "CTD")  # Default to CTD
-            temporal_reference = params.get("temporal_reference")
             
-            # Parse temporal reference for date range
-            date_from, date_to = self._parse_temporal_reference(temporal_reference)
+            # Use pre-parsed datetime values from enhanced parameter extractor
+            start_time_param = params.get("start_time")
+            end_time_param = params.get("end_time")
             
-            if not date_from or not date_to:
-                # Default to last 24 hours if no specific dates
+            if start_time_param and end_time_param:
+                # Use the already parsed datetime strings
+                date_from = start_time_param
+                date_to = end_time_param
+            else:
+                # Fallback to last 5 minutes for "latest" queries
                 from datetime import datetime, timedelta
                 date_to = datetime.utcnow()
-                date_from = date_to - timedelta(days=1)
+                date_from = date_to - timedelta(minutes=5)
                 date_from = date_from.strftime("%Y-%m-%dT%H:%M:%S.000Z")
                 date_to = date_to.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            
+            # Show API call summary first
+            api_params = {
+                'locationCode': location_code,
+                'deviceCategoryCode': device_category,
+                'dataProductCode': 'TSSD',  # Time Series Scalar Data
+                'extension': 'csv',
+                'dateFrom': date_from,
+                'dateTo': date_to,
+                'dpo_qualityControl': 1,
+                'dpo_resample': 'none',
+                'dpo_dataGaps': 0
+            }
+            
+            # Display API call information to user
+            if self.enhanced_formatter:
+                api_summary = self.enhanced_formatter.format_api_call_summary(api_params)
+                print(api_summary)
+                print("\n" + "="*70 + "\n")
             
             # Use advanced data downloader for CSV export
             logger.info(f"Downloading CSV data for {device_category} at {location_code}")
@@ -1289,31 +1334,56 @@ class OceanQuerySystem:
                 device_category=device_category,
                 date_from=date_from,
                 date_to=date_to,
-                output_dir="csv_downloads",
+                output_dir="output",  # Use main output directory
                 quality_control=True,
                 resample="none"
             )
             
-            if download_result['status'] == 'success':
-                return {
-                    "status": "success",
-                    "message": f"CSV data downloaded successfully",
-                    "data": download_result,
-                    "download_info": {
-                        "csv_files": download_result.get('csv_files', []),
-                        "download_directory": download_result.get('output_directory', 'csv_downloads'),
-                        "file_count": len(download_result.get('csv_files', [])),
-                        "location_code": location_code,
-                        "device_category": device_category,
-                        "date_range": f"{date_from} to {date_to}"
-                    },
-                    "metadata": {
-                        "query": query,
-                        "query_type": "csv_download",
-                        "download_requested": True,
-                        "execution_time": time.time() - start_time
-                    } if include_metadata else None
-                }
+            # Better validation of download success
+            if download_result.get('status') == 'success':
+                csv_files = download_result.get('csv_files', [])
+                if csv_files and len(csv_files) > 0:
+                    # Actual files were downloaded
+                    file_names = [file.split('/')[-1] for file in csv_files[:3]]  # Show first 3 filenames
+                    file_summary = ", ".join(file_names)
+                    if len(csv_files) > 3:
+                        file_summary += f" (and {len(csv_files) - 3} more)"
+                    
+                    return {
+                        "status": "success",
+                        "message": f"✅ **Download Complete!** Successfully downloaded {len(csv_files)} CSV file{'s' if len(csv_files) != 1 else ''} with {device_category} data from {location_code}.\n\n**Files created:** {file_summary}",
+                        "data": download_result,
+                        "download_info": {
+                            "csv_files": download_result.get('csv_files', []),
+                            "download_directory": download_result.get('output_directory', 'output'),
+                            "file_count": len(download_result.get('csv_files', [])),
+                            "location_code": location_code,
+                            "device_category": device_category,
+                            "date_range": f"{date_from} to {date_to}"
+                        },
+                        "metadata": {
+                            "query": query,
+                            "query_type": "csv_download",
+                            "download_requested": True,
+                            "execution_time": time.time() - start_time
+                        } if include_metadata else None
+                    }
+                else:
+                    # Download reported success but no files created
+                    return {
+                        "status": "no_data",
+                        "message": f"No data available for {device_category} at {location_code} for the requested time period. The download completed but no files were generated, which typically means no sensor data exists for these parameters and dates.",
+                        "data": None,
+                        "metadata": {
+                            "query": query,
+                            "query_type": "csv_download",
+                            "download_requested": True,
+                            "execution_time": time.time() - start_time,
+                            "date_range": f"{date_from} to {date_to}",
+                            "location_code": location_code,
+                            "device_category": device_category
+                        } if include_metadata else None
+                    }
             else:
                 return {
                     "status": "error",
@@ -1340,6 +1410,216 @@ class OceanQuerySystem:
                     "execution_time": time.time() - start_time
                 } if include_metadata else None
             }
+    
+    def _process_concurrent_csv_download(self, query: str, params: Dict[str, Any], 
+                                       include_metadata: bool, start_time: float) -> Dict[str, Any]:
+        """
+        Process CSV download with concurrent preview + background download
+        
+        Args:
+            query: Natural language query
+            params: Extracted parameters
+            include_metadata: Whether to include metadata
+            start_time: Processing start time
+            
+        Returns:
+            Response with preview data and background download info
+        """
+        try:
+            location_code = params["location_code"]
+            device_category = params.get("device_category", "CTD")
+            start_time_param = params.get("start_time")
+            end_time_param = params.get("end_time")
+            
+            # Parse datetime parameters with future date handling
+            if start_time_param and end_time_param:
+                date_from = start_time_param
+                date_to = end_time_param
+                logger.info(f"Using extracted date range: {date_from} to {date_to}")
+                
+                # Check for future dates and warn user
+                from datetime import datetime
+                try:
+                    date_obj = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+                    if date_obj > datetime.now():
+                        logger.warning(f"Future date detected: {date_from}. May not have data available.")
+                except:
+                    pass
+            else:
+                # Fallback to last 5 minutes for "latest" queries
+                from datetime import datetime, timedelta
+                date_to = datetime.utcnow()
+                date_from = date_to - timedelta(minutes=5)
+                date_from = date_from.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                date_to = date_to.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+                logger.info(f"Using fallback date range: {date_from} to {date_to}")
+            
+            logger.info(f"Starting concurrent download for {device_category} at {location_code}")
+            logger.info(f"Parameters: location={location_code}, device={device_category}, dates={date_from} to {date_to}")
+            
+            # Step 1: Get preview data immediately (limited rows)
+            preview_result = self._get_preview_data(location_code, device_category, date_from, date_to, max_rows=50)
+            
+            # Step 2: Start background download
+            download_manager = get_download_manager()
+            
+            # Prepare download parameters for background task
+            download_params = {
+                'location_code': location_code,
+                'device_category': device_category,
+                'date_from': date_from,
+                'date_to': date_to,
+                'output_dir': 'output',  # Use main output directory
+                'quality_control': True,
+                'resample': 'none',
+                'background_mode': True,  # Enable background mode optimizations
+                'progress_callback': None  # No progress callback for background downloads
+            }
+            
+            # Start background download
+            download_id = download_manager.start_background_download(
+                download_params=download_params,
+                download_function=self.data_downloader.download_csv_data,
+                callback=self._download_completion_callback
+            )
+            
+            # Step 3: Build immediate response with preview + download info
+            total_time = time.time() - start_time
+            
+            # Safely extract preview data
+            preview_data = preview_result.get("data") if preview_result else None
+            if preview_data is None:
+                preview_data = []
+            
+            response = {
+                "status": "success_with_download",
+                "message": f"Showing data preview from {device_category} at {location_code}. Full dataset download started in background.",
+                "data": preview_data,
+                "preview_info": {
+                    "is_preview": True,
+                    "preview_rows": len(preview_data),
+                    "date_range": f"{date_from} to {date_to}",
+                    "location_code": location_code,
+                    "device_category": device_category
+                },
+                "download_info": {
+                    "download_id": download_id,
+                    "status": "in_progress",
+                    "estimated_completion": "1-3 minutes",
+                    "output_directory": download_params['output_dir'],
+                    "background_task": True
+                }
+            }
+            
+            # Include API call information from preview
+            if preview_result and "raw_api_responses" in preview_result:
+                response["raw_api_responses"] = preview_result["raw_api_responses"]
+            
+            if include_metadata:
+                response["metadata"] = {
+                    "query": query,
+                    "query_type": "concurrent_csv_download",
+                    "concurrent_mode": True,
+                    "download_id": download_id,
+                    "execution_time": round(total_time, 2),
+                    "preview_execution_time": preview_result.get("execution_time", 0)
+                }
+            
+            logger.info(f"Concurrent download initiated: preview ready, background download {download_id} started")
+            return response
+            
+        except Exception as e:
+            logger.error(f"Concurrent CSV download failed: {e}")
+            return {
+                "status": "error",
+                "stage": "concurrent_csv_download",
+                "message": f"Concurrent CSV download failed: {str(e)}",
+                "data": None,
+                "metadata": {
+                    "query": query,
+                    "query_type": "concurrent_csv_download",
+                    "execution_time": time.time() - start_time
+                } if include_metadata else None
+            }
+    
+    def _get_preview_data(self, location_code: str, device_category: str, 
+                         date_from: str, date_to: str, max_rows: int = 50) -> Dict[str, Any]:
+        """
+        Get a limited preview of data for immediate display
+        
+        Args:
+            location_code: Location code  
+            device_category: Device category
+            date_from: Start date
+            date_to: End date
+            max_rows: Maximum rows to return
+            
+        Returns:
+            Preview data result
+        """
+        try:
+            logger.info(f"Getting preview data: {max_rows} rows from {device_category} at {location_code}")
+            
+            # Use the API client directly to avoid recursive calls
+            start_time_preview = time.time()
+            
+            # Use our API client to get a quick preview
+            api_result = self.api_client.search_data_range(
+                location_code=location_code,
+                device_category=device_category,
+                property_code='seawatertemperature',  # Default to temperature for previews
+                date_from=date_from,
+                date_to=date_to,
+                row_limit=max_rows,
+                max_devices=1,
+                parallel=False
+            )
+            
+            # Build preview result in the expected format
+            preview_result = {
+                "status": api_result.get("status", "error"),
+                "message": api_result.get("message", "Preview data"),
+                "data": api_result.get("data", []),
+                "execution_time": time.time() - start_time_preview
+            }
+            
+            # Include raw API responses for transparency
+            if "raw_api_responses" in api_result:
+                preview_result["raw_api_responses"] = api_result["raw_api_responses"]
+            
+            return preview_result
+            
+        except Exception as e:
+            logger.error(f"Error getting preview data: {e}")
+            return {
+                "status": "error",
+                "message": f"Preview data failed: {str(e)}",
+                "data": [],
+                "execution_time": time.time()
+            }
+    
+    def _download_completion_callback(self, download_id: str, result: Dict[str, Any]):
+        """
+        Callback function called when background download completes
+        
+        Args:
+            download_id: ID of the completed download
+            result: Download result dictionary
+        """
+        try:
+            if result and result.get('status') == 'success':
+                csv_files = result.get('csv_files', [])
+                logger.info(f"Background download {download_id} completed successfully: {len(csv_files)} files created")
+                
+                # Log file details
+                for csv_file in csv_files:
+                    logger.info(f"Created file: {csv_file}")
+            else:
+                error_msg = result.get('message', 'Unknown error') if result else 'No result'
+                logger.error(f"Background download {download_id} failed: {error_msg}")
+                
+        except Exception as e:
+            logger.error(f"Error in download completion callback for {download_id}: {e}")
     
     def _parse_temporal_reference(self, temporal_reference: str) -> tuple:
         """Parse temporal reference into date from and date to"""

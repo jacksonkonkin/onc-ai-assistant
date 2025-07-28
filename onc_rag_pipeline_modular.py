@@ -102,6 +102,14 @@ def main():
     except Exception as e:
         logger.error(f"Error: {e}")
         return 1
+    finally:
+        # Clean up background download manager to prevent hanging
+        try:
+            from src.database_search.download_manager import shutdown_download_manager
+            shutdown_download_manager()
+            logger.info("Background download manager cleaned up")
+        except Exception as cleanup_error:
+            logger.warning(f"Error during cleanup: {cleanup_error}")
     
     return 0
 

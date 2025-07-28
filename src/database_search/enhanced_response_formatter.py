@@ -513,6 +513,156 @@ I've downloaded {file_count} CSV file{'s' if file_count != 1 else ''} with {devi
             logger.error(f"Error formatting download response: {e}")
             return "The data download was completed, but there was an error formatting the response."
     
+    def format_download_response(self, base_response: str, result: Dict[str, Any], 
+                                conversation_context: str = "") -> str:
+        """
+        Format download response with enhanced natural language and concurrent download support.
+        
+        Args:
+            base_response: Base response from pipeline
+            result: Full result dictionary
+            conversation_context: Previous conversation context
+            
+        Returns:
+            Enhanced formatted response
+        """
+        try:
+            status = result.get("status", "unknown")
+            
+            if status == "success_with_download":
+                # Concurrent download - format with preview + background download info
+                return self._format_concurrent_download_response(result, conversation_context)
+            elif status == "success":
+                # Traditional download - use existing format
+                return self._format_download_response(result, conversation_context, "")
+            elif status == "no_data":
+                # No data available
+                return self._format_no_data_download_response(result, conversation_context)
+            else:
+                # Other cases - use base response
+                return base_response
+                
+        except Exception as e:
+            logger.error(f"Error in format_download_response: {e}")
+            return base_response
+    
+    def _format_concurrent_download_response(self, response: Dict[str, Any], 
+                                           conversation_context: str) -> str:
+        """Format concurrent download response with preview data and background download info."""
+        try:
+            preview_info = response.get("preview_info", {})
+            download_info = response.get("download_info", {})
+            
+            location_code = preview_info.get("location_code", "")
+            device_category = preview_info.get("device_category", "")
+            date_range = preview_info.get("date_range", "")
+            preview_rows = preview_info.get("preview_rows", 0)
+            
+            download_id = download_info.get("download_id", "")
+            download_status = download_info.get("status", "in_progress")
+            output_dir = download_info.get("output_directory", "")
+            
+            location_name = self._get_friendly_location_name(location_code)
+            
+            # Check for future dates
+            future_date_warning = ""
+            if "2025" in date_range or "2026" in date_range:
+                future_date_warning = "\n⚠️  **Note:** You requested future date data. The download may complete with no files if data isn't available for future dates."
+
+            # Build enhanced response
+            response_text = f"""🔄 **Data preview ready - Full download in progress!**
+
+I found {device_category} sensor data from {location_name} and I'm showing you a preview below. The complete dataset is being downloaded in the background.
+
+📊 **Preview Information:**
+• Location: {location_name}
+• Device type: {device_category}
+• Date range: {date_range}
+• Preview rows: {preview_rows}{future_date_warning}
+
+🚀 **Background Download:**
+• Status: {download_status.replace('_', ' ').title()}
+• Download ID: {download_id[:8]}...
+• Output directory: {output_dir}
+• Estimated completion: 1-3 minutes
+
+The full CSV files will be saved to your output directory when the download completes. You can continue asking questions while this processes in the background!"""
+
+            # Add API call information if available
+            raw_api_responses = response.get("raw_api_responses", {})
+            if raw_api_responses:
+                response_text += "\n\n" + self._format_api_calls_summary(raw_api_responses)
+            
+            return response_text
+            
+        except Exception as e:
+            logger.error(f"Error formatting concurrent download response: {e}")
+            return "Preview data is available and full download is in progress in the background."
+    
+    def _format_no_data_download_response(self, response: Dict[str, Any], 
+                                        conversation_context: str) -> str:
+        """Format no data download response."""
+        try:
+            message = response.get("message", "No data available")
+            metadata = response.get("metadata", {})
+            
+            location_code = metadata.get("location_code", "")
+            device_category = metadata.get("device_category", "")
+            date_range = metadata.get("date_range", "")
+            
+            location_name = self._get_friendly_location_name(location_code)
+            
+            response_text = f"""❌ **No data available for download**
+
+{message}
+
+**Search Parameters:**
+• Location: {location_name}
+• Device type: {device_category}
+• Date range: {date_range}
+
+**Suggestions:**
+• Try a different date range (data availability varies)
+• Check if the device type is correct for this location
+• Use "What devices are available at {location_name}?" to see options"""
+
+            return response_text
+            
+        except Exception as e:
+            logger.error(f"Error formatting no data download response: {e}")
+            return "No data was available for the requested download parameters."
+    
+    def _format_api_calls_summary(self, raw_api_responses: Dict[str, Any]) -> str:
+        """Format a summary of API calls made during the query."""
+        try:
+            lines = ["## 🔧 Ocean Networks Canada API Calls Made:"]
+            
+            # Show devices API call
+            if "devices_request" in raw_api_responses:
+                devices_req = raw_api_responses["devices_request"]
+                device_count = len(devices_req.get('data', []))
+                lines.append(f"• **Device Discovery:** Found {device_count} available devices")
+            
+            # Show sensor data API calls
+            if "scalar_data_requests" in raw_api_responses:
+                data_requests = raw_api_responses["scalar_data_requests"]
+                successful_requests = 0
+                for req in data_requests:
+                    response_data = req.get('response', {})
+                    sensor_data = response_data.get('sensorData', [])
+                    if sensor_data:
+                        successful_requests += 1
+                
+                lines.append(f"• **Data Retrieval:** {successful_requests} successful API calls for sensor data")
+            
+            lines.append("• **Parameters:** Filtered by location, device type, and date range")
+            
+            return "\n".join(lines)
+            
+        except Exception as e:
+            logger.error(f"Error formatting API calls summary: {e}")
+            return ""
+    
     def _format_error_response(self, response: Dict[str, Any], original_query: str) -> str:
         """Format error responses in natural language."""
         error_message = response.get('message', 'Unknown error occurred')
@@ -539,3 +689,91 @@ This could mean:
 • The specific time period you asked about predates available data
 
 You might try asking about a different time period, or I can suggest other types of oceanographic data available from this location. You can also ask about recent data, which is more likely to be available."""
+    
+    def format_api_call_summary(self, params: Dict[str, Any], endpoint: str = "orderDataProduct", 
+                               base_url: str = "https://data.oceannetworks.ca/api") -> str:
+        """
+        Format a clear summary of API calls and parameters before download begins.
+        
+        Args:
+            params: API parameters used for the call
+            endpoint: API endpoint being called
+            base_url: Base URL for the API
+            
+        Returns:
+            Formatted string showing API call details
+        """
+        try:
+            # Build the parameter summary
+            param_lines = []
+            
+            # Essential parameters with descriptions
+            essential_params = {
+                'locationCode': 'Location',
+                'deviceCategoryCode': 'Device Type', 
+                'dataProductCode': 'Data Product',
+                'extension': 'File Format',
+                'dateFrom': 'Start Date',
+                'dateTo': 'End Date'
+            }
+            
+            # Processing options
+            processing_params = {
+                'dpo_qualityControl': 'Quality Control',
+                'dpo_resample': 'Resampling',
+                'dpo_dataGaps': 'Data Gaps'
+            }
+            
+            # Format essential parameters
+            param_lines.append("**📋 Request Parameters:**")
+            for param_key, param_label in essential_params.items():
+                if param_key in params:
+                    value = params[param_key]
+                    param_lines.append(f"• **{param_label}**: `{value}`")
+            
+            # Format processing options if present
+            processing_present = any(key in params for key in processing_params.keys())
+            if processing_present:
+                param_lines.append("\n**⚙️ Processing Options:**")
+                for param_key, param_label in processing_params.items():
+                    if param_key in params:
+                        value = params[param_key]
+                        # Convert values to human readable
+                        if param_key == 'dpo_qualityControl':
+                            value = "Enabled" if str(value) == "1" else "Disabled"
+                        elif param_key == 'dpo_dataGaps':
+                            value = "Include gaps" if str(value) == "1" else "No gap markers"
+                        param_lines.append(f"• **{param_label}**: `{value}`")
+            
+            # Build API call example
+            param_string = "&".join([f"{k}={v}" for k, v in params.items() if k != 'token'])
+            api_call = f"{base_url}/{endpoint}?{param_string}&token=YOUR_TOKEN"
+            
+            # Construct the complete summary
+            summary = f"""
+🔍 **ONC API Call Summary**
+
+{chr(10).join(param_lines)}
+
+**🌐 API Endpoint:** 
+```
+{endpoint}
+```
+
+**📡 Full API Call:**
+```
+{api_call}
+```
+
+**💡 What this does:** Orders {params.get('dataProductCode', 'data')} from {params.get('deviceCategoryCode', 'devices')} at {params.get('locationCode', 'specified location')} for the period {params.get('dateFrom', 'start')} to {params.get('dateTo', 'end')}.
+
+---
+
+🚀 **Starting download...**
+"""
+            
+            return summary.strip()
+            
+        except Exception as e:
+            logger.error(f"Error formatting API calls summary: {e}")
+            return f"**🔍 API Call:** {endpoint} with {len(params)} parameters\n\n🚀 **Starting download...**"

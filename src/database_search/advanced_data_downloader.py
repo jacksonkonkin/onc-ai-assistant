@@ -211,7 +211,8 @@ class AdvancedDataDownloader:
             }
     
     def download_data_product(self, product_params: Dict[str, Any], 
-                             output_dir: str = "downloads") -> Dict[str, Any]:
+                             output_dir: str = "downloads",
+                             background_mode: bool = False) -> Dict[str, Any]:
         """
         Download data products with processing options
         Based on Sprint 3 download_data_products.py
@@ -239,11 +240,22 @@ class AdvancedDataDownloader:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
             
             if self.onc_client:
-                # Use official ONC package
-                result = self.onc_client.orderDataProduct(
-                    product_params, 
-                    includeMetadataFile=True
-                )
+                # Use official ONC package with timeout handling
+                logger.info(f"Starting ONC data product order in background mode: {background_mode}")
+                
+                try:
+                    result = self.onc_client.orderDataProduct(
+                        product_params, 
+                        includeMetadataFile=True
+                    )
+                    logger.info(f"ONC data product order completed")
+                except Exception as onc_error:
+                    logger.error(f"ONC orderDataProduct failed: {onc_error}")
+                    return {
+                        'status': 'error',
+                        'message': f"ONC data product order failed: {str(onc_error)}",
+                        'download_result': None
+                    }
                 
                 # Process download result
                 download_info = {
@@ -360,38 +372,54 @@ class AdvancedDataDownloader:
                          date_from: str, date_to: str,
                          output_dir: str = "csv_downloads",
                          quality_control: bool = True,
-                         resample: str = "none") -> Dict[str, Any]:
+                         resample: str = "none",
+                         background_mode: bool = False,
+                         progress_callback: Optional[callable] = None) -> Dict[str, Any]:
         """
         Download CSV data for a specific location and device
-        Optimized for CSV data export functionality
+        Optimized for CSV data export functionality with background support
         
         Args:
-            location_code: Location code (e.g., "SEVIP", "BACAX")
+            location_code: Location code (e.g., "SEVIP", "BACAX", "CBYIP")
             device_category: Device category (e.g., "CTD", "ADCP2MHZ")
             date_from: Start date in ISO format
             date_to: End date in ISO format
             output_dir: Directory to save CSV files
             quality_control: Apply quality control
             resample: Resampling option ("none", "average", "minMax", "minMaxAvg")
+            background_mode: Whether running in background (affects logging/progress)
+            progress_callback: Optional callback for progress updates
             
         Returns:
             Dictionary with download results and CSV file paths
         """
         try:
-            logger.info(f"Downloading CSV data for {device_category} at {location_code}")
+            log_level = logging.DEBUG if background_mode else logging.INFO
+            logger.log(log_level, f"Downloading CSV data for {device_category} at {location_code} (background: {background_mode})")
+            
+            # Report progress if callback provided
+            if progress_callback:
+                progress_callback("Starting download...", 0)
             
             if self.onc_client:
                 # Use official ONC package
-                return self._download_csv_with_onc_package(
+                result = self._download_csv_with_onc_package(
                     location_code, device_category, date_from, date_to, 
-                    output_dir, quality_control, resample
+                    output_dir, quality_control, resample, background_mode, progress_callback
                 )
             else:
                 # Use custom API client fallback
-                return self._download_csv_with_custom_client(
+                result = self._download_csv_with_custom_client(
                     location_code, device_category, date_from, date_to,
-                    output_dir, quality_control, resample
+                    output_dir, quality_control, resample, background_mode, progress_callback
                 )
+            
+            # Final progress update
+            if progress_callback and result.get('status') == 'success':
+                file_count = len(result.get('csv_files', []))
+                progress_callback(f"Download completed - {file_count} files created", 100)
+            
+            return result
             
         except Exception as e:
             logger.error(f"Error downloading CSV data: {e}")
@@ -403,7 +431,9 @@ class AdvancedDataDownloader:
     
     def _download_csv_with_onc_package(self, location_code: str, device_category: str,
                                       date_from: str, date_to: str, output_dir: str,
-                                      quality_control: bool, resample: str) -> Dict[str, Any]:
+                                      quality_control: bool, resample: str,
+                                      background_mode: bool = False,
+                                      progress_callback: Optional[callable] = None) -> Dict[str, Any]:
         """Download CSV using official ONC package"""
         # Parameters for CSV data download
         params = {
@@ -418,13 +448,53 @@ class AdvancedDataDownloader:
             "dpo_dataGaps": 0
         }
         
+        # Show API call summary before download starts
+        print("\n" + "🔍 **ONC API Call Summary**")
+        print("\n**📋 Request Parameters:**")
+        print(f"• **Location**: `{location_code}`")
+        print(f"• **Device Type**: `{device_category}`") 
+        print(f"• **Data Product**: `TSSD`")
+        print(f"• **File Format**: `csv`")
+        print(f"• **Start Date**: `{date_from}`")
+        print(f"• **End Date**: `{date_to}`")
+        
+        print("\n**⚙️ Processing Options:**")
+        print(f"• **Quality Control**: `{'Enabled' if quality_control else 'Disabled'}`")
+        print(f"• **Resampling**: `{resample}`")
+        print("• **Data Gaps**: `No gap markers`")
+        
+        print("\n**🌐 API Endpoint:**")
+        print("```")
+        print("orderDataProduct")
+        print("```")
+        
+        print("\n**📡 Full API Call:**")
+        param_string = "&".join([f"{k}={v}" for k, v in params.items()])
+        api_call = f"https://data.oceannetworks.ca/api/orderDataProduct?{param_string}&token=YOUR_TOKEN"
+        print("```")
+        print(api_call)
+        print("```")
+        
+        print(f"\n**💡 What this does:** Orders TSSD from {device_category} at {location_code} for the period {date_from} to {date_to}.")
+        
+        print("\n" + "─" * 70)
+        print("\n🚀 **Starting download...**")
+        print()
+
         # Download the CSV data
-        download_result = self.download_data_product(params, output_dir)
+        download_result = self.download_data_product(params, output_dir, background_mode)
         
         if download_result['status'] == 'success':
             # Process CSV files for additional metadata
             csv_files = self._find_csv_files(download_result, output_dir)
-            csv_info = self._analyze_csv_files(csv_files)
+            
+            # Skip heavy CSV analysis in background mode to avoid blocking
+            if background_mode:
+                csv_info = {'file_count': len(csv_files), 'files': [], 'background_mode': True}
+                if progress_callback:
+                    progress_callback("Skipping detailed analysis in background mode", 95)
+            else:
+                csv_info = self._analyze_csv_files(csv_files)
             
             download_result.update({
                 'csv_files': csv_files,
@@ -438,14 +508,20 @@ class AdvancedDataDownloader:
     
     def _download_csv_with_custom_client(self, location_code: str, device_category: str,
                                         date_from: str, date_to: str, output_dir: str,
-                                        quality_control: bool, resample: str) -> Dict[str, Any]:
+                                        quality_control: bool, resample: str,
+                                        background_mode: bool = False,
+                                        progress_callback: Optional[callable] = None) -> Dict[str, Any]:
         """Download CSV using custom API client as fallback"""
         try:
             # Create output directory
             Path(output_dir).mkdir(parents=True, exist_ok=True)
             
             # Use our existing API client to get scalar data
-            logger.info("Using custom API client for CSV data download")
+            log_level = logging.DEBUG if background_mode else logging.INFO
+            logger.log(log_level, "Using custom API client for CSV data download")
+            
+            if progress_callback:
+                progress_callback("Finding devices...", 10)
             
             # Get devices at location
             devices = self.api_client.get_devices(location_code, device_category)
@@ -456,16 +532,25 @@ class AdvancedDataDownloader:
                     'csv_files': []
                 }
             
+            if progress_callback:
+                progress_callback(f"Found {len(devices)} devices, downloading data...", 20)
+            
             csv_files = []
             all_data = []
             
             # Get data from each device
-            for device in devices[:3]:  # Limit to first 3 devices for demo
+            total_devices = min(len(devices), 3)  # Limit to first 3 devices for demo
+            for idx, device in enumerate(devices[:total_devices]):
                 device_code = device.get('deviceCode')
                 if not device_code:
                     continue
                 
                 try:
+                    # Update progress
+                    if progress_callback:
+                        device_progress = 20 + (idx / total_devices) * 60  # 20-80% for device processing
+                        progress_callback(f"Processing device {idx+1}/{total_devices}: {device_code}", device_progress)
+                    
                     # Get scalar data for temperature property
                     property_code = 'seawatertemperature' if 'temperature' in device_category.lower() else None
                     
@@ -491,13 +576,17 @@ class AdvancedDataDownloader:
                             csv_files.append(csv_path)
                             all_data.extend(sensor_data)
                             
-                            logger.info(f"Created CSV file: {csv_filename} with {len(sensor_data)} records")
+                            log_msg = f"Created CSV file: {csv_filename} with {len(sensor_data)} records"
+                            logger.log(log_level, log_msg)
                     
                 except Exception as e:
                     logger.warning(f"Could not get data for device {device_code}: {e}")
                     continue
             
             if csv_files:
+                if progress_callback:
+                    progress_callback("Finalizing CSV files...", 90)
+                
                 return {
                     'status': 'success',
                     'message': f"Downloaded CSV data to {len(csv_files)} files",
@@ -671,7 +760,29 @@ class AdvancedDataDownloader:
         for csv_file in csv_files:
             try:
                 if os.path.exists(csv_file):
-                    df = pd.read_csv(csv_file)
+                    # Try to read CSV with error handling for malformed files
+                    try:
+                        df = pd.read_csv(csv_file, on_bad_lines='skip')
+                    except Exception as read_error:
+                        # If pandas fails, try with different parameters
+                        logger.warning(f"Standard CSV read failed for {csv_file}, trying with error handling: {read_error}")
+                        try:
+                            df = pd.read_csv(csv_file, on_bad_lines='skip', sep=',', quoting=1)
+                        except Exception as fallback_error:
+                            logger.warning(f"Could not read CSV file {csv_file} even with error handling: {fallback_error}")
+                            # Still create file info with basic details
+                            file_info = {
+                                'filename': os.path.basename(csv_file),
+                                'path': csv_file,
+                                'rows': 'unknown (parsing error)',
+                                'columns': 'unknown (parsing error)',
+                                'column_names': [],
+                                'file_size_bytes': os.path.getsize(csv_file),
+                                'parsing_error': str(fallback_error)
+                            }
+                            analysis['files'].append(file_info)
+                            continue
+                    
                     file_info = {
                         'filename': os.path.basename(csv_file),
                         'path': csv_file,
@@ -681,8 +792,21 @@ class AdvancedDataDownloader:
                         'file_size_bytes': os.path.getsize(csv_file)
                     }
                     analysis['files'].append(file_info)
+                    
             except Exception as e:
                 logger.warning(f"Could not analyze CSV file {csv_file}: {e}")
+                # Add basic file info even if analysis fails
+                if os.path.exists(csv_file):
+                    file_info = {
+                        'filename': os.path.basename(csv_file),
+                        'path': csv_file,
+                        'rows': 'unknown (analysis error)',
+                        'columns': 'unknown (analysis error)', 
+                        'column_names': [],
+                        'file_size_bytes': os.path.getsize(csv_file),
+                        'analysis_error': str(e)
+                    }
+                    analysis['files'].append(file_info)
         
         return analysis
     

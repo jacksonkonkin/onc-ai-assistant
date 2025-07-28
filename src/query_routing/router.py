@@ -26,6 +26,7 @@ class QueryType(Enum):
     HYBRID_SEARCH = "hybrid_search"
     DIRECT_LLM = "direct_llm"
     DATA_DOWNLOAD = "data_download"  # New type for data download queries
+    STATISTICAL_ANALYSIS = "statistical_analysis"  # New type for statistical analysis queries
 
 
 class QueryRouter:
@@ -116,6 +117,9 @@ class QueryRouter:
             # Data request terms
             "data", "measurement", "sensor", "instrument", "value", "reading",
             "latest", "current", "recent", "today", "yesterday", "now",
+            # Download/Export terms
+            "download", "export", "csv", "file", "files", "save", "extract",
+            "download data", "export data", "get data", "csv data", "data file",
             # Location terms
             "cambridge bay", "station", "location", "coordinates", "site",
             # Time terms  
@@ -288,6 +292,104 @@ class QueryRouter:
         
         return False
 
+    def _detect_download_request(self, query: str) -> bool:
+        """
+        Detect if a query is explicitly requesting data download/export.
+        
+        Args:
+            query: User query to check
+            
+        Returns:
+            bool: True if query contains explicit download/export keywords
+        """
+        query_lower = query.lower()
+        
+        # Explicit download/export keywords
+        download_keywords = [
+            'download', 'export', 'csv', 'download data', 'export data',
+            'get csv', 'csv file', 'data file', 'save data', 'extract data',
+            'download csv', 'export csv', 'csv data', 'download file',
+            'export file', 'data export', 'data download'
+        ]
+        
+        # Check for download keywords combined with data context
+        has_download_keyword = any(keyword in query_lower for keyword in download_keywords)
+        
+        # Additional data context keywords
+        data_context_keywords = [
+            'data', 'temperature', 'pressure', 'ctd', 'sensor', 'measurement',
+            'cambridge bay', 'cby', 'onc', 'ocean', 'instrument'
+        ]
+        
+        has_data_context = any(keyword in query_lower for keyword in data_context_keywords)
+        
+        # Return True if we have download keywords with data context
+        return has_download_keyword and has_data_context
+
+    def _detect_statistical_request(self, query: str) -> bool:
+        """
+        Detect if a query is requesting statistical analysis.
+        
+        Args:
+            query: User query to check
+            
+        Returns:
+            bool: True if query contains statistical analysis keywords
+        """
+        query_lower = query.lower()
+        
+        # Statistical operation keywords
+        statistical_keywords = [
+            'min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean',
+            'sum', 'total', 'count', 'median', 'mode', 'std', 'stdev',
+            'variance', 'var', 'range', 'trend', 'correlation'
+        ]
+        
+        # Statistical analysis phrases
+        statistical_phrases = [
+            'what is the average', 'what is the maximum', 'what is the minimum',
+            'show me the trend', 'calculate the', 'statistical analysis',
+            'give me statistics', 'how much does', 'compare', 'analysis of',
+            'over time', 'seasonal', 'monthly average', 'daily average',
+            'yearly trend', 'rising', 'falling', 'increasing', 'decreasing'
+        ]
+        
+        # Comparison keywords that suggest statistical analysis
+        comparison_keywords = [
+            'higher', 'lower', 'greater', 'less', 'above', 'below',
+            'exceeds', 'under', 'compared to', 'vs', 'versus', 'difference'
+        ]
+        
+        # Time aggregation keywords
+        time_aggregation_keywords = [
+            'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'seasonal',
+            'by hour', 'by day', 'by week', 'by month', 'by year'
+        ]
+        
+        # Check for statistical keywords
+        has_statistical_keyword = any(keyword in query_lower for keyword in statistical_keywords)
+        
+        # Check for statistical phrases
+        has_statistical_phrase = any(phrase in query_lower for phrase in statistical_phrases)
+        
+        # Check for comparison keywords
+        has_comparison = any(keyword in query_lower for keyword in comparison_keywords)
+        
+        # Check for time aggregation
+        has_time_aggregation = any(keyword in query_lower for keyword in time_aggregation_keywords)
+        
+        # Additional data context keywords for statistical queries
+        data_context_keywords = [
+            'data', 'temperature', 'pressure', 'salinity', 'oxygen', 'ph',
+            'sensor', 'measurement', 'cambridge bay', 'onc', 'ocean'
+        ]
+        
+        has_data_context = any(keyword in query_lower for keyword in data_context_keywords)
+        
+        # Return True if we have statistical indicators with data context
+        return (has_statistical_keyword or has_statistical_phrase or 
+                has_comparison or has_time_aggregation) and has_data_context
+
     def _log_routing_decision(self, query: str, routing_decision: Dict[str, Any], method: str) -> None:
         """
         Log detailed routing decision for debugging and monitoring.
@@ -347,6 +449,66 @@ class QueryRouter:
             }
             self._log_routing_decision(query, routing_decision, "Greeting Filter")
             return routing_decision
+        
+        # PRE-ROUTING FILTER: Handle explicit download/export requests
+        if self._detect_download_request(query):
+            has_database = context.get('has_database', False)
+            if has_database:
+                routing_decision = {
+                    'type': QueryType.DATA_DOWNLOAD,
+                    'classification': 'explicit_download_request',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Explicit download/export keywords detected',
+                        'download_type': 'csv_export',
+                        'keyword_override': True,
+                        'search_type': 'structured'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Download Filter")
+                return routing_decision
+            else:
+                routing_decision = {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': 'download_no_database',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Download request but no database available',
+                        'download_type': 'csv_export'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Download Filter")
+                return routing_decision
+        
+        # PRE-ROUTING FILTER: Handle statistical analysis requests
+        if self._detect_statistical_request(query):
+            has_database = context.get('has_database', False)
+            if has_database:
+                routing_decision = {
+                    'type': QueryType.STATISTICAL_ANALYSIS,
+                    'classification': 'statistical_analysis_request',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Statistical analysis keywords detected',
+                        'analysis_type': 'statistical',
+                        'keyword_override': True,
+                        'search_type': 'statistical'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Statistical Filter")
+                return routing_decision
+            else:
+                routing_decision = {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': 'statistical_no_database',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Statistical request but no database available',
+                        'analysis_type': 'statistical'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Statistical Filter")
+                return routing_decision
         
         # Check for conversation context and follow-up detection
         conversation_context = context.get('conversation_context', '')
@@ -855,17 +1017,16 @@ class QueryRouter:
         
         # Map Sprint 3 categories to route types
         if classification == "data_download_instance" or classification == "data_download_interval":
-            # These are data requests - first show data, then offer download
+            # Treat all data requests as intervals - instance is just a minimal interval
             if has_database:
                 return {
-                    'type': QueryType.DATABASE_SEARCH,  # Changed from DATA_DOWNLOAD to DATABASE_SEARCH
+                    'type': QueryType.DATA_DOWNLOAD,  # Use DATA_DOWNLOAD for all data requests
                     'classification': classification,
                     'confidence': confidence_level,
                     'sprint3_confidence': confidence,
                     'parameters': {
-                        'download_type': 'instance' if classification == "data_download_instance" else 'interval',
-                        'search_type': 'structured',
-                        'show_data_first': True,  # New flag to indicate data preview flow
+                        'download_type': 'interval',  # All data requests are intervals now
+                        'interval_scope': 'instant' if classification == "data_download_instance" else 'period',
                         'sprint3_classified': True
                     }
                 }

@@ -18,6 +18,7 @@ from ..document_processing import DocumentProcessor, DocumentLoader
 from ..vector_database import VectorStoreManager, EmbeddingManager
 from ..query_routing import QueryRouter
 from ..database_search import OceanQuerySystem
+from ..database_search.statistical_analysis_engine import StatisticalAnalysisEngine
 from ..rag_engine import RAGEngine, LLMWrapper
 from ..conversation import ConversationManager
 from ..query_refinement import QueryRefinementManager
@@ -50,6 +51,7 @@ class ONCPipeline:
         self.vector_store_manager = None
         self.query_router = None
         self.ocean_query_system = None
+        self.statistical_analysis_engine = None
         self.llm_wrapper = None
         self.rag_engine = None
         self.conversation_manager = None
@@ -196,6 +198,17 @@ class ONCPipeline:
             self.ocean_query_system = OceanQuerySystem(onc_token=onc_token)
             logger.info("Ocean Query System initialized with standard formatting")
         
+        # Statistical Analysis Engine
+        if self.ocean_query_system:
+            self.statistical_analysis_engine = StatisticalAnalysisEngine(
+                onc_token=onc_token,
+                data_downloader=self.ocean_query_system.data_downloader
+            )
+            logger.info("Statistical Analysis Engine initialized")
+        else:
+            self.statistical_analysis_engine = StatisticalAnalysisEngine(onc_token=onc_token)
+            logger.info("Statistical Analysis Engine initialized without data downloader")
+        
         # Conversation Manager
         conversation_config = self.config_manager.get('conversation', {})
         max_history = conversation_config.get('max_history_length', 10)
@@ -339,6 +352,8 @@ class ONCPipeline:
                 response, initial_results = self._process_database_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
             elif query_type.value == 'data_download':
                 response, initial_results = self._process_data_download_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
+            elif query_type.value == 'statistical_analysis':
+                response, initial_results = self._process_statistical_analysis_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
             elif query_type.value == 'hybrid_search':
                 response, initial_results = self._process_hybrid_query_with_results(question, routing_decision.get('parameters', {}), conversation_context)
             else:  # direct_llm
@@ -581,8 +596,128 @@ class ONCPipeline:
             response = self._process_direct_query(question, conversation_context)
             return response, []
     
+    def _process_statistical_analysis_query_with_results(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> tuple[str, List[Any]]:
+        """Process query for statistical analysis of oceanographic data."""
+        if not self.statistical_analysis_engine:
+            return self._process_direct_query(question, conversation_context), []
+        
+        try:
+            logger.info(f"Processing statistical analysis query: '{question}'")
+            
+            # Use the statistical analysis engine to process the query
+            statistical_result = self.statistical_analysis_engine.process_statistical_query(
+                question, 
+                include_metadata=True
+            )
+            
+            if statistical_result['status'] == 'success':
+                # Format the statistical results into a natural language response
+                formatted_response = self._format_statistical_analysis_response(
+                    statistical_result, conversation_context
+                )
+                
+                # Extract relevant data for result analysis
+                statistical_data = statistical_result.get('statistical_results', {})
+                analysis_data = []
+                
+                # Convert statistical results to a format suitable for result analysis
+                if 'detailed_results' in statistical_data:
+                    detailed_results = statistical_data['detailed_results']
+                    if 'statistics' in detailed_results:
+                        for operation, results in detailed_results['statistics'].items():
+                            if isinstance(results, dict):
+                                for parameter, values in results.items():
+                                    if isinstance(values, dict) and 'value' in values:
+                                        analysis_data.append({
+                                            'operation': operation,
+                                            'parameter': parameter,
+                                            'value': values['value'],
+                                            'unit': values.get('unit', ''),
+                                            'timestamp': values.get('timestamp', '')
+                                        })
+                
+                return formatted_response, analysis_data
+            else:
+                # Handle error cases
+                error_message = statistical_result.get('message', 'Statistical analysis failed')
+                logger.error(f"Statistical analysis failed: {error_message}")
+                return self._process_direct_query(question, conversation_context), []
+                
+        except Exception as e:
+            logger.error(f"Error in statistical analysis query: {e}")
+            return self._process_direct_query(question, conversation_context), []
+    
+    def _format_statistical_analysis_response(self, statistical_result: Dict[str, Any], 
+                                           conversation_context: str = "") -> str:
+        """
+        Format statistical analysis results for user display
+        
+        Args:
+            statistical_result: Results from statistical analysis engine
+            conversation_context: Previous conversation context
+            
+        Returns:
+            Formatted natural language response
+        """
+        try:
+            # Extract the summary from statistical results
+            statistical_data = statistical_result.get('statistical_results', {})
+            summary = statistical_data.get('summary', 'Statistical analysis completed.')
+            
+            # Add metadata information if available
+            metadata = statistical_result.get('metadata', {})
+            processing_time = metadata.get('processing_time', 0)
+            operations = metadata.get('statistical_operations', [])
+            data_quality = metadata.get('data_quality_score', 0)
+            
+            # Build enhanced response
+            response_parts = [f"📊 **Statistical Analysis Results**", ""]
+            
+            # Add the main summary
+            response_parts.append(summary)
+            response_parts.append("")
+            
+            # Add technical details
+            if operations:
+                response_parts.append(f"**Operations performed:** {', '.join(operations)}")
+            
+            if data_quality > 0:
+                response_parts.append(f"**Data quality score:** {data_quality}%")
+            
+            if processing_time > 0:
+                response_parts.append(f"**Processing time:** {processing_time:.2f} seconds")
+            
+            # Add raw data summary
+            raw_data_summary = statistical_result.get('raw_data_summary', {})
+            if raw_data_summary:
+                total_records = raw_data_summary.get('total_records', 0)
+                if total_records > 0:
+                    response_parts.extend(["", f"**Analysis based on:** {total_records:,} data records"])
+            
+            # Add visualization info if available
+            statistical_data = statistical_result.get('statistical_results', {})
+            visualizations = statistical_data.get('visualizations', [])
+            if visualizations:
+                response_parts.extend(["", f"**Visualizations generated:** {len(visualizations)} charts"])
+            
+            # Add helpful context
+            response_parts.extend([
+                "",
+                "💡 **Next steps:**",
+                "  • Ask for specific statistics: 'What was the maximum temperature?'",
+                "  • Request trends: 'Show me temperature trends over time'",
+                "  • Compare data: 'How does this compare to last month?'"
+            ])
+            
+            return "\n".join(response_parts)
+            
+        except Exception as e:
+            logger.error(f"Error formatting statistical analysis response: {e}")
+            # Fallback to basic response
+            return f"Statistical analysis completed. {statistical_result.get('statistical_results', {}).get('summary', '')}"
+    
     def _process_data_download_query_with_results(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> tuple[str, List[Any]]:
-        """Process query for data downloads and CSV exports and return both response and raw results."""
+        """Process query for data downloads and CSV exports with concurrent preview + background download."""
         if not self.ocean_query_system:
             return self._process_direct_query(question, conversation_context), []
         
@@ -591,16 +726,24 @@ class ONCPipeline:
             download_type = parameters.get('download_type', 'instance')
             search_type = parameters.get('search_type', 'structured')
             
-            # Use data download query type
+            # Use data download query type with concurrent processing
             query_type = "data_download"
             
-            # Process the data download query
-            result = self.ocean_query_system.process_query(question, query_type=query_type)
+            # Process with synchronous download (disable concurrent to fix hanging issue)
+            result = self.ocean_query_system.process_query(
+                question, 
+                query_type=query_type,
+                concurrent_mode=False  # Disable concurrent processing to prevent hanging
+            )
             
-            if result["status"] in ["success"]:
+            if result["status"] in ["success", "success_with_download"]:
                 # Format enhanced response for data downloads
                 formatted_response = self._format_data_download_response(result, conversation_context)
                 return formatted_response, result.get("data", [])
+            elif result["status"] == "no_data":
+                # Handle no data case with enhanced formatting
+                formatted_response = self._format_data_download_response(result, conversation_context)
+                return formatted_response, []
             elif result["status"] == "error":
                 # Handle errors gracefully
                 error_message = f"Data download failed: {result.get('message', 'Unknown error')}"
@@ -620,9 +763,12 @@ class ONCPipeline:
             return self._process_direct_query(question, conversation_context), []
     
     def _format_data_download_response(self, result: Dict[str, Any], conversation_context: str = "") -> str:
-        """Format data download response for user display."""
+        """Format data download response for user display with concurrent download support."""
         try:
-            if result["status"] == "success":
+            status = result["status"]
+            
+            if status == "success":
+                # Traditional synchronous download completed
                 download_info = result.get("download_info", {})
                 message = result.get("message", "Data download completed")
                 
@@ -657,14 +803,49 @@ class ONCPipeline:
                 
                 # Use enhanced formatting if available
                 base_response = "\n".join(response_parts)
-                if self.ocean_query_system and self.ocean_query_system.enhanced_formatter:
-                    return self.ocean_query_system.enhanced_formatter.format_download_response(
-                        base_response, result, conversation_context
-                    )
-                else:
-                    return base_response
+                
+            elif status == "success_with_download":
+                # Concurrent download - preview available, download in progress
+                message = result.get("message", "Showing data preview, full download in progress...")
+                download_info = result.get("download_info", {})
+                
+                response_parts = [message]
+                
+                # Add download status information
+                if download_info:
+                    download_id = download_info.get("download_id")
+                    download_status = download_info.get("status", "in_progress")
+                    
+                    response_parts.append(f"\n🔄 **Background Download:**")
+                    response_parts.append(f"• Status: {download_status.replace('_', ' ').title()}")
+                    if download_id:
+                        response_parts.append(f"• Download ID: {download_id}")
+                    
+                    # Add preview information
+                    preview_info = result.get("preview_info", {})
+                    if preview_info:
+                        preview_rows = preview_info.get("preview_rows", 0)
+                        if preview_rows > 0:
+                            response_parts.append(f"• Preview rows shown: {preview_rows}")
+                
+                base_response = "\n".join(response_parts)
+                
+            elif status == "no_data":
+                # No data available
+                message = result.get("message", "No data available for the specified criteria")
+                base_response = f"❌ {message}"
+                
             else:
-                return f"Download failed: {result.get('message', 'Unknown error')}"
+                # Other status
+                base_response = result.get("message", f"Download status: {status}")
+            
+            # Use enhanced formatting if available
+            if self.ocean_query_system and self.ocean_query_system.enhanced_formatter:
+                return self.ocean_query_system.enhanced_formatter.format_download_response(
+                    base_response, result, conversation_context
+                )
+            else:
+                return base_response
                 
         except Exception as e:
             logger.error(f"Error formatting download response: {e}")
