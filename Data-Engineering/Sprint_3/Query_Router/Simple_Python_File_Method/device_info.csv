@@ -1,0 +1,301 @@
+question,label
+"What was the CO2 level at CBYSS on March 5, 2024 at 3pm?",data_download_instance
+What sensors are located at CBYIU?,data_discovery
+What is the depth of deployments at CBYDS?,data_discovery
+"What was the CO2 level at CBYIP on March 5, 2024 at 3pm?",data_download_instance
+"Display the turbidity at CBYSP on April 20, 2023 at 7am.",data_download_instance
+What type of devices are deployed at CBYSS?,data_discovery
+What is the purpose of a WET Labs ECO-PARS (S/N 440) in marine research?,general_knowledge
+Does CBY have active devices?,data_discovery
+What type of devices are deployed at CBYIU.AC2?,data_discovery
+Explain the function of a WET Labs ECO-NTUS 319.,general_knowledge
+How does a Sea-Bird SeaCAT SBE19plus V2 7769 operate?,general_knowledge
+"Show me the pressure values at CBYIP.D3 on February 14, 2024 at 11am.",data_download_instance
+"Display the turbidity at CBYSP on April 20, 2023 at 7am.",data_download_instance
+What type of devices are deployed at CBYIJ.J1?,data_discovery
+What categories of instruments are deployed at CBYIP.D1?,data_discovery
+"Give conductivity data from CBYIP.D2 on October 10, 2022 at 2pm.",data_download_instance
+How does a WET Labs Water Quality Monitor 196 operate?,general_knowledge
+What type of devices are deployed at CBYIP.K3?,data_discovery
+"Give me the salinity readings at CBYIU.AC1 on January 1, 2022 at 8am.",data_download_instance
+How does a Vaisala PTB210 Barometer J3120006 operate?,general_knowledge
+What devices were deployed at CBYIP in 2023?,data_discovery
+Are there any video cameras at CBYSS.M1?,data_discovery
+What is the purpose of a ROS Lights (SN 21251 21267) in marine research?,general_knowledge
+"Retrieve light intensity at CBYIU.AC3 on December 25, 2023 at 9am.",data_download_instance
+Give a list of deployments at CBYSU.,data_discovery
+What is a Sea-Bird SBE 63 Dissolved Oxygen Sensor 630225?,general_knowledge
+Give an overview of MOXA ioLogik E1242 TADFC1007805.,general_knowledge
+Explain the function of a ONC Mini Junction Box 009.,general_knowledge
+"Provide water level data from CBYIU.AC1 on May 18, 2023 at 6pm.",data_download_instance
+Explain the function of a WET Labs Water Quality Monitor 233.,general_knowledge
+"Give me the salinity readings at CBYSS on January 1, 2022 at 8am.",data_download_instance
+How many deployments are at CBYSP?,data_discovery
+Are there any video cameras at CBYIP.K1?,data_discovery
+"Show me the pressure values at CBYSP on February 14, 2024 at 11am.",data_download_instance
+"What was the temperature at CBYIU on August 10, 2024 at 5pm?",data_download_instance
+Does CBYIP.D1 have active devices?,data_discovery
+Explain the function of a Honeywell HMR3300 Orientation (SN 31963).,general_knowledge
+"Display the turbidity at CBYSU on April 20, 2023 at 7am.",data_download_instance
+"Display the turbidity at CBYIU.AC5 on April 20, 2023 at 7am.",data_download_instance
+"What was the CO2 level at CBYIP.D2 on March 5, 2024 at 3pm?",data_download_instance
+What is the purpose of a Garmin GPSMAP 62st (S/N 211006242) in marine research?,general_knowledge
+What categories of instruments are deployed at CBYIP.K3?,data_discovery
+What categories of instruments are deployed at CBYSP?,data_discovery
+What is the purpose of a Vemco VR2C-69kHz Single-Channel Acoustic Receiver 450150 in marine research?,general_knowledge
+Give a list of deployments at CBY.,data_discovery
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+"Give conductivity data from CBYIP.D4 on October 10, 2022 at 2pm.",data_download_instance
+"What was the temperature at CBYSU on August 10, 2024 at 5pm?",data_download_instance
+Why is a Omega Environment iBTHX-D Monitor (SN 15120257) important in oceanography?,general_knowledge
+What devices were deployed at CBYIU.AC2 in 2023?,data_discovery
+What sensors are located at CBYIU.AC1?,data_discovery
+What sensors are located at CBYSU.AC1?,data_discovery
+"What was the recorded radiometer reading at CBYDS on July 4, 2022 at 10am?",data_download_instance
+Give an overview of Aanderaa Optode 4531A (S/N 171).,general_knowledge
+"Provide water level data from CBYIU.AC1 on May 18, 2023 at 6pm.",data_download_instance
+"Give conductivity data from CBYIU.AC2 on October 10, 2022 at 2pm.",data_download_instance
+"Display the turbidity at CBYSS.M1 on April 20, 2023 at 7am.",data_download_instance
+How many deployments are at CBYIU?,data_discovery
+"Retrieve light intensity at CBYIJ.J1 on December 25, 2023 at 9am.",data_download_instance
+What is the depth of deployments at CBYIP.K2?,data_discovery
+Can you describe what a Turner Cyclops-7F Fluorometer (S/N 900473) is used for?,general_knowledge
+What sensors are located at CF240?,data_discovery
+"What was the recorded radiometer reading at CF240 on July 4, 2022 at 10am?",data_download_instance
+Does CBYIP.D2 have active devices?,data_discovery
+"Retrieve light intensity at CBYIJ.J2 on December 25, 2023 at 9am.",data_download_instance
+"Provide water level data from CBYIP.K3 on May 18, 2023 at 6pm.",data_download_instance
+"What was the temperature at CBYIJ.J1 on August 10, 2024 at 5pm?",data_download_instance
+Describe the deployment setup at CBYSS.M2.,data_discovery
+"What was the temperature at CF240 on August 10, 2024 at 5pm?",data_download_instance
+Are there any video cameras at CBYSU.AC1?,data_discovery
+Describe the deployment setup at CBYIP.D4.,data_discovery
+"What was the recorded radiometer reading at CBYSS.M2 on July 4, 2022 at 10am?",data_download_instance
+"What was the recorded radiometer reading at CBYIU.AC3 on July 4, 2022 at 10am?",data_download_instance
+Does CBYIP.K1 have active devices?,data_discovery
+"What was the CO2 level at CBYSP on March 5, 2024 at 3pm?",data_download_instance
+What devices were deployed at CBYSS.M1 in 2023?,data_discovery
+"Retrieve light intensity at CBYIP.D4 on December 25, 2023 at 9am.",data_download_instance
+"Show oxygen level data from CBYIU.AC2 on June 15, 2023 at noon.",data_download_instance
+What type of devices are deployed at CBYIU.AC4?,data_discovery
+"Retrieve light intensity at CBYIU.AC2 on December 25, 2023 at 9am.",data_download_instance
+Does CBYIP.D1 have active devices?,data_discovery
+How does a Canon PowerShot G16 Digital Camera 8406B001AA operate?,general_knowledge
+"Display the turbidity at CBYSS on April 20, 2023 at 7am.",data_download_instance
+What devices were deployed at CBYIJ.J1 in 2023?,data_discovery
+How is Axis Q6035 HD Webcam 1089 used in the field?,general_knowledge
+Are there any video cameras at CBYIU.AC2?,data_discovery
+"Show oxygen level data from CBYIP on June 15, 2023 at noon.",data_download_instance
+Are there any video cameras at CBYSS.M2?,data_discovery
+"Retrieve light intensity at CBYIP.D1 on December 25, 2023 at 9am.",data_download_instance
+What role does a Satlantic SeaFET Ocean pH Sensor (SN 452) play in underwater observation?,general_knowledge
+"Give conductivity data from CBYIP.K3 on October 10, 2022 at 2pm.",data_download_instance
+Why is a Sea-Bird SeaCAT SBE19plus V2 7589 important in oceanography?,general_knowledge
+"Give me the salinity readings at CBYIP on January 1, 2022 at 8am.",data_download_instance
+"What was the temperature at CBYIU.AC2 on August 10, 2024 at 5pm?",data_download_instance
+Explain the function of a Satlantic Nitrate Sensor ISUS-X V2 (SN 0116).,general_knowledge
+Explain the function of a Axis P1375 Camera SN ACCC8ED935D1.,general_knowledge
+What type of devices are deployed at CBYIU?,data_discovery
+"Give me the salinity readings at CBYIJ.J1 on January 1, 2022 at 8am.",data_download_instance
+How many deployments are at CBYIU.AC3?,data_discovery
+Give an overview of Digital Yacht AISnet Receiver 1315-0006-01.,general_knowledge
+How many deployments are at CBY?,data_discovery
+What devices were deployed at CBYIU.AC4 in 2023?,data_discovery
+What is the purpose of a Samsung Galaxy Tab Active3 (SN R52TA09CYBL) in marine research?,general_knowledge
+"What was the temperature at CBYIP.K1 on August 10, 2024 at 5pm?",data_download_instance
+What is a MOXA ioLogik E1214 TABHC1037724?,general_knowledge
+Explain the function of a Ocean Sonics icListen HF Hydrophone 1561.,general_knowledge
+Why is a Sea-Bird SBE 63 Dissolved Oxygen Sensor 631008 important in oceanography?,general_knowledge
+What devices were deployed at CBYSU.AC2 in 2023?,data_discovery
+What is a Sea-Bird SBE 63 Dissolved Oxygen Sensor 631008?,general_knowledge
+How many deployments are at CBYSU?,data_discovery
+How does a Ocean Sonics icListen HF Hydrophone 1951 operate?,general_knowledge
+"What was the temperature at CBYIJ.J1 on August 10, 2024 at 5pm?",data_download_instance
+"Display the turbidity at CBYIU.AC3 on April 20, 2023 at 7am.",data_download_instance
+"What was the recorded radiometer reading at CBYSU.AC1 on July 4, 2022 at 10am?",data_download_instance
+"Give me the salinity readings at CBYSU.AC1 on January 1, 2022 at 8am.",data_download_instance
+"Retrieve light intensity at CBYSU.AC2 on December 25, 2023 at 9am.",data_download_instance
+Give a list of deployments at CBYIU.AC2.,data_discovery
+How many deployments are at CBYIJ.J2?,data_discovery
+Give an overview of Turner Cyclops-7F Fluorometer (S/N 900436).,general_knowledge
+How does a MOXA ioLogik E1214 TABHC1037724 operate?,general_knowledge
+"Show me the pressure values at CBYIU.AC2 on February 14, 2024 at 11am.",data_download_instance
+Describe the deployment setup at CBYSS.,data_discovery
+"What was the temperature at CBYSU on August 10, 2024 at 5pm?",data_download_instance
+"Show me the pressure values at CBYIU.AC2 on February 14, 2024 at 11am.",data_download_instance
+Why is a WET Labs ECO FLRT 6106 important in oceanography?,general_knowledge
+What is a Sea-Bird SeaCAT SBE19plus V2 7036?,general_knowledge
+Give a list of deployments at CBYIP.K1.,data_discovery
+What role does a AML CTD Plus X 50334 play in underwater observation?,general_knowledge
+What role does a Axis P1346 Camera SN 00408CC1C89C play in underwater observation?,general_knowledge
+Tell me more about Sea-Bird SeaCAT SBE19plus V2 7518.,general_knowledge
+"Display the turbidity at CBYSU on April 20, 2023 at 7am.",data_download_instance
+"Give conductivity data from CBYSS.M2 on October 10, 2022 at 2pm.",data_download_instance
+Describe the deployment setup at CBYIP.D4.,data_discovery
+"What was the recorded radiometer reading at CBYSS on July 4, 2022 at 10am?",data_download_instance
+What is the depth of deployments at CBY?,data_discovery
+Give a list of deployments at CBYIU.AC5.,data_discovery
+"Give me the salinity readings at CBYIU.AC4 on January 1, 2022 at 8am.",data_download_instance
+How many deployments are at CBYIU.AC1?,data_discovery
+"Show oxygen level data from CBYIU on June 15, 2023 at noon.",data_download_instance
+Tell me more about WET Labs ECO-PARS (S/N 459).,general_knowledge
+Are there any video cameras at CBYIU.AC4?,data_discovery
+"Show me the pressure values at CBYSS.M2 on February 14, 2024 at 11am.",data_download_instance
+"What was the temperature at CBYIP.D4 on August 10, 2024 at 5pm?",data_download_instance
+Give an overview of WET Labs ECO-NTUS 319.,general_knowledge
+Does CBYIP.K1 have active devices?,data_discovery
+"Provide water level data from CBYIU.AC3 on May 18, 2023 at 6pm.",data_download_instance
+What role does a Sea-Bird SBE 63 Dissolved Oxygen Sensor 630108 play in underwater observation?,general_knowledge
+How many deployments are at CBYIP.D2?,data_discovery
+How does a Vemco VR2C-69kHz Single-Channel Acoustic Receiver 450094 operate?,general_knowledge
+Are there any video cameras at CBYDS?,data_discovery
+Can you describe what a Vemco VR2W Single-Channel Acoustic Receiver 112529 is used for?,general_knowledge
+"Show oxygen level data from CBYIU.AC5 on June 15, 2023 at noon.",data_download_instance
+"What was the recorded radiometer reading at CBYSU.AC1 on July 4, 2022 at 10am?",data_download_instance
+What role does a Satlantic Nitrate Sensor ISUS-X V2 (SN 0116) play in underwater observation?,general_knowledge
+Give an overview of Turner Cyclops-7F Fluorometer (S/N 900436).,general_knowledge
+"Give me the salinity readings at CBYIP on January 1, 2022 at 8am.",data_download_instance
+Give a list of deployments at CBYIU.AC5.,data_discovery
+"What was the CO2 level at CBYIP.D4 on March 5, 2024 at 3pm?",data_download_instance
+What is a Ocean Networks Canada Lights (SN05 SN06)?,general_knowledge
+What sensors are located at CBYIU.AC5?,data_discovery
+Why is a Satlantic SeaFET Ocean pH Sensor (SN 246) important in oceanography?,general_knowledge
+Give a list of deployments at CBYSU.AC1.,data_discovery
+What type of devices are deployed at CBYIP.D4?,data_discovery
+What is a ONC Mini Junction Box 033?,general_knowledge
+What is the depth of deployments at CBYIU.AC5?,data_discovery
+Why is a Sea-Bird SeaCAT SBE19plus V2 7036 important in oceanography?,general_knowledge
+Tell me more about Sunburst SAMI pH P0073.,general_knowledge
+Give an overview of Sea-Bird SBE 63 Dissolved Oxygen Sensor 631500.,general_knowledge
+Why is a Axis P1375 Camera SN ACCC8ED935D1 important in oceanography?,general_knowledge
+"Show me the pressure values at CBYIJ.J2 on February 14, 2024 at 11am.",data_download_instance
+Give a list of deployments at CBYIU.AC5.,data_discovery
+Give a list of deployments at CF240.,data_discovery
+Why is a AML CTD Plus X 50334 important in oceanography?,general_knowledge
+How many deployments are at CBYSS.M2?,data_discovery
+"Give conductivity data from CBYIJ.J1 on October 10, 2022 at 2pm.",data_download_instance
+What is the purpose of a Ocean Sonics icListen HF Hydrophone 1252 in marine research?,general_knowledge
+"What was the CO2 level at CBYSU on March 5, 2024 at 3pm?",data_download_instance
+What role does a Axis P1346 Camera SN 00408CC1C89C play in underwater observation?,general_knowledge
+What type of devices are deployed at CBYSP?,data_discovery
+What is a MOXA ioLogik E1242 TADFC1007805?,general_knowledge
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+What is a Ocean Sonics icListen HF Hydrophone 1251?,general_knowledge
+"What was the recorded radiometer reading at CF240 on July 4, 2022 at 10am?",data_download_instance
+Give an overview of Ocean Sonics icListen HF Hydrophone 1561.,general_knowledge
+Give a list of deployments at CBYIP.K1.,data_discovery
+"Retrieve light intensity at CBYIJ.J1 on December 25, 2023 at 9am.",data_download_instance
+Explain the function of a Vaisala PTB210 Barometer J3120006.,general_knowledge
+Are there any video cameras at CBYIP.D1?,data_discovery
+"What was the CO2 level at CBYIJ.J1 on March 5, 2024 at 3pm?",data_download_instance
+What is the depth of deployments at CBYIU.AC3?,data_discovery
+"Show me the pressure values at CBYIU.AC4 on February 14, 2024 at 11am.",data_download_instance
+Explain the function of a WET Labs ECO-PARS (S/N 459).,general_knowledge
+What is the depth of deployments at CBYIP.D2?,data_discovery
+What devices were deployed at CBYSS.M1 in 2023?,data_discovery
+Does CBYIU.AC3 have active devices?,data_discovery
+Does CBY have active devices?,data_discovery
+"What was the temperature at CBYIP.D1 on August 10, 2024 at 5pm?",data_download_instance
+What devices were deployed at CBYIP.K2 in 2023?,data_discovery
+How is WET Labs Water Quality Monitor 233 used in the field?,general_knowledge
+What sensors are located at CBYSU?,data_discovery
+Give an overview of Ocean Sonics icListen HF Hydrophone 1266.,general_knowledge
+"Show oxygen level data from CBYIJ.J2 on June 15, 2023 at noon.",data_download_instance
+Explain the function of a Sea-Bird SBE 63 Dissolved Oxygen Sensor 630108.,general_knowledge
+What type of devices are deployed at CBYIP.K3?,data_discovery
+"What was the temperature at CBYIU.AC1 on August 10, 2024 at 5pm?",data_download_instance
+What categories of instruments are deployed at CBYIP.D2?,data_discovery
+How many deployments are at CBYSS?,data_discovery
+What is the purpose of a MOXA ioLogik E1242 TADFC1007695 in marine research?,general_knowledge
+"What was the CO2 level at CBYSP on March 5, 2024 at 3pm?",data_download_instance
+"What was the recorded radiometer reading at CBYIJ.J2 on July 4, 2022 at 10am?",data_download_instance
+What role does a Ocean Networks Canada Lights (SN05 SN06) play in underwater observation?,general_knowledge
+How many deployments are at CBYIP.D3?,data_discovery
+What type of devices are deployed at CBYDS?,data_discovery
+What role does a ONC Mini Junction Box 033 play in underwater observation?,general_knowledge
+What categories of instruments are deployed at CBYIU.AC5?,data_discovery
+What role does a Ocean Networks Canada Lights (SN05 SN06) play in underwater observation?,general_knowledge
+What type of devices are deployed at CBYIJ.J2?,data_discovery
+Are there any video cameras at CF240?,data_discovery
+Does CBYSS have active devices?,data_discovery
+"Show oxygen level data from CBYIP.D4 on June 15, 2023 at noon.",data_download_instance
+Describe the deployment setup at CBYIU.AC2.,data_discovery
+"What was the CO2 level at CBYIU.AC5 on March 5, 2024 at 3pm?",data_download_instance
+What categories of instruments are deployed at CBYIU.AC4?,data_discovery
+"Give me the salinity readings at CBYIU.AC4 on January 1, 2022 at 8am.",data_download_instance
+What is the purpose of a WET Labs ECO FLRT 6106 in marine research?,general_knowledge
+Give an overview of Turner Cyclops-7 Fluorometer (S/N 900184).,general_knowledge
+What is a Ocean Sonics icListen HF Hydrophone 1251?,general_knowledge
+"Retrieve light intensity at CBYIU on December 25, 2023 at 9am.",data_download_instance
+What is the depth of deployments at CBYIP.D3?,data_discovery
+Why is a AML CTD Plus X 50334 important in oceanography?,general_knowledge
+"Display the turbidity at CBYSU on April 20, 2023 at 7am.",data_download_instance
+Give an overview of Suunto Zoop Dive Computer (S/N 32800551).,general_knowledge
+"Give me the salinity readings at CBYSP on January 1, 2022 at 8am.",data_download_instance
+Are there any video cameras at CBYIJ.J2?,data_discovery
+How does a Turner Cyclops-7F Fluorometer (S/N 900473) operate?,general_knowledge
+What role does a Sea-Bird SeaCAT SBE19plus V2 7036 play in underwater observation?,general_knowledge
+What is a Sea-Bird SBE 63 Dissolved Oxygen Sensor 630108?,general_knowledge
+"What was the temperature at CBYSU.AC1 on August 10, 2024 at 5pm?",data_download_instance
+How does a McLane Phytoplankton Sampler (SN 12935-01) operate?,general_knowledge
+"What was the temperature at CBYIP.D1 on August 10, 2024 at 5pm?",data_download_instance
+Why is a Lufft WS501 (S/N 072.0912.1009.031) Weather Station important in oceanography?,general_knowledge
+What is the purpose of a ONC Mini Junction Box 033 in marine research?,general_knowledge
+Are there any video cameras at CBYSU.AC1?,data_discovery
+What is the purpose of a Turner Cyclops-7F Fluorometer (S/N 900362) in marine research?,general_knowledge
+"Provide water level data from CBYIP.K3 on May 18, 2023 at 6pm.",data_download_instance
+What sensors are located at CBYSS.M2?,data_discovery
+"Give me the salinity readings at CBYIU on January 1, 2022 at 8am.",data_download_instance
+What role does a Ocean Sonics icListen HF Hydrophone 1951 play in underwater observation?,general_knowledge
+Can you describe what a Suunto Zoop Dive Computer (S/N 32800551) is used for?,general_knowledge
+Does CBYIP.K1 have active devices?,data_discovery
+What categories of instruments are deployed at CBYSS.M2?,data_discovery
+Explain the function of a Sea-Bird SBE 63 Dissolved Oxygen Sensor 630108.,general_knowledge
+"Retrieve light intensity at CBYDS on December 25, 2023 at 9am.",data_download_instance
+Explain the function of a Sea-Bird SeaCAT SBE19plus V2 7128.,general_knowledge
+Why is a Lufft WS501 (S/N 072.0912.1009.031) Weather Station important in oceanography?,general_knowledge
+What role does a MOXA ioLogik E1242 TADFC1007725 play in underwater observation?,general_knowledge
+What role does a Ocean Sonics icListen HF Hydrophone 1266 play in underwater observation?,general_knowledge
+"Show oxygen level data from CBYSS on June 15, 2023 at noon.",data_download_instance
+What role does a Biospherical PAR Irradiance QSP-2350L 70434 play in underwater observation?,general_knowledge
+Give an overview of SRSL Ice Mass Balance Buoy 1516027.,general_knowledge
+What is the purpose of a MOXA ioLogik E1214 TABLC1067517 in marine research?,general_knowledge
+What is the purpose of a MOXA ioLogik E1242 TADFC1007805 in marine research?,general_knowledge
+What devices were deployed at CBYSU.AC1 in 2023?,data_discovery
+"Display the turbidity at CBYIP.K1 on April 20, 2023 at 7am.",data_download_instance
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+"What was the temperature at CBYIP.D3 on August 10, 2024 at 5pm?",data_download_instance
+"Give conductivity data from CBYDS on October 10, 2022 at 2pm.",data_download_instance
+What categories of instruments are deployed at CBYIP.D4?,data_discovery
+How does a MOXA ioLogik E1242 TADFC1007805 operate?,general_knowledge
+What categories of instruments are deployed at CBYIP.D2?,data_discovery
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+"Retrieve light intensity at CBYSP on December 25, 2023 at 9am.",data_download_instance
+What type of devices are deployed at CBYIU.AC5?,data_discovery
+What sensors are located at CBYIP.D3?,data_discovery
+What is a Ocean Sonics icListen HF Hydrophone 1951?,general_knowledge
+"Give conductivity data from CBYIJ.J2 on October 10, 2022 at 2pm.",data_download_instance
+Describe the deployment setup at CBYIP.D2.,data_discovery
+How does a SRSL Ice Mass Balance Buoy CAN 02 01 operate?,general_knowledge
+What is a Aanderaa Optode 4797 pCO2 (S/N 33)?,general_knowledge
+What devices were deployed at CBYIJ.J2 in 2023?,data_discovery
+Tell me more about Lufft WS501 (S/N 072.0912.1009.031) Weather Station.,general_knowledge
+How does a RDI Workhorse Monitor ADCP 1200 kHz (9111) operate?,general_knowledge
+How does a WET Labs Water Quality Monitor 233 operate?,general_knowledge
+How is MOXA ioLogik E1242 TADFC1007805 used in the field?,general_knowledge
+How many deployments are at CBY?,data_discovery
+What role does a Aanderaa Optode 4797 pCO2 (S/N 33) play in underwater observation?,general_knowledge
+What is the depth of deployments at CBYIP.D2?,data_discovery
+Tell me more about MOXA ioLogik E1214 TABLC1067345.,general_knowledge
+Does CBYIP have active devices?,data_discovery
+"Give conductivity data from CBYSU on October 10, 2022 at 2pm.",data_download_instance
+Are there any video cameras at CBYSP?,data_discovery
+How is RDI Workhorse Monitor ADCP 1200 kHz (9111) used in the field?,general_knowledge
+"Show me the pressure values at CBYSU on February 14, 2024 at 11am.",data_download_instance
+What role does a Aanderaa Optode 4531A (S/N 171) play in underwater observation?,general_knowledge
+Does CBYSU have active devices?,data_discovery
+"Provide water level data from CBYIU.AC4 on May 18, 2023 at 6pm.",data_download_instance
+What type of devices are deployed at CBYIP.K2?,data_discovery
+"Show me the pressure values at CBYIP.K1 on February 14, 2024 at 11am.",data_download_instance
+"Show oxygen level data from CBYSU.AC2 on June 15, 2023 at noon.",data_download_instance
+"What was the CO2 level at CBYIU.AC2 on March 5, 2024 at 3pm?",data_download_instance

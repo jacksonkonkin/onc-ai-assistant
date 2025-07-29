@@ -1,9 +1,38 @@
 'use client';
 
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import './adminPanel.css';
 import DocUpload from './docUpload';
+import ReviewQueries from './reviewQueries';
 
 export default function AdminPage() {
+  const { isLoggedIn, user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is logged in and has admin role
+    if (!isLoggedIn) {
+      router.push('/authentication');
+      return;
+    }
+    
+    if (!user || user.role !== 'admin') {
+      // Redirect non-admin users to chat page
+      router.push('/chatPage');
+      return;
+    }
+  }, [isLoggedIn, user, router]);
+
+  // Show loading or redirect while checking permissions
+  if (!isLoggedIn || !user || user.role !== 'admin') {
+    return (
+      <div className="admin-container">
+        <h1>Checking permissions...</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">
@@ -22,19 +51,7 @@ export default function AdminPage() {
         </div>
 
         <div className="dash-column">
-          {/* User feedback module: will need to list common user queries/feedback */}
-          <div className="module">
-            <h2>Review User Feedback & Frequent Queries</h2>
-            <div className="frequent-queries">
-              {/* Will eventually be populated with backend data with a show more if overflowing. 
-              List items will be buttoms to show review functionality */}
-              <ul>
-                <li>What is the average temperature in Cambridge Bay in July?</li>
-                <li>What is the current temperature in Cambridge Bay?</li>
-                <li>Is there a turbidity sensor in Cambridge Bay??</li>
-              </ul>
-            </div>
-          </div>
+          <ReviewQueries />
 
           <DocUpload />
         </div>

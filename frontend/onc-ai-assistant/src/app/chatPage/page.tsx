@@ -2,8 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import "./ChatPage.css";
 import { FiSend } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
+import ChatHistorySidebar from "./ChatHistorySidebar";
+import ChatHistoryManager from "./ChatHistoryManager";
+import "./chatPage.css";
 
 type Message = {
   sender: "user" | "ai";
@@ -12,8 +15,8 @@ type Message = {
 };
 
 export default function ChatPage() {
+  const { isLoggedIn } = useAuth();
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [pageLoaded, setPageLoaded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -47,48 +50,38 @@ export default function ChatPage() {
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const createHandleSend = (addMessageToChat: (message: Message) => void, updateLastMessage: (updates: Partial<Message>) => void, selectedChat: any) => async () => {
+    if (!input.trim() || !selectedChat) return;
 
     const userMessage: Message = { sender: "user", text: input };
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-      { sender: "ai", text: "", isThinking: true },
-    ]);
+    addMessageToChat(userMessage);
+    addMessageToChat({ sender: "ai", text: "", isThinking: true });
+    // add post request to store AI response in the chat history (POST) /api/messages
+    // in the post request, if the chat is from the ai, set userid to -1 or null
+    // for reading chats, if the userid exists within the message set sender to user, else set sender to ai
     setInput("");
 
     const aiText = await fetchAIResponse(input);
 
-    // Stop thinking
-    setMessages((prev) => {
-      const updated = [...prev];
-      updated[updated.length - 1] = {
-        ...updated[updated.length - 1],
-        isThinking: false,
-      };
-      return updated;
-    });
-
-    // Typewriter effect
     let index = 0;
     const typeInterval = setInterval(() => {
-      setMessages((prev) => {
-        const updated = [...prev];
-        const currentAiMsg = updated[updated.length - 1];
-        updated[updated.length - 1] = {
-          ...currentAiMsg,
-          text: aiText.slice(0, index + 1),
-        };
-        return updated;
+      updateLastMessage({
+        isThinking: false,
+        text: aiText.slice(0, index + 1),
       });
 
       index++;
-
       if (index >= aiText.length) {
         clearInterval(typeInterval);
       }
-    }, 30);
+    }, 10);
+  };
+
+  const handleKeyPress = (handleSend: () => void) => (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
+      handleSend();
+    }
   };
 
   useEffect(() => {
@@ -120,46 +113,85 @@ export default function ChatPage() {
   };
 
   return (
-    <div className={`chat-container ${pageLoaded ? "fade-in" : ""}`}>
-      <div className="chat-header">
-        <Image
-          src="/FishLogo.png"
-          alt="Fish Logo"
-          width={100}
-          height={100}
-          quality={100}
-          className="fish-logo floating"
-        />
-        <h2>Hello! How can I assist you today?</h2>
-      </div>
+    <ChatHistoryManager>
+      {({
+        chatHistories,
+        selectedChatId,
+        selectedChat,
+        messages,
+        handleNewChat,
+        handleDeleteChat,
+        handleSelectChat,
+        addMessageToChat,
+        updateLastMessage,
+        isLoading,
+      }) => {
+        const handleSend = createHandleSend(addMessageToChat, updateLastMessage, selectedChat);
+        
+        return (
+          <div className="chat-page-wrapper">
+            <ChatHistorySidebar
+              histories={chatHistories}
+              selectedChatId={selectedChatId}
+              onSelectChat={handleSelectChat}
+              onNewChat={handleNewChat}
+              onDeleteChat={handleDeleteChat}
+              isLoggedIn={isLoggedIn}
+            />
+            <div className={`chat-container ${pageLoaded ? "fade-in" : ""}`}>
+              <div className="chat-header">
+                <Image
+                  src="/FishLogo.png"
+                  alt="Fish Logo"
+                  width={100}
+                  height={100}
+                  quality={100}
+                  className="fish-logo floating"
+                />
+                <h2>Hello! How can I assist you today?</h2>
+              </div>
 
-      <div className="chat-body">
-        <div className="messages">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`message ${
-                msg.sender === "user" ? "user-msg" : "ai-msg"
-              }`}
-            >
-              {renderMessageText(msg)}
+              <div className="chat-body">
+                <div className="messages">
+                  {isLoading ? (
+                    <div className="loading-message">Loading chat history...</div>
+                  ) : (
+                    messages.map((msg: Message, i: number) => (
+                      <div
+                        key={i}
+                        className={`message ${
+                          msg.sender === "user" ? "user-msg" : "ai-msg"
+                        }`}
+                      >
+                        {renderMessageText(msg)}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="chat-input-wrapper">
+                  <textarea
+                    ref={textareaRef}
+                    placeholder="Type a message..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress(handleSend)}
+                    className="chat-input"
+                    rows={1}
+                    disabled={isLoading}
+                  />
+                  <button 
+                    onClick={handleSend} 
+                    className="send-button"
+                    disabled={isLoading || !input.trim()}
+                  >
+                    <FiSend size={20} color="#007acc" className="send-icon" />
+                  </button>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="chat-input-wrapper">
-          <textarea
-            ref={textareaRef}
-            placeholder="Type a message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="chat-input"
-            rows={1}
-          />
-          <button onClick={handleSend} className="send-button">
-            <FiSend size={20} color="#007acc" className="send-icon" />
-          </button>
-        </div>
-      </div>
-    </div>
+          </div>
+        );
+      }}
+    </ChatHistoryManager>
   );
 }
