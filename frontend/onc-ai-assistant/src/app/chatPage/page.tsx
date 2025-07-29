@@ -2,9 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import "./ChatPage.css";
 import { FiSend, FiThumbsUp, FiThumbsDown, FiDownload } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
+import { useAuth } from "../context/AuthContext";
+import ChatHistorySidebar from "./ChatHistorySidebar";
+import ChatHistoryManager from "./ChatHistoryManager";
+import "./chatPage.css";
 
 type DownloadFile = {
   filename: string;
@@ -13,18 +16,22 @@ type DownloadFile = {
 };
 
 type Message = {
-  id: string;
+  id?: string;
   sender: "user" | "ai";
   text: string;
   isThinking?: boolean;
   userQuery?: string; // Store the original user query for feedback
   feedback?: "thumbs_up" | "thumbs_down" | null;
   downloads?: DownloadFile[];
+  chat_id?: string;
+  user_id?: string;
+  timestamp?: string;
+  rating?: number;
 };
 
 export default function ChatPage() {
+  const { isLoggedIn } = useAuth();
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [pageLoaded, setPageLoaded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -61,7 +68,7 @@ export default function ChatPage() {
     }
   };
 
-  const handleSend = async () => {
+  const createHandleSend = (addMessageToChat: (message: Message) => void, updateLastMessage: (updates: Partial<Message>) => void) => async () => {
     if (!input.trim()) return;
 
     const userQuery = input;
@@ -79,44 +86,39 @@ export default function ChatPage() {
       feedback: null
     };
     
-    setMessages((prev) => [...prev, userMessage, aiMessage]);
+    addMessageToChat(userMessage);
+    addMessageToChat(aiMessage);
     setInput("");
 
     const aiResponse = await fetchAIResponse(userQuery);
 
-    // Stop thinking and add downloads if any
-    setMessages((prev) => {
-      const updated = [...prev];
-      updated[updated.length - 1] = {
-        ...updated[updated.length - 1],
-        isThinking: false,
-        downloads: aiResponse.downloads
-      };
-      return updated;
+    // Update last message to show downloads
+    updateLastMessage({
+      isThinking: false,
+      downloads: aiResponse.downloads
     });
 
     // Typewriter effect
     let index = 0;
     const typeInterval = setInterval(() => {
-      setMessages((prev) => {
-        const updated = [...prev];
-        const currentAiMsg = updated[updated.length - 1];
-        updated[updated.length - 1] = {
-          ...currentAiMsg,
-          text: aiResponse.text.slice(0, index + 1),
-        };
-        return updated;
+      updateLastMessage({
+        isThinking: false,
+        text: aiResponse.text.slice(0, index + 1),
+        downloads: aiResponse.downloads
       });
 
       index++;
-
       if (index >= aiResponse.text.length) {
         clearInterval(typeInterval);
       }
     }, 10);
   };
 
-  const submitFeedback = async (messageId: string, rating: "thumbs_up" | "thumbs_down") => {
+  const [messageFeedback, setMessageFeedback] = useState<Record<string, "thumbs_up" | "thumbs_down">>({});
+
+  const submitFeedback = async (messageId: string | undefined, rating: "thumbs_up" | "thumbs_down", messages: Message[]) => {
+    if (!messageId) return;
+    
     const message = messages.find(msg => msg.id === messageId);
     if (!message || message.sender !== "ai") return;
 
@@ -138,17 +140,23 @@ export default function ChatPage() {
       });
 
       if (response.ok) {
-        // Update the message to show feedback was submitted
-        setMessages(prev => prev.map(msg => 
-          msg.id === messageId 
-            ? { ...msg, feedback: rating }
-            : msg
-        ));
+        // Update the local feedback state
+        setMessageFeedback(prev => ({
+          ...prev,
+          [messageId]: rating
+        }));
       } else {
         console.error("Failed to submit feedback");
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
+    }
+  };
+
+  const handleKeyDown = (handleSend: () => void) => (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
+      handleSend();
     }
   };
 
@@ -208,97 +216,136 @@ export default function ChatPage() {
   };
 
   return (
-    <div className={`chat-container ${pageLoaded ? "fade-in" : ""}`}>
-      <div className="chat-header">
-        <Image
-          src="/FishLogo.png"
-          alt="Fish Logo"
-          width={100}
-          height={100}
-          quality={100}
-          className="fish-logo floating"
-        />
-        <h2>Hello! How can I assist you today?</h2>
-      </div>
-
-      <div className="chat-body">
-        <div className="messages">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`message ${
-                msg.sender === "user" ? "user-msg" : "ai-msg"
-              }`}
-            >
-              <div className="message-content">
-                {renderMessageText(msg)}
+    <ChatHistoryManager>
+      {({
+        chatHistories,
+        selectedChatId,
+        selectedChat,
+        messages,
+        handleNewChat,
+        handleDeleteChat,
+        handleSelectChat,
+        addMessageToChat,
+        updateLastMessage,
+        isLoading,
+      }) => {
+        const handleSend = createHandleSend(addMessageToChat, updateLastMessage);
+        
+        return (
+          <div className="chat-page-wrapper">
+            <ChatHistorySidebar
+              histories={chatHistories}
+              selectedChatId={selectedChatId}
+              onSelectChat={handleSelectChat}
+              onNewChat={handleNewChat}
+              onDeleteChat={handleDeleteChat}
+              isLoggedIn={isLoggedIn}
+            />
+            <div className={`chat-container ${pageLoaded ? "fade-in" : ""}`}>
+              <div className="chat-header">
+                <Image
+                  src="/FishLogo.png"
+                  alt="Fish Logo"
+                  width={100}
+                  height={100}
+                  quality={100}
+                  className="fish-logo floating"
+                />
+                <h2>Hello! How can I assist you today?</h2>
               </div>
-              {msg.sender === "ai" && !msg.isThinking && msg.text && (
-                <>
-                  <div className="feedback-buttons">
-                    <button
-                      onClick={() => submitFeedback(msg.id, "thumbs_up")}
-                      className={`feedback-btn ${msg.feedback === "thumbs_up" ? "active" : ""}`}
-                      disabled={msg.feedback !== null}
-                      title="Helpful"
-                    >
-                      <FiThumbsUp size={16} />
-                    </button>
-                    <button
-                      onClick={() => submitFeedback(msg.id, "thumbs_down")}
-                      className={`feedback-btn ${msg.feedback === "thumbs_down" ? "active" : ""}`}
-                      disabled={msg.feedback !== null}
-                      title="Not helpful"
-                    >
-                      <FiThumbsDown size={16} />
-                    </button>
-                    {msg.feedback && (
-                      <span className="feedback-thanks">
-                        Thanks for your feedback!
-                      </span>
-                    )}
-                  </div>
-                  {msg.downloads && msg.downloads.length > 0 && (
-                    <div className="download-section">
-                      <h4 className="download-title">Available Downloads:</h4>
-                      <div className="download-buttons">
-                        {msg.downloads.map((file, index) => (
-                          <a
-                            key={index}
-                            href={`http://localhost:8000${file.download_url}`}
-                            download={file.filename}
-                            className="download-btn"
-                            title={`Download ${file.filename} (${(file.size / 1024 / 1024).toFixed(2)} MB)`}
-                          >
-                            <FiDownload size={16} />
-                            <span className="download-filename">{file.filename}</span>
-                            <span className="download-size">
-                              ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                            </span>
-                          </a>
-                        ))}
+
+              <div className="chat-body">
+                <div className="messages">
+                  {isLoading ? (
+                    <div className="loading-message">Loading chat history...</div>
+                  ) : (
+                    messages.map((msg: Message, i: number) => (
+                      <div
+                        key={i}
+                        className={`message ${
+                          msg.sender === "user" ? "user-msg" : "ai-msg"
+                        }`}
+                      >
+                        <div className="message-content">
+                          {renderMessageText(msg)}
+                        </div>
+                        {msg.sender === "ai" && !msg.isThinking && msg.text && (
+                          <>
+                            <div className="feedback-buttons">
+                              <button
+                                onClick={() => submitFeedback(msg.id, "thumbs_up", messages)}
+                                className={`feedback-btn ${messageFeedback[msg.id || ''] === "thumbs_up" ? "active" : ""}`}
+                                disabled={messageFeedback[msg.id || ''] !== undefined}
+                                title="Helpful"
+                              >
+                                <FiThumbsUp size={16} />
+                              </button>
+                              <button
+                                onClick={() => submitFeedback(msg.id, "thumbs_down", messages)}
+                                className={`feedback-btn ${messageFeedback[msg.id || ''] === "thumbs_down" ? "active" : ""}`}
+                                disabled={messageFeedback[msg.id || ''] !== undefined}
+                                title="Not helpful"
+                              >
+                                <FiThumbsDown size={16} />
+                              </button>
+                              {messageFeedback[msg.id || ''] && (
+                                <span className="feedback-thanks">
+                                  Thanks for your feedback!
+                                </span>
+                              )}
+                            </div>
+                            {msg.downloads && msg.downloads.length > 0 && (
+                              <div className="download-section">
+                                <h4 className="download-title">Available Downloads:</h4>
+                                <div className="download-buttons">
+                                  {msg.downloads.map((file, index) => (
+                                    <a
+                                      key={index}
+                                      href={`http://localhost:8000${file.download_url}`}
+                                      download={file.filename}
+                                      className="download-btn"
+                                      title={`Download ${file.filename} (${(file.size / 1024 / 1024).toFixed(2)} MB)`}
+                                    >
+                                      <FiDownload size={16} />
+                                      <span className="download-filename">{file.filename}</span>
+                                      <span className="download-size">
+                                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                      </span>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
-                    </div>
+                    ))
                   )}
-                </>
-              )}
+                </div>
+                <div className="chat-input-wrapper">
+                  <textarea
+                    ref={textareaRef}
+                    placeholder="Type a message..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown(handleSend)}
+                    className="chat-input"
+                    rows={1}
+                    disabled={isLoading}
+                  />
+                  <button 
+                    onClick={handleSend} 
+                    className="send-button"
+                    disabled={isLoading || !input.trim()}
+                  >
+                    <FiSend size={20} color="#007acc" className="send-icon" />
+                  </button>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="chat-input-wrapper">
-          <textarea
-            ref={textareaRef}
-            placeholder="Type a message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="chat-input"
-            rows={1}
-          />
-          <button onClick={handleSend} className="send-button">
-            <FiSend size={20} color="#007acc" className="send-icon" />
-          </button>
-        </div>
-      </div>
-    </div>
+          </div>
+        );
+      }}
+    </ChatHistoryManager>
   );
 }
