@@ -29,7 +29,6 @@
 
 .module {
     flex-basis: 75em;
-    height: 25%;
     border-radius: 15px;
     box-shadow: 0 4px 4px 4px #BFBFBF;
     padding: 20px;
@@ -83,4 +82,24 @@
     cursor: pointer;
     font-weight: bold;
     font-family: "Open Sans", sans-serif;
+}
+
+.rating-filter {
+    padding: 10px;
+    box-shadow: 0 4px 2px -1px #BFBFBF;
+}
+
+.rating-filter label {
+    padding: 0 10px 0 5px;
+}
+
+.query-display {
+    height: 15rem;
+    overflow: auto;
+}
+
+.query-display li {
+    padding: 10px;
+    border-radius: 0;
+    border-width: 0 0 2px 0;
 }
