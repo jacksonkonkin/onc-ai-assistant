@@ -6,7 +6,7 @@ import AccountDropdown from "./accountDropdown";
 import "./navbar.css";
 
 export default function Navbar() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
 
   return (
     <nav className="navBar">
@@ -17,7 +17,10 @@ export default function Navbar() {
         <div className="mainLinks">
           <Link href="/">Home</Link>
           <Link href="/chatPage">Chat</Link>
-          <Link href="/adminPages">Admin</Link>
+          {/* Only show Admin link for admin users */}
+          {isLoggedIn && user?.role === 'admin' && (
+            <Link href="/adminPages">Admin</Link>
+          )}
         </div>
 
         <div className="accountArea">

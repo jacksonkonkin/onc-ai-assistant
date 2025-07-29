@@ -272,8 +272,12 @@ class ONCPipeline:
                 logger.debug(f"Follow-up detection: {follow_up_info}")
             
             # Step 1: Analyze query clarity (check for ambiguity) WITH conversation context
+            # Skip refinement for high-confidence follow-up questions
+            skip_refinement = (follow_up_info.get('is_follow_up', False) and 
+                             follow_up_info.get('confidence', 0) > 0.7)
+            
             query_analysis = None
-            if self.query_refinement_manager:
+            if self.query_refinement_manager and not skip_refinement:
                 # Include conversation context in the analysis
                 analysis_context = context or {}
                 analysis_context['conversation_context'] = conversation_context
@@ -298,6 +302,8 @@ class ONCPipeline:
                             'missing_parameters': query_analysis.missing_data_parameters
                         })
                     return clarification_request
+            elif skip_refinement:
+                logger.info(f"Skipping query refinement for high-confidence follow-up (confidence: {follow_up_info.get('confidence', 0)})")
             
             # Route the query with conversation context
             routing_context = context or {}

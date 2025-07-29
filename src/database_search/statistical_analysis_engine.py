@@ -124,19 +124,30 @@ class StatisticalAnalysisEngine:
             logger.warning(f"Error checking active downloads: {e}")
             # Don't fail the statistical query if download checking fails
     
-    def process_statistical_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
+    def process_statistical_query(self, query: str, include_metadata: bool = True, conversation_context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Process a statistical query and return computed results
         
         Args:
             query: Natural language statistical query
             include_metadata: Whether to include processing metadata
+            conversation_context: Context from conversation manager for follow-up detection
             
         Returns:
             Dictionary with statistical results and metadata
         """
         start_time = datetime.now()
         logger.info(f"Processing statistical query: '{query}'")
+        
+        # Check if this is a follow-up question that can reuse previous data
+        if conversation_context:
+            follow_up_info = conversation_context.get('follow_up_detection', {})
+            if follow_up_info.get('is_follow_up') and follow_up_info.get('confidence', 0) > 0.5:
+                logger.info(f"Follow-up detected with confidence {follow_up_info['confidence']}, optimizing for data reuse")
+                # Enhance query with previous context for better parameter extraction
+                last_query_context = follow_up_info.get('context_info', {})
+                if last_query_context.get('last_metadata'):
+                    logger.info("Using previous query context for parameter inheritance")
         
         try:
             # Step 1: Extract statistical parameters from query
@@ -164,7 +175,7 @@ class StatisticalAnalysisEngine:
                 stats_params['statistical_parameters']
             )
             
-            # Step 4: Format results for presentation
+            # Step 4: Format results for presentation (filter to user-requested operations only)
             formatted_result = self._format_statistical_results(
                 analysis_result, 
                 stats_params, 
@@ -188,7 +199,7 @@ class StatisticalAnalysisEngine:
             if include_metadata:
                 response['metadata'] = {
                     'processing_time': round(total_time, 2),
-                    'statistical_operations': stats_params['statistical_parameters']['operations'],
+                    'statistical_operations': stats_params['statistical_parameters'].get('user_requested_operations', stats_params['statistical_parameters']['operations']),
                     'time_aggregation': stats_params['statistical_parameters'].get('time_window'),
                     'data_quality_score': self._calculate_aggregated_data_quality_score(raw_data_result['data'])
                 }
@@ -228,15 +239,47 @@ class StatisticalAnalysisEngine:
             # Extract statistical-specific parameters
             query_lower = query.lower()
             
-            # Detect statistical operations
+            # Handle common misspellings
+            query_lower = query_lower.replace('minimun', 'minimum')  # Common typo
+            query_lower = query_lower.replace('maxiumum', 'maximum')  # Common typo
+            
+            # Detect statistical operations with word boundary checking to avoid partial matches
             operations = []
-            for op_keyword, op_function in self.statistical_operations.items():
-                if op_keyword in query_lower:
+            import re
+            
+            # Sort by length (longest first) to prioritize longer matches like "minimum" over "min"
+            sorted_operations = sorted(self.statistical_operations.keys(), key=len, reverse=True)
+            
+            for op_keyword in sorted_operations:
+                # Use word boundaries to avoid partial matches
+                pattern = r'\b' + re.escape(op_keyword) + r'\b'
+                if re.search(pattern, query_lower) and op_keyword not in operations:
                     operations.append(op_keyword)
+                    logger.info(f"Detected statistical operation: '{op_keyword}' in query: '{query_lower}'")
             
             if not operations:
                 # Default to basic statistics if none specified
+                logger.warning(f"No statistical operations detected in query: '{query_lower}'")
+                logger.warning(f"Available operations: {list(self.statistical_operations.keys())}")
                 operations = ['average', 'min', 'max']
+            
+            # Normalize operations to remove duplicates (e.g., avg/average, min/minimum)
+            normalized_operations = self._normalize_statistical_operations(operations)
+            user_requested_operations = normalized_operations.copy()
+            
+            logger.info(f"Raw detected operations: {operations}")
+            logger.info(f"Normalized user-requested operations: {user_requested_operations}")
+            
+            # For data reuse optimization, download minMaxAvg but only show requested results
+            basic_ops = ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean']
+            if any(op in normalized_operations for op in basic_ops):
+                # We'll download minMaxAvg data but filter results to show only what user asked for
+                logger.info(f"User requested operations: {user_requested_operations}")
+                logger.info("Will download minMaxAvg for efficiency but filter results")
+                # Use all operations for downloading to get comprehensive data
+                operations = ['min', 'max', 'average']  # Standard minMaxAvg operations
+            else:
+                operations = normalized_operations
             
             # Detect time aggregation windows
             time_window = None
@@ -256,6 +299,7 @@ class StatisticalAnalysisEngine:
                 'data_parameters': basic_extraction['parameters'],
                 'statistical_parameters': {
                     'operations': operations,
+                    'user_requested_operations': user_requested_operations,  # Track what user actually asked for
                     'time_window': time_window,
                     'comparison': comparison_params,
                     'grouping': grouping_params,
@@ -605,7 +649,28 @@ class StatisticalAnalysisEngine:
                 other_operations = [op for op in stats_operations 
                                   if op not in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean']]
                 
-                for operation in other_operations:
+                # Check if we already have minMaxAvg data that might contain what we need
+                if results and any(op in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean'] for op in results.keys()):
+                    logger.info("Attempting to derive other statistics from existing minMaxAvg data")
+                    # Try to use existing data first before downloading raw data
+                    for operation in other_operations:
+                        if operation in ['count', 'range']:
+                            # These can be derived from minMaxAvg data
+                            first_result_key = next(iter(results.keys()))
+                            if results[first_result_key].get('data'):
+                                results[operation] = {
+                                    'data': results[first_result_key]['data'],
+                                    'csv_file': results[first_result_key]['csv_file'],
+                                    'operation': operation,
+                                    'resample_type': 'derived_from_minMaxAvg'
+                                }
+                                logger.info(f"Derived operation '{operation}' from existing minMaxAvg data")
+                                continue
+                
+                # Only download raw data for operations that truly need it
+                remaining_operations = [op for op in other_operations if op not in results]
+                
+                for operation in remaining_operations:
                     # These operations need raw data for local computation
                     download_params = {
                         'location_code': data_params['location_code'],
@@ -692,15 +757,54 @@ class StatisticalAnalysisEngine:
             Analysis results dictionary
         """
         try:
+            # Get user-requested operations to filter results
+            user_requested_operations = stats_params.get('user_requested_operations', stats_params.get('operations', []))
+            all_operations = stats_params.get('operations', [])
+            
+            logger.info(f"User requested operations: {user_requested_operations}")
+            logger.info(f"All operations for processing: {all_operations}")
+            logger.info(f"Available data operations: {list(data.keys())}")
+            
             results = {
                 'operations_performed': [],
                 'statistics': {},
                 'time_series_analysis': {},
-                'quality_metrics': {}
+                'quality_metrics': {},
+                'user_requested_operations': user_requested_operations  # Store for later filtering
             }
             
-            # Process each statistical operation's data
+            # Process only user-requested statistical operations
             for operation, operation_data in data.items():
+                # Check if this operation matches any user-requested operation (including synonyms)
+                operation_matches_request = False
+                
+                # Direct match
+                if operation in user_requested_operations:
+                    operation_matches_request = True
+                else:
+                    # Check synonym mapping (e.g., user requested "min" but data has "minimum")
+                    operation_synonyms = {
+                        'min': ['minimum', 'min'],
+                        'max': ['maximum', 'max'], 
+                        'average': ['avg', 'average', 'mean'],
+                        'minimum': ['minimum', 'min'],
+                        'maximum': ['maximum', 'max'],
+                        'avg': ['avg', 'average', 'mean'],
+                        'mean': ['avg', 'average', 'mean']
+                    }
+                    
+                    for requested_op in user_requested_operations:
+                        if operation in operation_synonyms.get(requested_op, []):
+                            operation_matches_request = True
+                            break
+                
+                # Skip operations that the user didn't request
+                if not operation_matches_request:
+                    logger.info(f"Skipping operation '{operation}' - not requested by user ({user_requested_operations})")
+                    continue
+                    
+                logger.info(f"Processing operation '{operation}' - matches user request")
+                    
                 if 'data' in operation_data and operation_data['data']:
                     parsed_data = operation_data['data']
                     df = parsed_data['dataframe']
@@ -760,6 +864,7 @@ class StatisticalAnalysisEngine:
                         if stats_result:
                             results['statistics'][operation] = stats_result
                             results['operations_performed'].append(operation)
+                            logger.info(f"Added operation '{operation}' to results with {len(stats_result)} parameters")
                     
                     # Add quality metrics based on metadata
                     if metadata:
@@ -1187,9 +1292,13 @@ class StatisticalAnalysisEngine:
     def _generate_statistical_summary(self, analysis_result: Dict[str, Any], 
                                     stats_params: Dict[str, Any]) -> str:
         """Generate a natural language summary focusing on temperature data"""
-        operations = stats_params['statistical_parameters']['operations']
+        # Use only user-requested operations for the summary
+        user_requested_operations = stats_params['statistical_parameters'].get('user_requested_operations', stats_params['statistical_parameters']['operations'])
+        operations = user_requested_operations  # Only show what user asked for
         statistics = analysis_result.get('statistics', {})
         original_query = stats_params['statistical_parameters'].get('original_query', '').lower()
+        
+        logger.info(f"Generating summary for user-requested operations: {operations}")
         
         # Determine which parameter the user is asking about
         target_param = None
@@ -1324,3 +1433,50 @@ class StatisticalAnalysisEngine:
     def get_supported_time_windows(self) -> Dict[str, str]:
         """Get supported time aggregation windows"""
         return self.time_windows.copy()
+    
+    def _normalize_statistical_operations(self, operations: List[str]) -> List[str]:
+        """
+        Normalize statistical operations to remove duplicates and synonyms
+        
+        Args:
+            operations: List of detected operations
+            
+        Returns:
+            Normalized list with duplicates removed
+        """
+        # Map synonyms to canonical forms
+        operation_mapping = {
+            'min': 'min',
+            'minimum': 'min',
+            'max': 'max', 
+            'maximum': 'max',
+            'avg': 'average',
+            'average': 'average',
+            'mean': 'average',
+            'std': 'std',
+            'stdev': 'std',
+            'var': 'variance',
+            'variance': 'variance',
+            'sum': 'sum',
+            'total': 'sum',
+            'median': 'median',
+            'mode': 'mode',
+            'range': 'range',
+            'count': 'count',
+            'trend': 'trend',
+            'correlation': 'correlation',
+            'seasonal': 'seasonal'
+        }
+        
+        # Normalize and deduplicate
+        normalized = []
+        seen = set()
+        
+        for op in operations:
+            canonical_op = operation_mapping.get(op, op)
+            if canonical_op not in seen:
+                normalized.append(canonical_op)
+                seen.add(canonical_op)
+        
+        logger.info(f"Normalized operations: {operations} -> {normalized}")
+        return normalized

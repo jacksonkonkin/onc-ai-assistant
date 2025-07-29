@@ -65,12 +65,21 @@ class BackgroundDownloadManager:
             Unique key string for these parameters
         """
         # Create normalized parameter dict for consistent hashing
+        # For statistical queries, normalize resampling to enable data reuse
+        resample_value = str(params.get('resample', 'none')).lower()
+        # Treat minMaxAvg and none as equivalent for basic statistical operations
+        # since minMaxAvg contains all the data needed for min, max, and avg
+        if resample_value in ['minmaxavg', 'none']:
+            resample_normalized = 'statistical_basic'  # Common key for statistical operations
+        else:
+            resample_normalized = resample_value
+            
         normalized_params = {
             'location_code': str(params.get('location_code', '')).upper(),
             'device_category': str(params.get('device_category', '')).upper(),
             'date_from': str(params.get('date_from', '')),
             'date_to': str(params.get('date_to', '')),
-            'resample': str(params.get('resample', 'none')).lower(),
+            'resample': resample_normalized,
             'quality_control': str(params.get('quality_control', False)).lower()
         }
         
