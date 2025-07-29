@@ -108,53 +108,90 @@ async def query(query: Query):
         logger.info(response)
         logger.info("=" * 80)
         
-        # Check for new CSV files created during processing in both main output and backend output directories
-        new_files = []
+        # Check for CSV files to include in download response
+        download_files = []
         
-        # Check main output directory
-        if output_dir.exists():
-            current_files = set(f.name for f in output_dir.glob("*.csv"))
-            new_csv_files = current_files - existing_files
-            
-            logger.info(f"📊 New CSV files detected in main output: {len(new_csv_files)} files")
-            
-            for filename in new_csv_files:
-                file_path = output_dir / filename
-                if file_path.exists():
-                    file_info = {
-                        "filename": filename,
-                        "download_url": f"/download/output/{filename}",
-                        "size": file_path.stat().st_size
-                    }
-                    new_files.append(file_info)
-                    logger.info(f"📄 New file in main output: {filename} ({file_info['size']} bytes)")
+        # Check if this was a duplicate data response (no new files created)
+        is_duplicate_response = "Similar Data Already Downloaded" in response or "duplicate download request" in response.lower()
         
-        # Also check backend output directory (where ONC package actually creates files)
-        backend_output_dir = project_root / "backend" / "output"
-        if backend_output_dir.exists():
-            backend_files = set(f.name for f in backend_output_dir.glob("*.csv"))
-            # Get files that are newer than when we started processing
+        if is_duplicate_response:
+            logger.info("🔄 Duplicate data detected - including existing CSV files in response")
+            # Include recent CSV files from all directories since this is duplicate data
             import time
-            recent_threshold = time.time() - 300  # Files created in last 5 minutes
+            recent_threshold = time.time() - 3600  # Files created in last hour for duplicates
             
-            for filename in backend_files:
-                file_path = backend_output_dir / filename
-                if file_path.exists() and file_path.stat().st_mtime > recent_threshold:
-                    # Check if we already found this file in main output
-                    if not any(f["filename"] == filename for f in new_files):
+            # Check main output directory for recent files
+            if output_dir.exists():
+                for csv_file in output_dir.glob("*.csv"):
+                    if csv_file.stat().st_mtime > recent_threshold:
+                        file_info = {
+                            "filename": csv_file.name,
+                            "download_url": f"/download/output/{csv_file.name}",
+                            "size": csv_file.stat().st_size
+                        }
+                        download_files.append(file_info)
+                        logger.info(f"📄 Including existing file from main output: {csv_file.name} ({file_info['size']} bytes)")
+            
+            # Check backend output directory for recent files
+            backend_output_dir = project_root / "backend" / "output"
+            if backend_output_dir.exists():
+                for csv_file in backend_output_dir.glob("*.csv"):
+                    if csv_file.stat().st_mtime > recent_threshold:
+                        # Check if we already found this file in main output
+                        if not any(f["filename"] == csv_file.name for f in download_files):
+                            file_info = {
+                                "filename": csv_file.name,
+                                "download_url": f"/download/backend/output/{csv_file.name}",
+                                "size": csv_file.stat().st_size
+                            }
+                            download_files.append(file_info)
+                            logger.info(f"📄 Including existing file from backend output: {csv_file.name} ({file_info['size']} bytes)")
+        else:
+            # Original logic for new files created during this request
+            # Check main output directory
+            if output_dir.exists():
+                current_files = set(f.name for f in output_dir.glob("*.csv"))
+                new_csv_files = current_files - existing_files
+                
+                logger.info(f"📊 New CSV files detected in main output: {len(new_csv_files)} files")
+                
+                for filename in new_csv_files:
+                    file_path = output_dir / filename
+                    if file_path.exists():
                         file_info = {
                             "filename": filename,
-                            "download_url": f"/download/backend/output/{filename}",
+                            "download_url": f"/download/output/{filename}",
                             "size": file_path.stat().st_size
                         }
-                        new_files.append(file_info)
-                        logger.info(f"📄 New file in backend output: {filename} ({file_info['size']} bytes)")
+                        download_files.append(file_info)
+                        logger.info(f"📄 New file in main output: {filename} ({file_info['size']} bytes)")
+            
+            # Also check backend output directory (where ONC package actually creates files)
+            backend_output_dir = project_root / "backend" / "output"
+            if backend_output_dir.exists():
+                backend_files = set(f.name for f in backend_output_dir.glob("*.csv"))
+                # Get files that are newer than when we started processing
+                import time
+                recent_threshold = time.time() - 300  # Files created in last 5 minutes
+                
+                for filename in backend_files:
+                    file_path = backend_output_dir / filename
+                    if file_path.exists() and file_path.stat().st_mtime > recent_threshold:
+                        # Check if we already found this file in main output
+                        if not any(f["filename"] == filename for f in download_files):
+                            file_info = {
+                                "filename": filename,
+                                "download_url": f"/download/backend/output/{filename}",
+                                "size": file_path.stat().st_size
+                            }
+                            download_files.append(file_info)
+                            logger.info(f"📄 New file in backend output: {filename} ({file_info['size']} bytes)")
         
-        # Include download links in response if files were created
+        # Include download links in response if files were found
         response_data = {"response": response}
-        if new_files:
-            response_data["downloads"] = new_files
-            logger.info(f"✅ Response includes {len(new_files)} download links")
+        if download_files:
+            response_data["downloads"] = download_files
+            logger.info(f"✅ Response includes {len(download_files)} download links")
         else:
             logger.info("ℹ️ No download links in response")
             
