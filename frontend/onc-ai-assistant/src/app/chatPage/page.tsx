@@ -57,6 +57,8 @@ export default function ChatPage() {
     addMessageToChat(userMessage);
     addMessageToChat({ sender: "ai", text: "", isThinking: true });
     // add post request to store AI response in the chat history (POST) /api/messages
+    // in the post request, if the chat is from the ai, set userid to -1 or null
+    // for reading chats, if the userid exists within the message set sender to user, else set sender to ai
     setInput("");
 
     const aiText = await fetchAIResponse(input);

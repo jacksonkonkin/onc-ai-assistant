@@ -20,10 +20,10 @@ export type ChatHistory = {
 
 interface ChatHistorySidebarProps {
   histories: ChatHistory[];
-  selectedChatId: number;
-  onSelectChat: (id: number) => void;
+  selectedChatId: string;
+  onSelectChat: (id: string) => void;
   onNewChat: () => void;
-  onDeleteChat: (id: number) => void;
+  onDeleteChat: (id: string) => void;
   isLoggedIn: boolean;
 }
 
@@ -37,7 +37,7 @@ export default function ChatHistorySidebar({
 }: ChatHistorySidebarProps) {
   if (!isLoggedIn) return null;
 
-  const handleDeleteChat = (e: React.MouseEvent, chatId: number) => {
+  const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
     e.stopPropagation(); // Prevent selecting the chat when clicking delete
     onDeleteChat(chatId);
   };

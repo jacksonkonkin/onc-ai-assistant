@@ -34,12 +34,12 @@ type ApiMessage = {
 interface ChatHistoryManagerProps {
   children: (props: {
     chatHistories: ChatHistory[];
-    selectedChatId: number;
+    selectedChatId: string;
     selectedChat: ChatHistory | undefined;
     messages: Message[];
     handleNewChat: () => void;
-    handleDeleteChat: (chatId: number) => void;
-    handleSelectChat: (chatId: number) => void;
+    handleDeleteChat: (chatId: string) => void;
+    handleSelectChat: (chatId: string) => void;
     addMessageToChat: (message: Message) => void;
     updateLastMessage: (updates: Partial<Message>) => void;
     isLoading: boolean;
@@ -49,7 +49,7 @@ interface ChatHistoryManagerProps {
 export default function ChatHistoryManager({ children }: ChatHistoryManagerProps) {
   const { isLoggedIn, user, token } = useAuth();
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
-  const [selectedChatId, setSelectedChatId] = useState<number>(0);
+  const [selectedChatId, setSelectedChatId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -89,15 +89,9 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     if (isInitialized) return;
     
     if (!isLoggedIn) {
-      // If not logged in, create a new chat only
-      const newId = Date.now();
-      const newChat: ChatHistory = { 
-        id: newId, 
-        title: "New Chat", 
-        messages: [] 
-      };
-      setChatHistories([newChat]);
-      setSelectedChatId(newId);
+      // No chat histories for non-logged in users
+      setChatHistories([]);
+      setSelectedChatId("");
       setIsLoading(false);
       setIsInitialized(true);
       return;
@@ -131,7 +125,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     } catch (error) {
       console.error('Failed to load chat histories:', error);
       // Fallback: create a new chat only
-      const newId = Date.now();
+      const newId = Date.now().toString();
       const newChat: ChatHistory = { 
         id: newId, 
         title: "New Chat", 
@@ -146,7 +140,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
   };
 
   // Load messages for a specific chat
-  const loadMessages = async (chatId: number) => {
+  const loadMessages = async (chatId: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/messages?chat_id=${chatId}`, {
         headers: getAuthHeaders(),
@@ -188,7 +182,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     
     if (!isLoggedIn) {
       // Fallback for non-logged in users
-      const newId = Date.now();
+      const newId = Date.now().toString();
       const newChat: ChatHistory = { 
         id: newId, 
         title: "New Chat", 
@@ -222,7 +216,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     } catch (error) {
       console.error('Failed to create new chat:', error);
       // Fallback to local state
-      const newId = Date.now();
+      const newId = Date.now().toString();
       const newChat: ChatHistory = { 
         id: newId, 
         title: newChatTitle, 
@@ -246,7 +240,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     await createNewChat();
   };
 
-  const handleDeleteChat = async (chatId: number) => {
+  const handleDeleteChat = async (chatId: string) => {
     if (!isLoggedIn) {
       // Local deletion for non-logged in users
       setChatHistories((prev) => {
@@ -256,7 +250,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
           if (filteredHistories.length > 0) {
             setSelectedChatId(filteredHistories[0].id);
           } else {
-            const newId = Date.now();
+            const newId = Date.now().toString();
             const newChat = { id: newId, title: "New Chat", messages: [] };
             setSelectedChatId(newId);
             return [newChat];
@@ -303,7 +297,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
           if (filteredHistories.length > 0) {
             setSelectedChatId(filteredHistories[0].id);
           } else {
-            const newId = Date.now();
+            const newId = Date.now().toString();
             const newChat = { id: newId, title: "New Chat", messages: [] };
             setSelectedChatId(newId);
             return [newChat];
@@ -315,7 +309,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     }
   };
 
-  const handleSelectChat = async (chatId: number) => {
+  const handleSelectChat = async (chatId: string) => {
     setSelectedChatId(chatId);
     
     // Don't try to load messages if not logged in
@@ -354,7 +348,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
         headers: getAuthHeaders(),
         body: JSON.stringify({
           text: message.text,
-          chat_id: selectedChatId.toString(),
+          chat_id: selectedChatId,
           user_id: userId,
         }),
       });
