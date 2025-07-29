@@ -90,29 +90,32 @@ export default function ChatPage() {
     addMessageToChat(aiMessage);
     setInput("");
 
-    const aiResponse = await fetchAIResponse(userQuery);
+    try {
+      const aiResponse = await fetchAIResponse(userQuery);
 
-    // Update last message to show downloads
-    updateLastMessage({
-      isThinking: false,
-      downloads: aiResponse.downloads
-    });
+      // Typewriter effect
+      let index = 0;
+      const typeInterval = setInterval(() => {
+        updateLastMessage({
+          isThinking: false,
+          text: aiResponse.text.slice(0, index + 1),
+          downloads: aiResponse.downloads
+        });
 
-    // Typewriter effect
-    let index = 0;
-    const typeInterval = setInterval(() => {
+        index++;
+        if (index >= aiResponse.text.length) {
+          clearInterval(typeInterval);
+        }
+      }, 10);
+    } catch (error) {
+      console.error("Error generating AI response:", error);
       updateLastMessage({
         isThinking: false,
-        text: aiResponse.text.slice(0, index + 1),
-        downloads: aiResponse.downloads
+        text: "Sorry, something went wrong.",
       });
-
-      index++;
-      if (index >= aiResponse.text.length) {
-        clearInterval(typeInterval);
-      }
-    }, 10);
+    }
   };
+
 
   const [messageFeedback, setMessageFeedback] = useState<Record<string, "thumbs_up" | "thumbs_down">>({});
 
