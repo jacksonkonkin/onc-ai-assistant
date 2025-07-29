@@ -1,5 +1,5 @@
 import './adminPanel.css';
-// import {BarChart, Bar, CartesianGrid} from 'recharts';
+import {BarChart, Bar, CartesianGrid, XAxis, YAxis} from 'recharts';
 import data from './messages.json';
 import {Component, useState} from 'react';
 
@@ -17,6 +17,11 @@ type AnalyticsData = {
 type AnalyticsDisplay = {
     metric: String;
     data: AnalyticsData[]
+}
+
+type RatingFrequency = {
+    rating: String,
+    count: Number
 }
 
 export default function Analytics() {
@@ -60,24 +65,31 @@ export default function Analytics() {
     }
 
     const ratingFrequency = () => {
-        const pos = 1, neutral = 0, neg = -1;
         let posCount = 0, neutralCount = 0, negCount = 0;
         for (let i in msgs) {
-            if (msgs[i].rating == pos) {
+            if (msgs[i].rating == 1) {
                 posCount++;
-            } else if (msgs[i].rating == neutral) {
+            } else if (msgs[i].rating == 0) {
                 neutralCount++;
-            } else if (msgs[i].rating == neg) {
+            } else if (msgs[i].rating == -1) {
                 negCount++;
             }
         }
 
-        const posData: AnalyticsData = {key: "Positive", val: posCount}
-        const neutralData: AnalyticsData = {key: "Not Rated", val: neutralCount}
-        const negData: AnalyticsData = {key: "Negative", val: negCount}
+        // const posData: AnalyticsData = {key: "Positive", val: posCount}
+        // const neutralData: AnalyticsData = {key: "Not Rated", val: neutralCount}
+        // const negData: AnalyticsData = {key: "Negative", val: negCount}
 
-        const frequency: AnalyticsDisplay = {metric: "Rating Frequency", data: [posData, neutralData, negData]}
-        return frequency;
+        // const frequency: AnalyticsDisplay = {metric: "Rating Frequency", data: [posData, neutralData, negData]}
+        // return frequency;
+
+        // const frequency: RatingFrequency = {Positive: posCount, Unrated: neutralCount, Negative: negCount}
+
+        const posFreq: RatingFrequency = {rating: "Positive", count: posCount}
+        const neutralFreq: RatingFrequency = {rating: "Not Rated", count: neutralCount}
+        const negFreq: RatingFrequency = {rating: "Negative", count: negCount}
+
+        return [posFreq, neutralFreq, negFreq]
         
     }
 
@@ -87,12 +99,18 @@ export default function Analytics() {
     return(
         <div className="module">
         <h2>View Analytics</h2>
+        <button onClick={setupData}>Reload Data</button>
         <div className="analytics"> 
-            <button onClick={setupData}>Reload Data</button>
             <div className="chartDisplay"></div>
-            <h2>{ratingFrequency().metric}</h2>
-            {ratingFrequency().data.map((datapoint, i) => <li key={i}>{datapoint.key}: {datapoint.val}</li>)}
-        </div>
+
+            <BarChart width={730} height={250} data={ratingFrequency()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="rating" />
+                <YAxis />
+                <Bar dataKey="count" fill="#123253"/>
+            </BarChart>
+
+            </div>
         </div>
     );
 }
