@@ -4,9 +4,18 @@ import React from "react";
 import { FiTrash2 } from "react-icons/fi";
 
 export type ChatHistory = {
-  id: number;
+  id: string;
   title: string;
-  messages: { sender: "user" | "ai"; text: string; isThinking?: boolean }[];
+  messages: {
+    id?: string;
+    sender: "user" | "ai";
+    text: string;
+    isThinking?: boolean;
+    chat_id?: string;
+    user_id?: string;
+    timestamp?: string;
+    rating?: number;
+  }[];
 };
 
 interface ChatHistorySidebarProps {

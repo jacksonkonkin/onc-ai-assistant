@@ -6,7 +6,7 @@ import { FiSend } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import ChatHistorySidebar from "./ChatHistorySidebar";
 import ChatHistoryManager from "./ChatHistoryManager";
-import "./ChatPage.css";
+import "./chatPage.css";
 
 type Message = {
   sender: "user" | "ai";
@@ -56,6 +56,7 @@ export default function ChatPage() {
     const userMessage: Message = { sender: "user", text: input };
     addMessageToChat(userMessage);
     addMessageToChat({ sender: "ai", text: "", isThinking: true });
+    // add post request to store AI response in the chat history (POST) /api/messages
     setInput("");
 
     const aiText = await fetchAIResponse(input);
@@ -121,6 +122,7 @@ export default function ChatPage() {
         handleSelectChat,
         addMessageToChat,
         updateLastMessage,
+        isLoading,
       }) => {
         const handleSend = createHandleSend(addMessageToChat, updateLastMessage, selectedChat);
         
@@ -149,16 +151,20 @@ export default function ChatPage() {
 
               <div className="chat-body">
                 <div className="messages">
-                  {messages.map((msg: Message, i: number) => (
-                    <div
-                      key={i}
-                      className={`message ${
-                        msg.sender === "user" ? "user-msg" : "ai-msg"
-                      }`}
-                    >
-                      {renderMessageText(msg)}
-                    </div>
-                  ))}
+                  {isLoading ? (
+                    <div className="loading-message">Loading chat history...</div>
+                  ) : (
+                    messages.map((msg: Message, i: number) => (
+                      <div
+                        key={i}
+                        className={`message ${
+                          msg.sender === "user" ? "user-msg" : "ai-msg"
+                        }`}
+                      >
+                        {renderMessageText(msg)}
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div className="chat-input-wrapper">
                   <textarea
@@ -169,8 +175,13 @@ export default function ChatPage() {
                     onKeyPress={handleKeyPress(handleSend)}
                     className="chat-input"
                     rows={1}
+                    disabled={isLoading}
                   />
-                  <button onClick={handleSend} className="send-button">
+                  <button 
+                    onClick={handleSend} 
+                    className="send-button"
+                    disabled={isLoading || !input.trim()}
+                  >
                     <FiSend size={20} color="#007acc" className="send-icon" />
                   </button>
                 </div>
