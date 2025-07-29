@@ -29,7 +29,6 @@
 
 .module {
     flex-basis: 75em;
-    height: 25%;
     border-radius: 15px;
     box-shadow: 0 4px 4px 4px #BFBFBF;
     padding: 20px;
@@ -91,4 +90,10 @@
 
 .rating-filter label {
     padding: 0 10px 0 5px;
+}
+
+.query-display {
+    border: 2px solid black;
+    height: fit-content(10%);
+    overflow: auto;
 }
