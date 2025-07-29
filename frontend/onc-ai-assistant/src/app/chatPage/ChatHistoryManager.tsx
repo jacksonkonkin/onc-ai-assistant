@@ -64,7 +64,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
     title: apiChat.summary || "New Chat",
     messages: messages.map(msg => ({
       id: msg.id,
-      sender: msg.user_id === userId ? "user" : "ai",
+      sender: msg.user_id === "-1" ? "ai" : (msg.user_id === userId ? "user" : "ai"), // -1 = AI, matching userId = user, other = ai
       text: msg.text,
       chat_id: msg.chat_id,
       user_id: msg.user_id,
@@ -168,7 +168,7 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
                 ...chat,
                 messages: apiMessages.map(msg => ({
                   id: msg.id,
-                  sender: msg.user_id === userId ? "user" : "ai",
+                  sender: msg.user_id === "-1" ? "ai" : (msg.user_id === userId ? "user" : "ai"), // -1 = AI, matching userId = user, other = ai
                   text: msg.text,
                   chat_id: msg.chat_id,
                   user_id: msg.user_id,

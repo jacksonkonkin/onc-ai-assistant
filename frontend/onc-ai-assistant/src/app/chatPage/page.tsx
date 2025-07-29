@@ -56,25 +56,63 @@ export default function ChatPage() {
     const userMessage: Message = { sender: "user", text: input };
     addMessageToChat(userMessage);
     addMessageToChat({ sender: "ai", text: "", isThinking: true });
-    // add post request to store AI response in the chat history (POST) /api/messages
-    // in the post request, if the chat is from the ai, set userid to -1 or null
-    // for reading chats, if the userid exists within the message set sender to user, else set sender to ai
+    
+    const userInput = input;
     setInput("");
 
-    const aiText = await fetchAIResponse(input);
+    try {
+      const aiText = await fetchAIResponse(userInput);
 
-    let index = 0;
-    const typeInterval = setInterval(() => {
+      // Type out the AI response
+      let index = 0;
+      const typeInterval = setInterval(() => {
+        updateLastMessage({
+          isThinking: false,
+          text: aiText.slice(0, index + 1),
+        });
+
+        index++;
+        if (index >= aiText.length) {
+          clearInterval(typeInterval);
+          
+          // Save AI response to database after typing animation completes
+          if (isLoggedIn) {
+            saveAIMessageToDatabase(aiText, selectedChat.id);
+          }
+        }
+      }, 10);
+    } catch (error) {
+      console.error("Error generating AI response:", error);
       updateLastMessage({
         isThinking: false,
-        text: aiText.slice(0, index + 1),
+        text: "Sorry, something went wrong.",
       });
+    }
+  };
 
-      index++;
-      if (index >= aiText.length) {
-        clearInterval(typeInterval);
+  const saveAIMessageToDatabase = async (aiText: string, chatId: string) => {
+    try {
+      const response = await fetch(
+        "https://onc-assistant-822f952329ee.herokuapp.com/api/messages",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: aiText,
+            chat_id: chatId,
+            user_id: "-1", // Special ID to indicate AI message
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to save AI message to database");
       }
-    }, 10);
+    } catch (error) {
+      console.error("Error saving AI message:", error);
+    }
   };
 
   const handleKeyPress = (handleSend: () => void) => (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
