@@ -258,33 +258,47 @@ class AdvancedDataDownloader:
                     signal.alarm(300)  # 5 minutes timeout
                     
                     try:
-                        # First try with metadata file included
+                        # Change to output directory before making ONC API calls
+                        original_cwd = os.getcwd()
+                        logger.info(f"🔧 DEBUG: Advanced downloader changing from {original_cwd} to {os.path.abspath(output_dir)}")
+                        os.chdir(output_dir)
+                        logger.info(f"🔧 DEBUG: Advanced downloader now in: {os.getcwd()}")
+                        
                         try:
-                            logger.info(f"Making ONC API call: orderDataProduct with metadata")
-                            result = self.onc_client.orderDataProduct(
-                                product_params, 
-                                includeMetadataFile=True
-                            )
-                            logger.info(f"ONC data product order completed with metadata")
-                            logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
-                        except Exception as metadata_error:
-                            # If metadata fails, try without it (many data products don't support metadata)
-                            error_str = str(metadata_error)
-                            if any(keyword in error_str for keyword in [
-                                "Metadata file not valid", 
-                                "index=meta", 
-                                "API Error 127",
-                                "Bad Request",
-                                "RuntimeWarning: Metadata file not downloaded"
-                            ]):
-                                logger.warning(f"Metadata file not supported for this data product: {error_str}")
-                                logger.info("Retrying download without metadata file...")
-                                result = self.onc_client.orderDataProduct(product_params)
-                                logger.info(f"ONC data product order completed successfully without metadata")
+                            # First try with metadata file included
+                            try:
+                                logger.info(f"Making ONC API call: orderDataProduct with metadata")
+                                result = self.onc_client.orderDataProduct(
+                                    product_params, 
+                                    includeMetadataFile=True
+                                )
+                                logger.info(f"ONC data product order completed with metadata")
                                 logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
-                            else:
-                                # Re-raise if it's a different error
-                                raise metadata_error
+                            except Exception as metadata_error:
+                                # If metadata fails, try without it (many data products don't support metadata)
+                                error_str = str(metadata_error)
+                                if any(keyword in error_str for keyword in [
+                                    "Metadata file not valid", 
+                                    "index=meta", 
+                                    "API Error 127",
+                                    "Bad Request",
+                                    "RuntimeWarning: Metadata file not downloaded"
+                                ]):
+                                    logger.warning(f"Metadata file not supported for this data product: {error_str}")
+                                    logger.info("Retrying download without metadata file...")
+                                    result = self.onc_client.orderDataProduct(product_params)
+                                    logger.info(f"ONC data product order completed successfully without metadata")
+                                    logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
+                                else:
+                                    # Re-raise if it's a different error
+                                    raise metadata_error
+                        finally:
+                            # Always restore the original working directory
+                            os.chdir(original_cwd)
+                            
+                            # Move any files that were created in the original directory to the target output directory
+                            if original_cwd != os.path.abspath(output_dir):
+                                self._move_files_to_output_dir(original_cwd, output_dir)
                     finally:
                         signal.alarm(0)  # Cancel the alarm
                         
@@ -398,8 +412,20 @@ class AdvancedDataDownloader:
                 # Direct bulk download
                 Path(output_dir).mkdir(parents=True, exist_ok=True)
                 
-                # Download all matching files
-                download_result = self.onc_client.downloadDirectArchivefile(query_params)
+                # Change to output directory before downloading
+                original_cwd = os.getcwd()
+                os.chdir(output_dir)
+                
+                try:
+                    # Download all matching files
+                    download_result = self.onc_client.downloadDirectArchivefile(query_params)
+                finally:
+                    # Always restore the original working directory
+                    os.chdir(original_cwd)
+                    
+                    # Move any files that were created in the original directory to the target output directory
+                    if original_cwd != os.path.abspath(output_dir):
+                        self._move_files_to_output_dir(original_cwd, output_dir)
                 
                 return {
                     'status': 'success',
@@ -531,6 +557,10 @@ class AdvancedDataDownloader:
                 file_count = len(result.get('csv_files', []))
                 progress_callback(f"Download completed - {file_count} files created", 100)
             
+            # Post-process to move files to correct location and update result
+            if result.get('status') == 'success':
+                result = self._post_process_download_result(result, output_dir)
+            
             return result
             
         except Exception as e:
@@ -600,6 +630,9 @@ class AdvancedDataDownloader:
         logger.info(f"download_data_product keys: {list(download_result.keys()) if isinstance(download_result, dict) else 'Not a dict'}")
         
         if download_result['status'] == 'success':
+            # First, try to move files from current directory to expected location
+            download_result = self._post_process_download_result(download_result, output_dir)
+            
             # Process CSV files for additional metadata
             logger.info(f"Download status is success, looking for CSV files in: {output_dir}")
             csv_files = self._find_csv_files(download_result, output_dir)
@@ -878,6 +911,19 @@ class AdvancedDataDownloader:
         if output_path.exists():
             csv_files.extend([str(f) for f in output_path.glob("*.csv")])
         
+        # Additionally scan current working directory (where ONC package actually creates files)
+        current_dir = Path(os.getcwd())
+        if current_dir != output_path:
+            logger.info(f"Also scanning current working directory for CSV files: {current_dir}")
+            cwd_csv_files = list(current_dir.glob("*.csv"))
+            logger.info(f"Found {len(cwd_csv_files)} CSV files in current directory")
+            for f in cwd_csv_files:
+                size = f.stat().st_size if f.exists() else 0
+                logger.info(f"  File: {f.name}, size: {size} bytes")
+                if size > 0:
+                    csv_files.append(str(f))
+                    logger.info(f"    -> Added to csv_files list")
+        
         # Remove duplicates and check for actual content
         final_files = []
         for csv_file in set(csv_files):
@@ -945,6 +991,155 @@ class AdvancedDataDownloader:
                     analysis['files'].append(file_info)
         
         return analysis
+    
+    def _move_files_to_output_dir(self, source_dir: str, target_dir: str) -> None:
+        """
+        Move any ONC-generated files from source directory to target directory.
+        
+        Args:
+            source_dir: Directory where ONC package may have created files
+            target_dir: Target output directory
+        """
+        try:
+            import shutil
+            source_path = Path(source_dir)
+            target_path = Path(target_dir)
+            
+            # Ensure target directory exists
+            target_path.mkdir(parents=True, exist_ok=True)
+            
+            # Look for files that match ONC naming patterns
+            patterns = [
+                "*.csv",
+                "*.xml", 
+                "*CambridgeBay*",
+                "*CTD*",
+                "*TSSD*"
+            ]
+            
+            moved_files = []
+            for pattern in patterns:
+                for file_path in source_path.glob(pattern):
+                    if file_path.is_file():
+                        target_file = target_path / file_path.name
+                        # Only move if the file doesn't already exist in target
+                        if not target_file.exists():
+                            shutil.move(str(file_path), str(target_file))
+                            moved_files.append(str(target_file))
+                            logger.info(f"Moved ONC file from {file_path} to {target_file}")
+            
+            if moved_files:
+                logger.info(f"Successfully moved {len(moved_files)} ONC files to correct output directory")
+            else:
+                logger.debug("No ONC files found to move")
+                
+        except Exception as e:
+            logger.warning(f"Error moving ONC files to output directory: {e}")
+    
+    def _post_process_download_result(self, result: Dict[str, Any], expected_output_dir: str) -> Dict[str, Any]:
+        """
+        Post-process download results to handle ONC package file location issues.
+        
+        The ONC package creates files in the current working directory, but we want them
+        in the specified output directory. This method:
+        1. Scans for newly created ONC files in the current directory
+        2. Moves them to the expected output directory  
+        3. Updates the result with correct file paths
+        
+        Args:
+            result: Download result dictionary
+            expected_output_dir: Where files should be located
+            
+        Returns:
+            Updated result with corrected file paths
+        """
+        try:
+            current_dir = os.getcwd()
+            target_dir = os.path.abspath(expected_output_dir)
+            
+            logger.info(f"Post-processing download result - scanning {current_dir} for ONC files")
+            
+            # Find files that look like ONC outputs in current directory
+            onc_files = []
+            current_path = Path(current_dir)
+            
+            # Look for recent files matching ONC patterns
+            import time
+            recent_threshold = time.time() - 600  # Files created in last 10 minutes
+            logger.info(f"Looking for files newer than {recent_threshold} (current time: {time.time()})")
+            
+            patterns = [
+                "*CambridgeBay*.csv",
+                "*CambridgeBay*.xml", 
+                "*CTD*.csv",
+                "*TSSD*.csv",
+                "*.csv"  # Any CSV as fallback
+            ]
+            
+            for pattern in patterns:
+                for file_path in current_path.glob(pattern):
+                    if file_path.is_file():
+                        mtime = file_path.stat().st_mtime
+                        logger.info(f"Found file {file_path.name} with mtime {mtime} (threshold: {recent_threshold})")
+                        if mtime > recent_threshold:
+                            onc_files.append(file_path)
+                            logger.info(f"  -> Added to onc_files list")
+                        else:
+                            logger.info(f"  -> Too old, skipping")
+            
+            # Remove duplicates and sort by modification time (newest first)
+            onc_files = list(set(onc_files))
+            onc_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+            
+            logger.info(f"Found {len(onc_files)} potential ONC files: {[f.name for f in onc_files]}")
+            
+            if not onc_files:
+                logger.warning("No recent ONC files found in current directory")
+                return result
+            
+            # Ensure target directory exists
+            Path(target_dir).mkdir(parents=True, exist_ok=True)
+            
+            # Move files to target directory
+            moved_files = []
+            csv_files = []
+            
+            for file_path in onc_files:
+                target_file = Path(target_dir) / file_path.name
+                
+                try:
+                    if target_file.exists():
+                        logger.info(f"Target file already exists, skipping: {target_file}")
+                        # Still add to results if it's a CSV
+                        if file_path.suffix.lower() == '.csv':
+                            csv_files.append(str(target_file))
+                    else:
+                        import shutil
+                        shutil.move(str(file_path), str(target_file))
+                        moved_files.append(str(target_file))
+                        logger.info(f"Moved {file_path.name} to {target_dir}")
+                        
+                        # Add CSV files to result
+                        if target_file.suffix.lower() == '.csv':
+                            csv_files.append(str(target_file))
+                            
+                except Exception as e:
+                    logger.error(f"Error moving {file_path} to {target_file}: {e}")
+            
+            # Update result with corrected file paths
+            if csv_files:
+                result['csv_files'] = csv_files
+                result['output_directory'] = target_dir
+                logger.info(f"Updated result with {len(csv_files)} CSV files in correct location")
+            
+            if moved_files:
+                logger.info(f"Successfully moved {len(moved_files)} files to {target_dir}")
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in post-processing download result: {e}")
+            return result
     
     def _extract_available_formats(self, products: List[Dict]) -> List[str]:
         """Extract available file formats from products"""

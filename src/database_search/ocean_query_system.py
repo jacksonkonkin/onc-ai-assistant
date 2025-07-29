@@ -5,6 +5,7 @@ Natural Language Query → Parameter Extraction → ONC API Call → Raw JSON Re
 """
 
 import json
+import os
 import sys
 import time
 import logging
@@ -411,7 +412,7 @@ class OceanQuerySystem:
             device_category=device_category,
             date_from=date_from,
             date_to=date_to,
-            output_dir="csv_downloads",
+            output_dir=os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'output')),
             quality_control=True,
             resample="none"
         )
@@ -1328,13 +1329,14 @@ class OceanQuerySystem:
                 print("\n" + "="*70 + "\n")
             
             # Use advanced data downloader for CSV export
+            output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'output'))
             logger.info(f"Downloading CSV data for {device_category} at {location_code}")
             download_result = self.data_downloader.download_csv_data(
                 location_code=location_code,
                 device_category=device_category,
                 date_from=date_from,
                 date_to=date_to,
-                output_dir="output",  # Use main output directory
+                output_dir=output_dir,  # Use absolute path to main output directory
                 quality_control=True,
                 resample="none"
             )
@@ -1464,12 +1466,17 @@ class OceanQuerySystem:
             download_manager = get_download_manager()
             
             # Prepare download parameters for background task
+            # Calculate absolute output directory
+            output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'output'))
+            logger.info(f"🔧 DEBUG: Ocean query system calculated output_dir: {output_dir}")
+            logger.info(f"🔧 DEBUG: Ocean query system current working dir: {os.getcwd()}")
+            
             download_params = {
                 'location_code': location_code,
                 'device_category': device_category,
                 'date_from': date_from,
                 'date_to': date_to,
-                'output_dir': 'output',  # Use main output directory
+                'output_dir': output_dir,  # Use absolute path to main output directory
                 'quality_control': True,
                 'resample': 'none',
                 'background_mode': True,  # Enable background mode optimizations

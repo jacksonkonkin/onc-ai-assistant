@@ -538,8 +538,12 @@ class StatisticalAnalysisEngine:
             if needs_basic_stats:
                 # Use absolute path for output directory to ensure consistency
                 import os
+                # Always use the project root, regardless of where the backend is running from
                 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
                 output_dir = os.path.join(project_root, 'output')
+                
+                # Ensure output directory exists
+                os.makedirs(output_dir, exist_ok=True)
                 
                 download_params = {
                     'location_code': data_params['location_code'],

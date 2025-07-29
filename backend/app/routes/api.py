@@ -90,6 +90,9 @@ async def query(query: Query):
         # Get pipeline instance and process query directly
         pipeline = get_pipeline()
         
+        # DEBUG: Check current working directory
+        logger.info(f"🔧 DEBUG: Backend current working directory: {os.getcwd()}")
+        
         # Create query context with session info
         query_context = {
             'session_id': f"api_session_{query.chatID}_{query.userID}",
@@ -105,32 +108,47 @@ async def query(query: Query):
         logger.info(response)
         logger.info("=" * 80)
         
-        # Check for new CSV files created during processing
+        # Check for new CSV files created during processing in both main output and backend output directories
         new_files = []
+        
+        # Check main output directory
         if output_dir.exists():
             current_files = set(f.name for f in output_dir.glob("*.csv"))
             new_csv_files = current_files - existing_files
             
-            logger.info(f"📊 New CSV files detected: {len(new_csv_files)} files")
-            logger.info(f"📂 Output directory: {output_dir}")
-            logger.info(f"📂 All CSV files in output dir: {list(current_files)}")
-            logger.info(f"📂 Existing files before query: {list(existing_files)}")
-            logger.info(f"📂 New files after query: {list(new_csv_files)}")
+            logger.info(f"📊 New CSV files detected in main output: {len(new_csv_files)} files")
             
             for filename in new_csv_files:
                 file_path = output_dir / filename
-                if file_path.exists():  # Double-check file exists
+                if file_path.exists():
                     file_info = {
                         "filename": filename,
                         "download_url": f"/download/output/{filename}",
                         "size": file_path.stat().st_size
                     }
                     new_files.append(file_info)
-                    logger.info(f"📄 New file: {filename} ({file_info['size']} bytes)")
-                else:
-                    logger.warning(f"⚠️ File {filename} was detected but doesn't exist at {file_path}")
-        else:
-            logger.warning(f"⚠️ Output directory {output_dir} does not exist")
+                    logger.info(f"📄 New file in main output: {filename} ({file_info['size']} bytes)")
+        
+        # Also check backend output directory (where ONC package actually creates files)
+        backend_output_dir = project_root / "backend" / "output"
+        if backend_output_dir.exists():
+            backend_files = set(f.name for f in backend_output_dir.glob("*.csv"))
+            # Get files that are newer than when we started processing
+            import time
+            recent_threshold = time.time() - 300  # Files created in last 5 minutes
+            
+            for filename in backend_files:
+                file_path = backend_output_dir / filename
+                if file_path.exists() and file_path.stat().st_mtime > recent_threshold:
+                    # Check if we already found this file in main output
+                    if not any(f["filename"] == filename for f in new_files):
+                        file_info = {
+                            "filename": filename,
+                            "download_url": f"/download/backend/output/{filename}",
+                            "size": file_path.stat().st_size
+                        }
+                        new_files.append(file_info)
+                        logger.info(f"📄 New file in backend output: {filename} ({file_info['size']} bytes)")
         
         # Include download links in response if files were created
         response_data = {"response": response}
@@ -201,7 +219,8 @@ async def download_file(file_path: str):
     # Security checks
     allowed_dirs = [
         os.path.join(project_root, "output"),
-        os.path.join(project_root, "csv_downloads")
+        os.path.join(project_root, "csv_downloads"),
+        os.path.join(project_root, "backend", "output")  # Where ONC package actually creates files
     ]
     
     # Check if file exists and is in allowed directory

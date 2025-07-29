@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmi:MI_Metadata xmlns:gco="http://standards.iso.org/iso/19115/-3/gco/1.0" xmlns:gml="http://standards.iso.org/iso/19115/-3/gml/1.0"  xmlns:mrd="http://standards.iso.org/iso/19115/-3/mrd/1.0" xmlns:gmi="http://standards.iso.org/iso/19115/-3/gmi/1.0" xmlns:cit="http://standards.iso.org/iso/19115/-3/cit/1.0" xmlns:mdb="http://standards.iso.org/iso/19115/-3/mdb/1.0" xmlns:mco="http://standards.iso.org/iso/19115/-3/mco/1.0" xmlns:mri="http://standards.iso.org/iso/19115/-3/mri/1.0" xmlns:gex="http://standards.iso.org/iso/19115/-3/gex/1.0" xmlns:mmi="http://standards.iso.org/iso/19115/-3/mmi/1.0">
+    <mdb:metadataIdentifier><gco:CharacterString>51640291</gco:CharacterString></mdb:metadataIdentifier>
+    <mdb:dateInfo>
+        <cit:CI_Date>
+            <cit:date>
+                <gco:Date>2025-07-29T19:54:15Z</gco:Date>
+            </cit:date>
+            <cit:dateType>
+                <CI_DateTypeCode codeSpace="ISOTC211/19115" codeListValue="creation" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">creation</CI_DateTypeCode>
+            </cit:dateType>
+        </cit:CI_Date>
+    </mdb:dateInfo>
+    <mdb:metadataStandard>
+        <cit:CI_Citation>
+            <cit:title>
+                <gco:CharacterString>ISO 19115-1:2014 Geographic information -- Metadata -- Part 1:Fundamentals</gco:CharacterString>
+            </cit:title>
+        </cit:CI_Citation>
+    </mdb:metadataStandard>
+    <mdb:contact>
+        <cit:CI_Responsibility>
+            <cit:role>
+                <CI_RoleCode codeSpace="ISOTC211/19115" codeListValue="pointOfContact" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode">pointOfContact</CI_RoleCode>
+            </cit:role>
+            <cit:party><cit:CI_Organisation><cit:name><gco:CharacterString>Ocean Networks Canada</gco:CharacterString></cit:name></cit:CI_Organisation></cit:party>
+            <cit:phone><gco:CharacterString>250-472-5400</gco:CharacterString></cit:phone>
+            <cit:electronicMailAddress><gco:CharacterString>datastewardship@oceannetworks.ca</gco:CharacterString></cit:electronicMailAddress>
+        </cit:CI_Responsibility>
+    </mdb:contact>
+    <mdb:MD_MetadataScope>
+        <mdb:resourceScope>
+            <MD_ScopeCode codeSpace="ISOTC211/19115" codeListValue="dataset" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode">dataset</MD_ScopeCode>
+        </mdb:resourceScope>
+    </mdb:MD_MetadataScope>
+    <mri:MD_DataIdentification>
+        <mri:abstract>
+            <gco:CharacterString>Ocean Networks Canada operates numerous ocean observing systems to support marine research, to monitor ocean properties,
+	        and assess marine environmental conditions. Data flow from various infrastructure facilities including
+	        submarine cabled observatories, land-based marine monitoring stations, and various mobile platforms
+	        to a central hierarchal data archive. Access to the data is provided over the Internet using a variety
+	        of tools ranging from web site interfaces to low-level automatic web services.</gco:CharacterString>
+        </mri:abstract>
+        <mri:purpose>
+            <gco:CharacterString>To support scientific study of the ocean through web-accessible real-time measurements and high temporal resolution long-term observations.</gco:CharacterString>
+        </mri:purpose>
+        <mri:status>
+            <MD_ProgressCode codeSpace="ISOTC211/19115" codeListValue="completed" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode">completed</MD_ProgressCode>
+        </mri:status>
+        <mri:topicCategory>
+            <gco:CharacterString>oceans</gco:CharacterString>
+        </mri:topicCategory>
+        <mri:citation>
+            <mri:CI_Citation>
+                <cit:title>CambridgeBay_UnderwaterNetwork_ConductivityTemperatureDepth</cit:title>
+                <cit:role>
+                    <CI_RoleCode codeSpace="ISOTC211/19115" codeListValue="owner" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode">owner</CI_RoleCode>
+                </cit:role>
+                <cit:name><gco:CharacterString>Ocean Networks Canada</gco:CharacterString></cit:name>
+            </mri:CI_Citation>
+        </mri:citation>
+		<mri:descriptiveKeywords><mri:MD_Keywords><mri:keyword><gco:CharacterString>Sea-Bird SBE 19plus V2 SEACAT CTD</gco:CharacterString></mri:keyword></mri:MD_Keywords><thesaurusName><CI_Citation><cit:title><gco:CharacterString>SeaVoX Device Catalogue</gco:CharacterString></cit:title><cit:edition><gco:CharacterString>1</gco:CharacterString></cit:edition><cit:date><gco:Date>2017-07-05T20:22:23Z</gco:Date></cit:date><cit:dateType><CI_DateTypeCode codeSpace="ISOTC211/19115" codeListValue="lastUpdate" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">lastUpdate</CI_DateTypeCode></cit:dateType></CI_Citation></thesaurusName><mri:MD_Keywords><mri:keyword><gco:CharacterString>CTD</gco:CharacterString></mri:keyword></mri:MD_Keywords><thesaurusName><CI_Citation><cit:title><gco:CharacterString>SeaDataNet device categories</gco:CharacterString></cit:title><cit:edition><gco:CharacterString>3</gco:CharacterString></cit:edition><cit:date><gco:Date>2020-08-05T14:11:35Z</gco:Date></cit:date><cit:dateType><CI_DateTypeCode codeSpace="ISOTC211/19115" codeListValue="lastUpdate" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">lastUpdate</CI_DateTypeCode></cit:dateType></CI_Citation></thesaurusName></mri:descriptiveKeywords>
+		<mri:descriptiveKeywords><mri:MD_Keywords><mri:keyword><gco:CharacterString>depth</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_pressure_due_to_sea_water</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>speed_of_sound_in_sea_water</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_electrical_conductivity</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_practical_salinity</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_temperature</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_density</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_sigma_t</gco:CharacterString></mri:keyword><mri:keyword><gco:CharacterString>sea_water_sigma_theta</gco:CharacterString></mri:keyword><thesaurusName><CI_Citation><cit:title><gco:CharacterString>CF Standard Names</gco:CharacterString></cit:title><cit:edition><gco:CharacterString>27</gco:CharacterString></cit:edition><cit:date><gco:Date>2017-07-25T00:00:00Z</gco:Date></cit:date><cit:dateType><CI_DateTypeCode codeSpace="ISOTC211/19115" codeListValue="lastUpdate" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">lastUpdate</CI_DateTypeCode></cit:dateType></CI_Citation></thesaurusName></mri:MD_Keywords></mri:descriptiveKeywords>
+	</mri:MD_DataIdentification>
+    <gex:EX_Extent>
+        <gex:description>
+            <gco:CharacterString> Location 1 = Ocean Networks Canada -> Arctic -> Cambridge Bay -> Underwater Network</gco:CharacterString>
+        </gex:description>
+        <gex:EX_GeographicBoundingBox>
+            <gex:westBoundingLongtitude>
+                <gco:Decimal>-105.06</gco:Decimal>
+            </gex:westBoundingLongtitude>
+            <gex:eastBoundingLongtitude>
+                <gco:Decimal>-105.06</gco:Decimal>
+            </gex:eastBoundingLongtitude>
+            <gex:southBoundingLatitude>
+                <gco:Decimal>69.11</gco:Decimal>
+            </gex:southBoundingLatitude>
+            <gex:northBoundingLatitude>
+                <gco:Decimal>69.11</gco:Decimal>
+            </gex:northBoundingLatitude>
+        </gex:EX_GeographicBoundingBox>
+        <gex:EX_TemporalExtent>
+            <gex:extent>
+            	<gml:begin><gco:Date>2025-06-01T00:00:00Z</gco:Date></gml:begin>
+            	<gml:end><gco:Date>2025-06-30T23:59:59Z</gco:Date></gml:end>
+            </gex:extent>
+        </gex:EX_TemporalExtent>
+        <gex:EX_VerticalExtent>
+            <gex:minimumValue><gco:Real>9.0</gco:Real></gex:minimumValue>
+            <gex:maximumValue><gco:Real>9.0</gco:Real></gex:maximumValue>
+        </gex:EX_VerticalExtent>
+    </gex:EX_Extent>
+    <mmi:MD_MaintenanceInformation>
+        <mmi:maintenanceAndUpdateFrequency>
+            <MD_MaintenanceFrequencyCode codeSpace="ISOTC211/19115" codeListValue="asNeeded" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode">pointOfContact</MD_MaintenanceFrequencyCode>
+        </mmi:maintenanceAndUpdateFrequency>
+        <mmi:maintenanceNote>
+            <gco:CharacterString>Data curation activities are on going. Data are subject to change as we gather more details on the resource.</gco:CharacterString>
+        </mmi:maintenanceNote>
+    </mmi:MD_MaintenanceInformation>
+    <mrd:MD_Distribution>
+    	<mrd:MD_Distributor>
+       		<cit:role>
+            	<CI_RoleCode codeSpace="ISOTC211/19115" codeListValue="distributor" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode">distributor</CI_RoleCode>
+        	</cit:role>
+        	<cit:name>
+            	<gco:CharacterString>Ocean Networks Canada</gco:CharacterString>
+        	</cit:name>
+        	<cit:electronicMailAddress>
+            	<gco:CharacterString>datastewardship@oceannetworks.ca</gco:CharacterString>
+        	</cit:electronicMailAddress>
+    	</mrd:MD_Distributor>
+  	  	<mrd:MD_DigitalTransferOptions>
+        	<mrd:online>
+            	<cit:CI_OnlineResource>
+            		<cit:description>
+           				 <gco:CharacterString>Raw and clean data can be accessed through ONC's Data Search tool</gco:CharacterString>
+            		</cit:description>
+            		<cit:linkage>
+            			<gco:CharacterString>https://data.oceannetworks.ca/DataSearch</gco:CharacterString>
+        			</cit:linkage>
+        		</cit:CI_OnlineResource>
+        	</mrd:online>
+        	<mrd:transferSize>
+        		<gco:Real>31.641236305236816</gco:Real>
+			</mrd:transferSize>
+    	</mrd:MD_DigitalTransferOptions>
+    </mrd:MD_Distribution>
+	<mco:MD_LegalConstraints>
+    	<mco:useConstraints>
+        	<MD_RestrictionCode codeSpace="ISOTC211/19115" codeListValue="asNeeded" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode">pointOfContact</MD_RestrictionCode>
+      	</mco:useConstraints>
+        <mco:otherConstraints>
+        	<gco:CharacterString>Please refer to our data policy page http://www.oceannetworks.ca/data-tools/data-help/data-usage-policy</gco:CharacterString>
+     	</mco:otherConstraints>
+	</mco:MD_LegalConstraints>
+</gmi:MI_Metadata>
