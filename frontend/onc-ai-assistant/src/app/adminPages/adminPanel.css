@@ -57,7 +57,8 @@
 }
 
 .fileDrop {
-    border: 2px dashed #7F7F7F;
+    border-width: 2px;
+    border-color: #7F7F7F;
     height: 60%;
     margin: auto;
     max-width: 90%;
@@ -67,10 +68,14 @@
     justify-content: center;
 }
 
-.fileDrop p {
+.fileList p {
     text-align: center;
-    color: #7F7F7F;
     font-family: "Open Sans", sans-serif;
+}
+
+.fileList {
+    max-height: 50rem;
+    padding: 5px
 }
 
 .upload {

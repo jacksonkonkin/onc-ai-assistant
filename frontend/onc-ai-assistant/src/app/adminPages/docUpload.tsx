@@ -7,12 +7,14 @@ export default function DocUpload() {
     const browseInput = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
     const [isDragging, setDragging] = useState(false);
+    const [hasFiles, setHasFiles] = useState(false);
 
     const addFiles = (filesToAdd: File[]) => {
         const tempFiles = files;
         for (const i in filesToAdd) {
             tempFiles.push(filesToAdd[i])
         }
+        setHasFiles(true);
         setFiles(tempFiles);
     }
 
@@ -24,6 +26,7 @@ export default function DocUpload() {
 
     const handleDragOver = (e:any) => {
         e.preventDefault();
+        setDragging(true)
     }
 
     const handleDragEnter = () => setDragging(true);
@@ -48,7 +51,8 @@ export default function DocUpload() {
             let file: File = files[i];
             console.log(file.name)
         }
-        setFiles([]);
+        setFiles([]); //clear files
+        setHasFiles(false);
     }
 
     //overflow of filenames listed in the drag and drop isn't being handled but it can take 9 or 10 filenames and display them currently
@@ -60,15 +64,14 @@ export default function DocUpload() {
                 onDrop={handleDrop}
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragExit}
-                style={{backgroundColor: isDragging ? "#d3d3d3" : "white" }}
+                style={{backgroundColor: isDragging ? "#d3d3d3" : "white",  borderStyle: (hasFiles ? "solid" : "dashed")}}
             > 
-                <p style={{visibility: (files.length == 0 ? "visible" : "hidden")}}><i>
+                <div className="fileList" style={{overflow: (hasFiles ? "auto" : "none")}}>
+                    <p style={{display: (hasFiles ? "none" : "block"), padding: "5rem 0", color:"#7F7F7F"}}><i>
                     Drag and drop/upload files here to enhance the assistant's model.
-                </i></p>
-                <div style={{visibility: (files.length == 0 ? "hidden" : "visible")}}>
-                    {Array.from(files).map(file => <p>{file.name}</p>)}
+                    </i></p>
+                    {Array.from(files).map((file, i) => <p key={i} style={{color: "black"}}>{file.name}</p>)}
                 </div>
-
             </div>
             <div className="upload"> 
                 <input ref={browseInput} type="file" onChange={addFromBrowse} hidden multiple/>
