@@ -21,5 +21,11 @@ app.add_middleware(
 
 app.include_router(api.router)
 app.include_router(auth.router)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+
 app.include_router(chat_history.router)     # include chat_history router
 app.include_router(message_routes.router)   # include messages router
