@@ -118,8 +118,16 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
         setChatHistories(histories);
         setSelectedChatId(histories[0].id);
       } else {
-        // Only create a new chat if no existing chats
-        await createNewChat();
+        // Create a new chat directly instead of calling createNewChat() to avoid double creation
+        const newChatTitle = user ? `${user.username}'s New Chat` : "New Chat";
+        const newId = Date.now().toString();
+        const newChat: ChatHistory = { 
+          id: newId, 
+          title: newChatTitle, 
+          messages: [] 
+        };
+        setChatHistories([newChat]);
+        setSelectedChatId(newId);
       }
       
     } catch (error) {
@@ -241,6 +249,12 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
   };
 
   const handleDeleteChat = async (chatId: string) => {
+    // Prevent deletion if this is the only chat left
+    if (chatHistories.length <= 1) {
+      console.log("Cannot delete the last remaining chat");
+      return;
+    }
+
     if (!isLoggedIn) {
       // Local deletion for non-logged in users
       setChatHistories((prev) => {
@@ -249,11 +263,6 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
         if (chatId === selectedChatId) {
           if (filteredHistories.length > 0) {
             setSelectedChatId(filteredHistories[0].id);
-          } else {
-            const newId = Date.now().toString();
-            const newChat = { id: newId, title: "New Chat", messages: [] };
-            setSelectedChatId(newId);
-            return [newChat];
           }
         }
         
@@ -279,10 +288,8 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
         if (chatId === selectedChatId) {
           if (filteredHistories.length > 0) {
             setSelectedChatId(filteredHistories[0].id);
-          } else {
-            // Create a new chat if this was the last one
-            createNewChat();
           }
+          // No need for else case since we guarantee at least one chat remains
         }
         
         return filteredHistories;
@@ -296,12 +303,8 @@ export default function ChatHistoryManager({ children }: ChatHistoryManagerProps
         if (chatId === selectedChatId) {
           if (filteredHistories.length > 0) {
             setSelectedChatId(filteredHistories[0].id);
-          } else {
-            const newId = Date.now().toString();
-            const newChat = { id: newId, title: "New Chat", messages: [] };
-            setSelectedChatId(newId);
-            return [newChat];
           }
+          // No need for else case since we guarantee at least one chat remains
         }
         
         return filteredHistories;
