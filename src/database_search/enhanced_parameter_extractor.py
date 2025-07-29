@@ -5,11 +5,14 @@ Maps natural language queries to specific ONC location/device/property codes
 """
 
 import json
+import logging
 import os
 import sys
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, Tuple, List, Any
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 def load_env_file():
@@ -41,7 +44,7 @@ except ImportError:
 class EnhancedParameterExtractor:
     """Extract parameters and map to exact ONC codes"""
     
-    def __init__(self):
+    def __init__(self, onc_client=None):
         # Initialize Groq client
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
@@ -49,6 +52,9 @@ class EnhancedParameterExtractor:
         
         self.client = Groq(api_key=api_key)
         self.model = "llama3-70b-8192"
+        
+        # Store ONC API client for location discovery
+        self.onc_client = onc_client
         
         # Load ONC codes mappings
         self._load_onc_codes()
@@ -107,6 +113,30 @@ class EnhancedParameterExtractor:
             "cambridge bay met 1": "CBYSS.M1",
             "cambridge bay met 2": "CBYSS.M2",
             "cambridge bay weather": "CBYSS.M1"
+        }
+        
+        # Statistical keywords for detection
+        self.statistical_keywords = {
+            "aggregation": ["min", "minimum", "max", "maximum", "avg", "average", "mean", 
+                          "sum", "total", "count", "median", "mode", "std", "stdev", 
+                          "variance", "var", "range"],
+            "comparison": ["higher", "lower", "greater", "less", "above", "below", 
+                         "exceeds", "under", "compared to", "vs", "versus", "difference"],
+            "temporal": ["trend", "change", "increase", "decrease", "rising", "falling",
+                        "seasonal", "monthly", "daily", "weekly", "yearly", "over time"],
+            "analysis": ["correlation", "relationship", "pattern", "analysis", "statistics",
+                        "statistical", "distribution", "outlier", "anomaly"]
+        }
+        
+        # Time window patterns for statistical analysis
+        self.time_window_patterns = {
+            "minute": ["minute", "min", "1min", "5min", "15min", "30min"],
+            "hourly": ["hour", "hourly", "hr", "1hr", "2hr", "6hr", "12hr"],
+            "daily": ["day", "daily", "per day", "each day", "1day", "24hr"],
+            "weekly": ["week", "weekly", "per week", "each week", "7day"],
+            "monthly": ["month", "monthly", "per month", "each month", "30day"],
+            "yearly": ["year", "yearly", "annual", "per year", "each year", "365day"],
+            "seasonal": ["season", "seasonal", "spring", "summer", "fall", "winter"]
         }
 
     def _load_onc_codes(self):
@@ -199,6 +229,13 @@ IMPORTANT: Current date is {current_date}. When extracting dates:
 - Only use different years if explicitly mentioned in the query
 - For dates like "April 12" without year, extract as "{current_year}-04-12"
 
+CRITICAL: For download_requested field - look for ANY download intent:
+- "Can you download it?" → download_requested: true
+- "download temperature data" → download_requested: true  
+- "export data as CSV" → download_requested: true
+- "save data to file" → download_requested: true
+- "what is the temperature" → download_requested: false
+
 Return ONLY a JSON object with these exact fields:
 {{
     "location_code": "exact ONC location code (e.g. CBYIP, CBYSS.M1)",
@@ -206,7 +243,8 @@ Return ONLY a JSON object with these exact fields:
     "property_code": "exact ONC property code (e.g. seawatertemperature, windspeed)",
     "temporal_reference": "the exact date/time reference from query (use {current_year} for unspecified years)",
     "temporal_type": "single_date or date_range",
-    "depth_meters": null or numeric depth if mentioned
+    "depth_meters": null or numeric depth if mentioned,
+    "download_requested": boolean indicating if user wants to download/export data to files
 }}
 
 Mapping rules:
@@ -219,6 +257,13 @@ Mapping rules:
 - Always use exact codes from the available options
 - If location unclear, default to "CBYIP"
 - If device unclear for property, pick the most appropriate device that has that property
+
+Download detection rules (IMPORTANT - check carefully):
+- Set "download_requested": true if query contains ANY of these keywords: download, export, save, CSV, file, "get data files", "retrieve files"
+- Set "download_requested": true if user asks "Can you download it?", "download it", "export it", "save it as file", "save to file"
+- Set "download_requested": true for "download [parameter] data", "export [parameter] data", "get CSV data"
+- Set "download_requested": false ONLY for queries asking about data values, latest readings, or just showing/displaying data
+- When in doubt about download intent, prefer "download_requested": true if ANY download-related words are present
 
 Return ONLY the JSON object."""
 
@@ -266,30 +311,41 @@ Return ONLY the JSON object."""
         temporal_type = raw_params.get("temporal_type", "single_date")
         depth = raw_params.get("depth_meters")
         
-        # Validate location code
+        # Validate location code - try dynamic discovery first if available
         if location_code not in self.location_devices:
-            # Try to map from aliases
-            query_lower = original_query.lower()
-            location_code = None
-            for alias, code in self.location_aliases.items():
-                if alias in query_lower:
-                    location_code = code
-                    break
-            
-            if not location_code:
-                location_code = "CBYIP"  # Default location
+            # Try dynamic location discovery for Cambridge Bay queries
+            discovered_location = self._discover_location(original_query)
+            if discovered_location:
+                location_code = discovered_location
+            else:
+                # Try to map from aliases
+                query_lower = original_query.lower()
+                location_code = None
+                for alias, code in self.location_aliases.items():
+                    if alias in query_lower:
+                        location_code = code
+                        break
+                
+                if not location_code:
+                    location_code = "CBYIP"  # Default location
 
         # Validate device category exists for this location
         available_devices = self.location_devices.get(location_code, [])
         
-        # First check if current device has the requested property
-        current_device_properties = self.device_properties.get(device_category, [])
-        
-        # If device doesn't exist OR device doesn't have the property, find appropriate device
-        if (device_category not in available_devices or 
-            property_code not in current_device_properties):
-            # Try to find appropriate device for the property
-            device_category = self._find_device_for_property(property_code, available_devices)
+        # Try dynamic device discovery if device category is not found
+        if device_category not in available_devices:
+            discovered_device = self._discover_device(original_query)
+            if discovered_device:
+                device_category = discovered_device
+            else:
+                # First check if current device has the requested property
+                current_device_properties = self.device_properties.get(device_category, [])
+                
+                # If device doesn't exist OR device doesn't have the property, find appropriate device
+                if (device_category not in available_devices or 
+                    property_code not in current_device_properties):
+                    # Try to find appropriate device for the property
+                    device_category = self._find_device_for_property(property_code, available_devices)
 
         # Validate property code exists for the selected device
         available_properties = self.device_properties.get(device_category, [])
@@ -312,6 +368,15 @@ Return ONLY the JSON object."""
         # Parse temporal information
         start_time, end_time = self._parse_temporal_reference(temporal_ref, temporal_type)
         
+        # Validate date range - check for future dates
+        validation_errors = self._validate_date_range(start_time, end_time, original_query)
+        if validation_errors:
+            return {
+                "status": "error",
+                "message": validation_errors,
+                "data": None
+            }
+        
         # Build final result
         result = {
             "status": "success",
@@ -319,9 +384,12 @@ Return ONLY the JSON object."""
                 "location_code": location_code,
                 "device_category": device_category,
                 "property_code": property_code,
+                "temporal_reference": temporal_ref if temporal_ref else None,
+                "temporal_type": temporal_type,
                 "start_time": start_time.strftime('%Y-%m-%dT%H:%M:%S.000Z') if start_time else None,
                 "end_time": end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z') if end_time else None,
-                "depth_meters": depth
+                "depth_meters": depth,
+                "download_requested": raw_params.get("download_requested", self._fallback_download_detection(original_query))
             },
             "metadata": {
                 "original_query": original_query,
@@ -333,6 +401,37 @@ Return ONLY the JSON object."""
         }
         
         return result
+
+    def _fallback_download_detection(self, query: str) -> bool:
+        """
+        Fallback method to detect download intent if LLM missed it
+        """
+        query_lower = query.lower()
+        
+        # Download keywords
+        download_keywords = [
+            'download', 'export', 'save', 'csv', 'file', 'files',
+            'retrieve files', 'get data files', 'save to file',
+            'export data', 'download data', 'save data'
+        ]
+        
+        # Download phrases
+        download_phrases = [
+            'can you download', 'download it', 'export it', 
+            'save it', 'get csv', 'as csv', 'to file'
+        ]
+        
+        # Check for download keywords
+        for keyword in download_keywords:
+            if keyword in query_lower:
+                return True
+        
+        # Check for download phrases
+        for phrase in download_phrases:
+            if phrase in query_lower:
+                return True
+        
+        return False
 
     def _find_device_for_property(self, property_code: str, available_devices: List[str]) -> str:
         """Find appropriate device that has the requested property"""
@@ -360,35 +459,134 @@ Return ONLY the JSON object."""
         return available_devices[0] if available_devices else "CTD"
 
     def _parse_temporal_reference(self, temporal_ref: str, temporal_type: str) -> Tuple[datetime, datetime]:
-        """Convert natural language dates to datetime objects"""
+        """Convert natural language dates and times to datetime objects with enhanced interval support"""
+        import re
+        from calendar import monthrange
+        
         if not temporal_ref:
-            # Default to last 24 hours
+            # For no temporal reference, default to "latest" - very short window
             end_time = datetime.now()
-            start_time = end_time - timedelta(days=1)
+            start_time = end_time - timedelta(minutes=5)  # 5-minute window for "latest"
             return start_time, end_time
         
         now = datetime.now()
-        temporal_ref = temporal_ref.lower().strip()
+        temporal_ref_lower = temporal_ref.lower().strip()
         
-        # First try to parse as specific date formats
+        # Handle date ranges FIRST (from X to Y) - including slash format
+        # This must come before single date parsing to catch ranges properly
+        if ' to ' in temporal_ref_lower or ' - ' in temporal_ref_lower or '/' in temporal_ref:
+            return self._parse_date_range(temporal_ref, now)
+        
+        # Handle "entire month" and "whole month" queries BEFORE other month parsing
+        entire_month_patterns = [
+            r'entire month of (\w+)(?:\s+(\d{4}))?',  # "entire month of April" or "entire month of April 2024"
+            r'whole month of (\w+)(?:\s+(\d{4}))?',   # "whole month of April" or "whole month of April 2024"
+            r'full month of (\w+)(?:\s+(\d{4}))?',    # "full month of April" or "full month of April 2024"
+            r'(\w+)\s+entire month(?:\s+(\d{4}))?',   # "April entire month" or "April entire month 2024"
+            r'(\w+)\s+whole month(?:\s+(\d{4}))?',    # "April whole month" or "April whole month 2024"
+            r'(\w+)\s+full month(?:\s+(\d{4}))?',     # "April full month" or "April full month 2024"
+        ]
+        
+        for pattern in entire_month_patterns:
+            match = re.search(pattern, temporal_ref_lower)
+            if match:
+                month_name = match.group(1).lower()
+                year_str = match.group(2) if len(match.groups()) > 1 and match.group(2) else None
+                
+                # Map month names to numbers
+                months = {
+                    'january': 1, 'jan': 1, 'february': 2, 'feb': 2, 'march': 3, 'mar': 3,
+                    'april': 4, 'apr': 4, 'may': 5, 'june': 6, 'jun': 6,
+                    'july': 7, 'jul': 7, 'august': 8, 'aug': 8, 'september': 9, 'sep': 9, 'sept': 9,
+                    'october': 10, 'oct': 10, 'november': 11, 'nov': 11, 'december': 12, 'dec': 12
+                }
+                
+                if month_name in months:
+                    month_num = months[month_name]
+                    year = int(year_str) if year_str else now.year
+                    
+                    # If no year specified and the month is in the future, use previous year
+                    if not year_str:
+                        test_date = datetime(year, month_num, 1)
+                        if test_date > now:
+                            year -= 1
+                    
+                    # Get the full month boundaries
+                    start_time = datetime(year, month_num, 1, 0, 0, 0)
+                    _, last_day = monthrange(year, month_num)
+                    end_time = datetime(year, month_num, last_day, 23, 59, 59)
+                    
+                    return start_time, end_time
+        
+        # Handle "week of" queries
+        if 'week of' in temporal_ref_lower:
+            # Extract the date after "week of"
+            week_match = re.search(r'week of\s+(.+)', temporal_ref_lower)
+            if week_match:
+                date_str = week_match.group(1).strip()
+                base_date = self._parse_specific_date(date_str, now)
+                if base_date:
+                    # Calculate start of week (Monday) and end of week (Sunday)
+                    days_since_monday = base_date.weekday()
+                    week_start = base_date - timedelta(days=days_since_monday)
+                    week_end = week_start + timedelta(days=6)
+                    
+                    start_time = datetime.combine(week_start, datetime.min.time())
+                    end_time = datetime.combine(week_end, datetime.max.time())
+                    return start_time, end_time
+        
+        # Handle explicit intervals
+        interval_patterns = {
+            # Multi-unit intervals
+            r'last (\d+) hours?': lambda m: (now - timedelta(hours=int(m.group(1))), now),
+            r'past (\d+) hours?': lambda m: (now - timedelta(hours=int(m.group(1))), now),
+            r'last (\d+) days?': lambda m: (now - timedelta(days=int(m.group(1))), now),
+            r'past (\d+) days?': lambda m: (now - timedelta(days=int(m.group(1))), now),
+            r'last (\d+) weeks?': lambda m: (now - timedelta(weeks=int(m.group(1))), now),
+            r'past (\d+) weeks?': lambda m: (now - timedelta(weeks=int(m.group(1))), now),
+            r'last (\d+) months?': lambda m: self._calculate_months_ago(int(m.group(1)), now),
+            r'past (\d+) months?': lambda m: self._calculate_months_ago(int(m.group(1)), now),
+            
+            # Common intervals
+            r'last hour': lambda m: (now - timedelta(hours=1), now),
+            r'past hour': lambda m: (now - timedelta(hours=1), now),
+            r'last 24 hours?': lambda m: (now - timedelta(hours=24), now),
+            r'past 24 hours?': lambda m: (now - timedelta(hours=24), now),
+            r'last week': lambda m: (now - timedelta(weeks=1), now),
+            r'past week': lambda m: (now - timedelta(weeks=1), now),
+            r'last month': lambda m: self._calculate_months_ago(1, now),
+            r'past month': lambda m: self._calculate_months_ago(1, now),
+            
+            # Specific timeframes - FIXED to span full periods
+            r'this week': lambda m: self._get_current_week_boundaries(now),
+            r'this month': lambda m: self._get_current_month_boundaries(now),
+            
+            # "Latest" and "current" - minimal intervals
+            r'latest|current|now': lambda m: (now - timedelta(minutes=5), now),
+        }
+        
+        # Check for interval patterns
+        import re
+        for pattern, handler in interval_patterns.items():
+            match = re.search(pattern, temporal_ref_lower)
+            if match:
+                return handler(match)
+        
+        # Try to parse as specific date formats
         date = self._parse_specific_date(temporal_ref, now)
         
         if date is None:
             # Handle relative dates
-            if "today" in temporal_ref:
+            if "today" in temporal_ref_lower:
                 date = now.date()
-            elif "yesterday" in temporal_ref:
+            elif "yesterday" in temporal_ref_lower:
                 date = (now - timedelta(days=1)).date()
-            elif "last week" in temporal_ref:
-                start_time = now - timedelta(weeks=1)
-                end_time = now
-                return start_time, end_time
             else:
                 # Handle day names
                 days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
                 day_found = False
                 for i, day in enumerate(days):
-                    if day in temporal_ref:
+                    if day in temporal_ref_lower:
                         current_weekday = now.weekday()
                         days_diff = i - current_weekday
                         if days_diff >= 0:
@@ -398,18 +596,167 @@ Return ONLY the JSON object."""
                         break
                 
                 if not day_found:
-                    # Default to yesterday to avoid future dates
-                    date = (now - timedelta(days=1)).date()
+                    # Default to latest 5-minute window for unknown temporal references
+                    return now - timedelta(minutes=5), now
         
-        # For single dates, create time range (use a smaller range for better results)
-        if temporal_type == "single_date":
-            start_time = datetime.combine(date, datetime.min.time())
-            end_time = start_time + timedelta(hours=12)  # 12 hour window instead of 24
+        # Parse specific time if mentioned
+        specific_time = self._parse_specific_time(temporal_ref)
+        
+        # Determine interval scope based on context
+        if temporal_type == "single_date" or "instant" in temporal_type:
+            if specific_time is not None:
+                # Use exact timestamp for precise time queries - small window
+                start_time = datetime.combine(date, specific_time)
+                end_time = start_time + timedelta(minutes=1)
+            else:
+                # For date-only queries, use the full day
+                start_time = datetime.combine(date, datetime.min.time())
+                end_time = start_time + timedelta(days=1) - timedelta(seconds=1)
         else:
+            # Default to full day range
             start_time = datetime.combine(date, datetime.min.time())
-            end_time = start_time + timedelta(days=1)  # 1 day range instead of 7
+            end_time = start_time + timedelta(days=1) - timedelta(seconds=1)
         
         return start_time, end_time
+    
+    def _parse_date_range(self, temporal_ref: str, now: datetime) -> Tuple[datetime, datetime]:
+        """Parse date ranges like '2024-01-01 to 2024-01-31', 'Monday to Friday', or '2024-01-01/2024-01-31'"""
+        import re
+        
+        # Handle different range separators more carefully
+        start_str = None
+        end_str = None
+        
+        # Try different range separators in order of preference
+        if ' to ' in temporal_ref:
+            parts = temporal_ref.split(' to ')
+            if len(parts) == 2:
+                start_str, end_str = parts[0].strip(), parts[1].strip()
+        elif '/' in temporal_ref and temporal_ref.count('/') == 1:
+            # Only split on single forward slash (not part of date like 2024/07/20)
+            # Check if it's a range separator by seeing if we have two ISO-style dates
+            slash_pos = temporal_ref.find('/')
+            if slash_pos > 0:
+                potential_start = temporal_ref[:slash_pos].strip()
+                potential_end = temporal_ref[slash_pos+1:].strip()
+                # Check if both parts look like dates (YYYY-MM-DD format)
+                if (re.match(r'\d{4}-\d{1,2}-\d{1,2}', potential_start) and 
+                    re.match(r'\d{4}-\d{1,2}-\d{1,2}', potential_end)):
+                    start_str, end_str = potential_start, potential_end
+        elif ' - ' in temporal_ref:
+            # Only split on spaced dashes (not date dashes)
+            parts = temporal_ref.split(' - ')
+            if len(parts) == 2:
+                start_str, end_str = parts[0].strip(), parts[1].strip()
+        
+        if not start_str or not end_str:
+            # Fallback to last 24 hours
+            return now - timedelta(days=1), now
+        
+        # Try to parse both parts as dates
+        start_date = self._parse_specific_date(start_str, now)
+        end_date = self._parse_specific_date(end_str, now)
+        
+        if start_date and end_date:
+            start_time = datetime.combine(start_date, datetime.min.time())
+            end_time = datetime.combine(end_date, datetime.max.time())
+            return start_time, end_time
+        
+        # Fallback
+        return now - timedelta(days=1), now
+
+    def _validate_date_range(self, start_time: datetime, end_time: datetime, query: str) -> Optional[str]:
+        """Validate date range and return error message if invalid"""
+        if not start_time or not end_time:
+            return None
+        
+        now = datetime.now()
+        
+        # Make sure we're comparing timezone-aware or timezone-naive consistently
+        if start_time.tzinfo is None:
+            comparison_start = start_time
+            comparison_now = now
+        else:
+            comparison_start = start_time.replace(tzinfo=None)
+            comparison_now = now
+        
+        # Check for future dates (allowing some tolerance for time zones and processing delays)
+        if comparison_start > comparison_now:
+            days_in_future = (comparison_start - comparison_now).days
+            if days_in_future >= 0:
+                return f"I cannot provide data for future dates. The requested date ({comparison_start.strftime('%B %d, %Y')}) is {days_in_future} days in the future. Ocean sensor data is only available for past dates. Please ask for a date in the past."
+        
+        # Also check if the date is very recent (data may not be processed yet)
+        days_ago = (comparison_now - comparison_start).days
+        if days_ago < 1:  # Less than 1 day ago
+            return f"The requested date ({comparison_start.strftime('%B %d, %Y')}) is very recent. Ocean sensor data typically has a 1-2 day processing delay. Please try requesting data from at least 2 days ago for more reliable results."
+        
+        # Check for very old dates (before ONC data availability)
+        onc_start_date = datetime(2007, 1, 1)  # ONC started operations around 2007
+        if end_time < onc_start_date:
+            return f"The requested date ({start_time.strftime('%B %d, %Y')}) is before Ocean Networks Canada data collection began. Please request data from 2007 onwards."
+        
+        # Check for excessively long date ranges
+        duration = end_time - start_time
+        if duration.days > 365:  # More than a year
+            return f"The requested date range spans {duration.days} days, which is quite large. For better performance, please try a shorter date range (up to 1 year)."
+        
+        return None
+
+    def _parse_specific_time(self, temporal_ref: str) -> Optional:
+        """
+        Parse specific time expressions like '4:00pm', '16:00', 'at 4pm', etc.
+        Returns a time object if parsing succeeds, None otherwise.
+        """
+        import re
+        from datetime import time
+        
+        # Common time patterns
+        time_patterns = [
+            # 12-hour format with AM/PM
+            r'(\d{1,2}):(\d{2})\s*(am|pm)',  # 4:00pm, 12:30am
+            r'(\d{1,2})\s*(am|pm)',          # 4pm, 12am
+            r'(\d{1,2}):(\d{2})',            # 16:00, 4:00 (24-hour assumed if > 12)
+            r'at\s+(\d{1,2}):(\d{2})\s*(am|pm)',  # at 4:00pm
+            r'at\s+(\d{1,2})\s*(am|pm)',          # at 4pm
+            r'at\s+(\d{1,2}):(\d{2})',            # at 16:00
+        ]
+        
+        temporal_ref = temporal_ref.lower().strip()
+        
+        for pattern in time_patterns:
+            match = re.search(pattern, temporal_ref)
+            if match:
+                groups = match.groups()
+                
+                if len(groups) == 3:  # Hour, minute, AM/PM
+                    hour, minute, am_pm = groups
+                    hour, minute = int(hour), int(minute)
+                    
+                    # Convert to 24-hour format
+                    if am_pm == 'pm' and hour != 12:
+                        hour += 12
+                    elif am_pm == 'am' and hour == 12:
+                        hour = 0
+                        
+                elif len(groups) == 2:
+                    if groups[1] in ['am', 'pm']:  # Hour only with AM/PM
+                        hour, am_pm = groups
+                        hour, minute = int(hour), 0
+                        
+                        # Convert to 24-hour format
+                        if am_pm == 'pm' and hour != 12:
+                            hour += 12
+                        elif am_pm == 'am' and hour == 12:
+                            hour = 0
+                    else:  # Hour and minute (24-hour format)
+                        hour, minute = int(groups[0]), int(groups[1])
+                
+                # Validate time
+                if 0 <= hour <= 23 and 0 <= minute <= 59:
+                    return time(hour, minute)
+        
+        return None
 
     def _parse_specific_date(self, temporal_ref: str, now: datetime) -> Optional:
         """
@@ -523,6 +870,518 @@ Return ONLY the JSON object."""
         
         return None
 
+    def _calculate_months_ago(self, months: int, now: datetime) -> Tuple[datetime, datetime]:
+        """
+        Calculate proper month boundaries going back N months
+        
+        Args:
+            months: Number of months to go back
+            now: Current datetime
+            
+        Returns:
+            Tuple of (start_time, end_time) for the complete target month
+        """
+        from calendar import monthrange
+        
+        # Calculate the target month and year
+        target_month = now.month - months
+        target_year = now.year
+        
+        # Handle year boundary crossing
+        while target_month <= 0:
+            target_month += 12
+            target_year -= 1
+        
+        # Get the first day of the target month
+        start_time = datetime(target_year, target_month, 1, 0, 0, 0)
+        
+        # Get the last day of the target month
+        _, last_day = monthrange(target_year, target_month)
+        end_time = datetime(target_year, target_month, last_day, 23, 59, 59)
+        
+        return start_time, end_time
+
+    def _get_current_week_boundaries(self, now: datetime) -> Tuple[datetime, datetime]:
+        """
+        Get the boundaries for the current week (Monday to Sunday)
+        
+        Args:
+            now: Current datetime
+            
+        Returns:
+            Tuple of (start_time, end_time) for the current week
+        """
+        # Calculate start of week (Monday)
+        days_since_monday = now.weekday()
+        week_start = now - timedelta(days=days_since_monday)
+        week_end = week_start + timedelta(days=6)
+        
+        start_time = datetime.combine(week_start.date(), datetime.min.time())
+        end_time = datetime.combine(week_end.date(), datetime.max.time())
+        
+        return start_time, end_time
+
+    def _get_current_month_boundaries(self, now: datetime) -> Tuple[datetime, datetime]:
+        """
+        Get the boundaries for the current month (1st to last day)
+        
+        Args:
+            now: Current datetime
+            
+        Returns:
+            Tuple of (start_time, end_time) for the current month
+        """
+        from calendar import monthrange
+        
+        # Get the first day of the current month
+        start_time = datetime(now.year, now.month, 1, 0, 0, 0)
+        
+        # Get the last day of the current month
+        _, last_day = monthrange(now.year, now.month)
+        end_time = datetime(now.year, now.month, last_day, 23, 59, 59)
+        
+        return start_time, end_time
+
+    def _discover_location(self, query: str) -> Optional[str]:
+        """
+        Discover Cambridge Bay location using ONC API client
+        
+        Args:
+            query: User query that may contain location references
+            
+        Returns:
+            Location code if found, None otherwise
+        """
+        if not self.onc_client or not query:
+            return None
+        
+        try:
+            query_lower = query.lower()
+            
+            # Check if query mentions Cambridge Bay
+            if any(term in query_lower for term in ["cambridge bay", "cambridge", "iqaluktuuttiaq"]):
+                # Get Cambridge Bay locations from ONC API
+                cambridge_locations = self.onc_client.find_cambridge_bay_locations()
+                
+                if cambridge_locations:
+                    # For queries about locations/deployments, return the main CBYIP location
+                    # For specific device/sensor queries, could return more specific locations
+                    if any(term in query_lower for term in ["location", "where", "site", "station"]):
+                        # Return first location for general location queries
+                        return cambridge_locations[0].get('locationCode', 'CBYIP')
+                    else:
+                        # For data queries, use CBYIP as default Cambridge Bay location
+                        return 'CBYIP'
+                        
+        except Exception as e:
+            # If API call fails, fall back to default
+            logger.warning(f"Location discovery failed: {e}")
+            return None
+        
+        return None
+
+    def _discover_device(self, query: str) -> Optional[str]:
+        """
+        Discover Cambridge Bay devices using ONC API client
+        
+        Args:
+            query: User query that may contain device references
+            
+        Returns:
+            Device category code if found, None otherwise
+        """
+        if not self.onc_client or not query:
+            return None
+        
+        try:
+            query_lower = query.lower()
+            
+            # Check for device discovery queries
+            device_discovery_terms = [
+                "device", "sensor", "instrument", "equipment", "ctd", "hydrophone",
+                "weather station", "oxygen sensor", "ph sensor", "ice profiler",
+                "what sensors", "what devices", "what instruments"
+            ]
+            
+            if any(term in query_lower for term in device_discovery_terms):
+                # Extract device type from query
+                device_type = self._extract_device_type_from_query(query_lower)
+                
+                if device_type:
+                    # Try to find devices of this type at Cambridge Bay
+                    devices = self.onc_client.discover_devices_by_type(device_type)
+                    
+                    if devices:
+                        # Return the device category of the first matching device
+                        return devices[0].get('deviceCategoryCode')
+                        
+        except Exception as e:
+            logger.warning(f"Device discovery failed: {e}")
+            return None
+        
+        return None
+
+    def _extract_device_type_from_query(self, query_lower: str) -> Optional[str]:
+        """
+        Extract device type from natural language query
+        
+        Args:
+            query_lower: Lowercase query string
+            
+        Returns:
+            Device type if found, None otherwise
+        """
+        # Device type patterns to look for
+        device_patterns = {
+            'ctd': ['ctd', 'conductivity', 'temperature', 'depth'],
+            'hydrophone': ['hydrophone', 'acoustic', 'underwater sound', 'sound pressure'],
+            'weather': ['weather', 'meteorological', 'wind', 'air temperature', 'met station'],
+            'oxygen': ['oxygen', 'o2', 'dissolved oxygen'],
+            'ph': ['ph', 'acidity', 'ph sensor'],
+            'ice': ['ice', 'ice profiler', 'ice draft']
+        }
+        
+        for device_type, patterns in device_patterns.items():
+            if any(pattern in query_lower for pattern in patterns):
+                return device_type
+        
+        # If no specific pattern matched, try generic terms
+        if any(term in query_lower for term in ['sensor', 'device', 'instrument']):
+            # Look for measurement types that might indicate device type
+            if any(term in query_lower for term in ['temperature', 'salinity', 'conductivity']):
+                return 'ctd'
+            elif any(term in query_lower for term in ['wind', 'air', 'weather']):
+                return 'weather'
+            elif any(term in query_lower for term in ['sound', 'acoustic', 'noise']):
+                return 'hydrophone'
+        
+        return None
+
+    def detect_statistical_intent(self, query: str) -> Dict[str, Any]:
+        """
+        Detect if a query has statistical intent and extract statistical parameters
+        
+        Args:
+            query: Natural language query
+            
+        Returns:
+            Dictionary with statistical intent detection results
+        """
+        query_lower = query.lower()
+        
+        # Initialize detection results
+        statistical_intent = {
+            'is_statistical': False,
+            'operations': [],
+            'time_aggregation': None,
+            'comparison_type': None,
+            'analysis_type': None,
+            'confidence': 0.0
+        }
+        
+        confidence_score = 0.0
+        
+        # Check for aggregation operations
+        found_operations = []
+        for operation in self.statistical_keywords['aggregation']:
+            if operation in query_lower:
+                found_operations.append(operation)
+                confidence_score += 1.0
+        
+        if found_operations:
+            statistical_intent['operations'] = found_operations
+            statistical_intent['is_statistical'] = True
+        
+        # Check for comparison keywords
+        comparison_found = []
+        for comparison in self.statistical_keywords['comparison']:
+            if comparison in query_lower:
+                comparison_found.append(comparison)
+                confidence_score += 0.8
+        
+        if comparison_found:
+            statistical_intent['comparison_type'] = comparison_found[0]
+            statistical_intent['is_statistical'] = True
+        
+        # Check for temporal analysis
+        temporal_found = []
+        for temporal in self.statistical_keywords['temporal']:
+            if temporal in query_lower:
+                temporal_found.append(temporal)
+                confidence_score += 0.9
+        
+        if temporal_found:
+            statistical_intent['analysis_type'] = 'temporal'
+            statistical_intent['is_statistical'] = True
+        
+        # Check for general analysis keywords
+        analysis_found = []
+        for analysis in self.statistical_keywords['analysis']:
+            if analysis in query_lower:
+                analysis_found.append(analysis)
+                confidence_score += 0.7
+        
+        if analysis_found:
+            if not statistical_intent['analysis_type']:
+                statistical_intent['analysis_type'] = 'general'
+            statistical_intent['is_statistical'] = True
+        
+        # Detect time aggregation windows
+        for window_type, patterns in self.time_window_patterns.items():
+            for pattern in patterns:
+                if pattern in query_lower:
+                    statistical_intent['time_aggregation'] = window_type
+                    confidence_score += 0.6
+                    statistical_intent['is_statistical'] = True
+                    break
+            if statistical_intent['time_aggregation']:
+                break
+        
+        # Calculate final confidence score
+        max_possible_score = 4.3  # Rough estimate of max score
+        statistical_intent['confidence'] = min(confidence_score / max_possible_score, 1.0)
+        
+        # If we found any statistical indicators, mark as statistical
+        if confidence_score > 0:
+            statistical_intent['is_statistical'] = True
+        
+        return statistical_intent
+    
+    def extract_statistical_parameters(self, query: str) -> Dict[str, Any]:
+        """
+        Extract statistical parameters from a query
+        
+        Args:
+            query: Natural language query with statistical intent
+            
+        Returns:
+            Dictionary with extracted statistical parameters
+        """
+        # First get basic parameters
+        basic_params = self.extract_parameters(query)
+        
+        # Then get statistical intent
+        statistical_intent = self.detect_statistical_intent(query)
+        
+        # Enhanced statistical parameter extraction using LLM
+        if statistical_intent['is_statistical']:
+            try:
+                enhanced_stats = self._extract_statistical_parameters_with_llm(query, statistical_intent)
+                
+                # Merge basic parameters with statistical parameters
+                result = {
+                    'status': basic_params.get('status', 'success'),
+                    'parameters': basic_params.get('parameters', {}),
+                    'statistical_intent': statistical_intent,
+                    'statistical_parameters': enhanced_stats,
+                    'is_statistical_query': True
+                }
+                
+                return result
+                
+            except Exception as e:
+                logger.error(f"Error in statistical parameter extraction: {e}")
+                # Fall back to basic detection
+                result = {
+                    'status': basic_params.get('status', 'success'),
+                    'parameters': basic_params.get('parameters', {}),
+                    'statistical_intent': statistical_intent,
+                    'statistical_parameters': self._extract_basic_statistical_params(query),
+                    'is_statistical_query': True
+                }
+                return result
+        else:
+            # Not a statistical query, return basic parameters
+            result = basic_params.copy()
+            result['is_statistical_query'] = False
+            result['statistical_intent'] = statistical_intent
+            return result
+    
+    def _extract_statistical_parameters_with_llm(self, query: str, statistical_intent: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Use LLM to extract detailed statistical parameters
+        
+        Args:
+            query: User query
+            statistical_intent: Basic statistical intent detection results
+            
+        Returns:
+            Detailed statistical parameters
+        """
+        system_prompt = """You are an expert at extracting statistical analysis parameters from natural language queries about oceanographic data.
+
+Extract statistical parameters and return ONLY valid JSON with these fields:
+- operations: list of statistical operations (min, max, avg, sum, count, etc.)
+- time_window: time aggregation window (hourly, daily, weekly, monthly, yearly, etc.)
+- comparison_criteria: what to compare (locations, time periods, thresholds)
+- grouping: how to group data (by time, location, device, depth)
+- threshold_values: any numeric thresholds mentioned
+- analysis_type: type of analysis (basic_stats, trend, correlation, seasonal)
+
+Available operations: min, max, avg, mean, sum, count, median, std, variance, range, trend, correlation"""
+
+        extraction_prompt = f"""Extract statistical parameters from this query:
+Query: "{query}"
+
+Pre-detected intent: {json.dumps(statistical_intent, indent=2)}
+
+Return ONLY valid JSON with the statistical parameters."""
+
+        try:
+            completion = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": extraction_prompt}
+                ],
+                temperature=0.1,
+                max_tokens=500
+            )
+            
+            response_text = completion.choices[0].message.content.strip()
+            
+            # Clean and parse JSON
+            if response_text.startswith('```json'):
+                response_text = response_text.replace('```json', '').replace('```', '').strip()
+            elif response_text.startswith('```'):
+                response_text = response_text.replace('```', '').strip()
+            
+            statistical_params = json.loads(response_text)
+            
+            # Validate and clean the parameters
+            validated_params = self._validate_statistical_parameters(statistical_params)
+            
+            return validated_params
+            
+        except Exception as e:
+            logger.error(f"LLM statistical parameter extraction failed: {e}")
+            return self._extract_basic_statistical_params(query)
+    
+    def _extract_basic_statistical_params(self, query: str) -> Dict[str, Any]:
+        """
+        Extract basic statistical parameters using pattern matching
+        
+        Args:
+            query: User query
+            
+        Returns:
+            Basic statistical parameters
+        """
+        query_lower = query.lower()
+        
+        # Extract operations
+        operations = []
+        for operation in self.statistical_keywords['aggregation']:
+            if operation in query_lower:
+                operations.append(operation)
+        
+        # Extract time window  
+        time_window = None
+        for window_type, patterns in self.time_window_patterns.items():
+            for pattern in patterns:
+                if pattern in query_lower:
+                    time_window = window_type
+                    break
+            if time_window:
+                break
+        
+        # Extract comparison criteria
+        comparison_criteria = []
+        for comparison in self.statistical_keywords['comparison']:
+            if comparison in query_lower:
+                comparison_criteria.append(comparison)
+        
+        # Determine analysis type
+        analysis_type = 'basic_stats'
+        if any(word in query_lower for word in ['trend', 'change', 'increase', 'decrease']):
+            analysis_type = 'trend'
+        elif any(word in query_lower for word in ['correlation', 'relationship']):
+            analysis_type = 'correlation'
+        elif any(word in query_lower for word in ['seasonal', 'monthly', 'yearly']):
+            analysis_type = 'seasonal'
+        
+        return {
+            'operations': operations if operations else ['avg', 'min', 'max'],
+            'time_window': time_window,
+            'comparison_criteria': comparison_criteria,
+            'grouping': self._extract_grouping_from_query(query_lower),
+            'threshold_values': self._extract_numeric_thresholds(query),
+            'analysis_type': analysis_type
+        }
+    
+    def _extract_grouping_from_query(self, query_lower: str) -> Dict[str, bool]:
+        """Extract grouping criteria from query"""
+        return {
+            'by_time': any(phrase in query_lower for phrase in ['by hour', 'by day', 'by month', 'hourly', 'daily', 'monthly']),
+            'by_location': 'by location' in query_lower or 'per location' in query_lower,
+            'by_device': 'by device' in query_lower or 'per device' in query_lower,
+            'by_depth': 'by depth' in query_lower or 'per depth' in query_lower
+        }
+    
+    def _extract_numeric_thresholds(self, query: str) -> List[float]:
+        """Extract numeric thresholds from query"""
+        import re
+        
+        # Find numbers in the query
+        numbers = re.findall(r'-?\d+\.?\d*', query)
+        
+        # Convert to float and filter reasonable values for oceanographic data
+        thresholds = []
+        for num_str in numbers:
+            try:
+                num = float(num_str)
+                # Filter reasonable oceanographic values (rough ranges)
+                if -50 <= num <= 100:  # Temperature, salinity, etc.
+                    thresholds.append(num)
+            except ValueError:
+                continue
+        
+        return thresholds
+    
+    def _validate_statistical_parameters(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate and clean statistical parameters from LLM
+        
+        Args:
+            params: Raw parameters from LLM
+            
+        Returns:
+            Validated and cleaned parameters
+        """
+        validated = {
+            'operations': [],
+            'time_window': None,
+            'comparison_criteria': [],
+            'grouping': {},
+            'threshold_values': [],
+            'analysis_type': 'basic_stats'
+        }
+        
+        # Validate operations
+        if 'operations' in params and isinstance(params['operations'], list):
+            valid_operations = []
+            all_operations = self.statistical_keywords['aggregation']
+            for op in params['operations']:
+                if op.lower() in [o.lower() for o in all_operations]:
+                    valid_operations.append(op.lower())
+            validated['operations'] = valid_operations if valid_operations else ['avg', 'min', 'max']
+        else:
+            validated['operations'] = ['avg', 'min', 'max']
+        
+        # Validate time window
+        if 'time_window' in params:
+            time_window = params['time_window']
+            if time_window and time_window.lower() in self.time_window_patterns:
+                validated['time_window'] = time_window.lower()
+        
+        # Validate other fields
+        validated['comparison_criteria'] = params.get('comparison_criteria', [])
+        validated['grouping'] = params.get('grouping', {})
+        validated['threshold_values'] = params.get('threshold_values', [])
+        validated['analysis_type'] = params.get('analysis_type', 'basic_stats')
+        
+        return validated
+
     def get_available_options(self) -> Dict:
         """Return all available ONC codes for reference"""
         return {
@@ -531,7 +1390,9 @@ Return ONLY the JSON object."""
             "aliases": {
                 "parameters": self.parameter_aliases,
                 "locations": self.location_aliases
-            }
+            },
+            "statistical_operations": self.statistical_keywords,
+            "time_windows": self.time_window_patterns
         }
 
 

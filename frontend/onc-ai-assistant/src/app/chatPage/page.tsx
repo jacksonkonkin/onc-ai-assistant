@@ -2,16 +2,31 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiThumbsUp, FiThumbsDown, FiDownload } from "react-icons/fi";
+import ReactMarkdown from "react-markdown";
 import { useAuth } from "../context/AuthContext";
 import ChatHistorySidebar from "./ChatHistorySidebar";
 import ChatHistoryManager from "./ChatHistoryManager";
 import "./chatPage.css";
 
+type DownloadFile = {
+  filename: string;
+  download_url: string;
+  size: number;
+};
+
 type Message = {
+  id?: string;
   sender: "user" | "ai";
   text: string;
   isThinking?: boolean;
+  userQuery?: string; // Store the original user query for feedback
+  feedback?: "thumbs_up" | "thumbs_down" | null;
+  downloads?: DownloadFile[];
+  chat_id?: string;
+  user_id?: string;
+  timestamp?: string;
+  rating?: number;
 };
 
 export default function ChatPage() {
@@ -25,10 +40,10 @@ export default function ChatPage() {
     setPageLoaded(true);
   }, []);
 
-  const fetchAIResponse = async (prompt: string): Promise<string> => {
+  const fetchAIResponse = async (prompt: string): Promise<{text: string, downloads?: DownloadFile[]}> => {
     try {
       const response = await fetch(
-        "https://onc-assistant-822f952329ee.herokuapp.com/query",
+        "http://localhost:8000/query",
         {
           method: "POST",
           headers: {
@@ -43,42 +58,53 @@ export default function ChatPage() {
       }
 
       const data = await response.json();
-      return data.response ?? "No response from AI.";
+      return {
+        text: data.response ?? "No response from AI.",
+        downloads: data.downloads
+      };
     } catch (error) {
       console.error("Error fetching AI response:", error);
-      return "Sorry, something went wrong.";
+      return { text: "Sorry, something went wrong." };
     }
   };
 
-  const createHandleSend = (addMessageToChat: (message: Message) => void, updateLastMessage: (updates: Partial<Message>) => void, selectedChat: any) => async () => {
-    if (!input.trim() || !selectedChat) return;
+  const createHandleSend = (addMessageToChat: (message: Message) => void, updateLastMessage: (updates: Partial<Message>) => void) => async () => {
+    if (!input.trim()) return;
 
-    const userMessage: Message = { sender: "user", text: input };
-    addMessageToChat(userMessage);
-    addMessageToChat({ sender: "ai", text: "", isThinking: true });
+    const userQuery = input;
+    const userMessage: Message = { 
+      id: Date.now().toString() + "-user", 
+      sender: "user", 
+      text: input 
+    };
+    const aiMessage: Message = { 
+      id: Date.now().toString() + "-ai", 
+      sender: "ai", 
+      text: "", 
+      isThinking: true, 
+      userQuery: userQuery,
+      feedback: null
+    };
     
-    const userInput = input;
+    addMessageToChat(userMessage);
+    addMessageToChat(aiMessage);
     setInput("");
 
     try {
-      const aiText = await fetchAIResponse(userInput);
+      const aiResponse = await fetchAIResponse(userQuery);
 
-      // Type out the AI response
+      // Typewriter effect
       let index = 0;
       const typeInterval = setInterval(() => {
         updateLastMessage({
           isThinking: false,
-          text: aiText.slice(0, index + 1),
+          text: aiResponse.text.slice(0, index + 1),
+          downloads: aiResponse.downloads
         });
 
         index++;
-        if (index >= aiText.length) {
+        if (index >= aiResponse.text.length) {
           clearInterval(typeInterval);
-          
-          // Save AI response to database after typing animation completes
-          if (isLoggedIn) {
-            saveAIMessageToDatabase(aiText, selectedChat.id);
-          }
         }
       }, 10);
     } catch (error) {
@@ -90,32 +116,47 @@ export default function ChatPage() {
     }
   };
 
-  const saveAIMessageToDatabase = async (aiText: string, chatId: string) => {
-    try {
-      const response = await fetch(
-        "https://onc-assistant-822f952329ee.herokuapp.com/api/messages",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            text: aiText,
-            chat_id: chatId,
-            user_id: "-1", // Special ID to indicate AI message
-          }),
-        }
-      );
 
-      if (!response.ok) {
-        console.error("Failed to save AI message to database");
+  const [messageFeedback, setMessageFeedback] = useState<Record<string, "thumbs_up" | "thumbs_down">>({});
+
+  const submitFeedback = async (messageId: string | undefined, rating: "thumbs_up" | "thumbs_down", messages: Message[]) => {
+    if (!messageId) return;
+    
+    const message = messages.find(msg => msg.id === messageId);
+    if (!message || message.sender !== "ai") return;
+
+    try {
+      const response = await fetch("http://localhost:8000/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          rating: rating,
+          query: message.userQuery || "",
+          response: message.text,
+          metadata: {
+            messageId: messageId,
+            timestamp: new Date().toISOString()
+          }
+        }),
+      });
+
+      if (response.ok) {
+        // Update the local feedback state
+        setMessageFeedback(prev => ({
+          ...prev,
+          [messageId]: rating
+        }));
+      } else {
+        console.error("Failed to submit feedback");
       }
     } catch (error) {
-      console.error("Error saving AI message:", error);
+      console.error("Error submitting feedback:", error);
     }
   };
 
-  const handleKeyPress = (handleSend: () => void) => (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (handleSend: () => void) => (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault(); // Prevent new line
       handleSend();
@@ -147,6 +188,33 @@ export default function ChatPage() {
         </span>
       );
     }
+    
+    // Render markdown for AI responses, plain text for user messages
+    if (msg.sender === "ai" && msg.text) {
+      return (
+        <div className="markdown-content">
+          <ReactMarkdown 
+            components={{
+              // Custom components for better styling
+              h1: ({ children }) => <h1 className="markdown-h1">{children}</h1>,
+              h2: ({ children }) => <h2 className="markdown-h2">{children}</h2>,
+              h3: ({ children }) => <h3 className="markdown-h3">{children}</h3>,
+              p: ({ children }) => <p className="markdown-p">{children}</p>,
+              ul: ({ children }) => <ul className="markdown-ul">{children}</ul>,
+              ol: ({ children }) => <ol className="markdown-ol">{children}</ol>,
+              li: ({ children }) => <li className="markdown-li">{children}</li>,
+              strong: ({ children }) => <strong className="markdown-strong">{children}</strong>,
+              em: ({ children }) => <em className="markdown-em">{children}</em>,
+              code: ({ children }) => <code className="markdown-code">{children}</code>,
+              blockquote: ({ children }) => <blockquote className="markdown-blockquote">{children}</blockquote>,
+            }}
+          >
+            {msg.text}
+          </ReactMarkdown>
+        </div>
+      );
+    }
+    
     return msg.text;
   };
 
@@ -164,7 +232,7 @@ export default function ChatPage() {
         updateLastMessage,
         isLoading,
       }) => {
-        const handleSend = createHandleSend(addMessageToChat, updateLastMessage, selectedChat);
+        const handleSend = createHandleSend(addMessageToChat, updateLastMessage);
         
         return (
           <div className="chat-page-wrapper">
@@ -201,7 +269,58 @@ export default function ChatPage() {
                           msg.sender === "user" ? "user-msg" : "ai-msg"
                         }`}
                       >
-                        {renderMessageText(msg)}
+                        <div className="message-content">
+                          {renderMessageText(msg)}
+                        </div>
+                        {msg.sender === "ai" && !msg.isThinking && msg.text && (
+                          <>
+                            <div className="feedback-buttons">
+                              <button
+                                onClick={() => submitFeedback(msg.id, "thumbs_up", messages)}
+                                className={`feedback-btn ${messageFeedback[msg.id || ''] === "thumbs_up" ? "active" : ""}`}
+                                disabled={messageFeedback[msg.id || ''] !== undefined}
+                                title="Helpful"
+                              >
+                                <FiThumbsUp size={16} />
+                              </button>
+                              <button
+                                onClick={() => submitFeedback(msg.id, "thumbs_down", messages)}
+                                className={`feedback-btn ${messageFeedback[msg.id || ''] === "thumbs_down" ? "active" : ""}`}
+                                disabled={messageFeedback[msg.id || ''] !== undefined}
+                                title="Not helpful"
+                              >
+                                <FiThumbsDown size={16} />
+                              </button>
+                              {messageFeedback[msg.id || ''] && (
+                                <span className="feedback-thanks">
+                                  Thanks for your feedback!
+                                </span>
+                              )}
+                            </div>
+                            {msg.downloads && msg.downloads.length > 0 && (
+                              <div className="download-section">
+                                <h4 className="download-title">Available Downloads:</h4>
+                                <div className="download-buttons">
+                                  {msg.downloads.map((file, index) => (
+                                    <a
+                                      key={index}
+                                      href={`http://localhost:8000${file.download_url}`}
+                                      download={file.filename}
+                                      className="download-btn"
+                                      title={`Download ${file.filename} (${(file.size / 1024 / 1024).toFixed(2)} MB)`}
+                                    >
+                                      <FiDownload size={16} />
+                                      <span className="download-filename">{file.filename}</span>
+                                      <span className="download-size">
+                                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                      </span>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     ))
                   )}
@@ -212,7 +331,7 @@ export default function ChatPage() {
                     placeholder="Type a message..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress(handleSend)}
+                    onKeyDown={handleKeyDown(handleSend)}
                     className="chat-input"
                     rows={1}
                     disabled={isLoading}

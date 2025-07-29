@@ -1,0 +1,1151 @@
+"""
+Advanced ONC Data Downloader - Integration of Sprint 3 Scripts
+Provides comprehensive data product discovery and download capabilities with query routing
+"""
+
+import os
+import sys
+import logging
+import warnings
+from typing import Dict, Any, List, Optional, Union
+from datetime import datetime, timedelta
+from pathlib import Path
+import pandas as pd
+import json
+
+from .onc_api_client import ONCAPIClient
+
+# Suppress specific ONC package warnings about metadata downloads
+warnings.filterwarnings("ignore", message="Metadata file not downloaded.*", category=RuntimeWarning)
+
+logger = logging.getLogger(__name__)
+
+try:
+    from onc import ONC
+    HAS_ONC_PACKAGE = True
+except ImportError:
+    logger.warning("ONC Python package not available. Using custom API client for basic functionality.")
+    HAS_ONC_PACKAGE = False
+
+# Query routing is handled by the main system query router
+
+
+class AdvancedDataDownloader:
+    """
+    Advanced data downloader integrating Sprint 3 capabilities
+    Supports data product discovery, archive downloads, and CSV exports
+    """
+    
+    def __init__(self, onc_token: str = None):
+        """
+        Initialize the advanced data downloader
+        
+        Args:
+            onc_token: ONC API token (optional, will use default if not provided)
+        """
+        # Use token from environment or parameter
+        token = onc_token or os.getenv('ONC_API_TOKEN', '45b4e105-43ed-411e-bd1b-1d2799eda3c4')
+        
+        try:
+            if HAS_ONC_PACKAGE:
+                # Use official ONC package if available
+                self.onc_client = ONC(token)
+                self.api_client = None
+                logger.info("Advanced Data Downloader initialized with ONC package")
+            else:
+                # Use custom API client as fallback
+                self.onc_client = None
+                self.api_client = ONCAPIClient(token)
+                logger.info("Advanced Data Downloader initialized with custom API client")
+        except Exception as e:
+            logger.error(f"Failed to initialize data downloader: {e}")
+            raise
+    
+    # Query classification is handled by the main system query router
+    # This class focuses on data download functionality only
+    
+    def discover_data_products(self, query_params: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Discover available data products with advanced filtering
+        Based on Sprint 3 discover_data_products.py
+        
+        Args:
+            query_params: Dictionary with filtering parameters:
+                - locationCode: e.g., "BACAX", "SEVIP"
+                - deviceCategoryCode: e.g., "CTD", "ADCP2MHZ", "HYDROPHONE"
+                - deviceCode: Specific device code
+                - dataProductCode: e.g., "TSSD", "TSSP"
+                - extension: e.g., "csv", "mat", "png", "pdf"
+                - dataProductName: Search term for product name
+                
+        Returns:
+            Dictionary with discovered products and metadata
+        """
+        try:
+            logger.info(f"Discovering data products with params: {query_params}")
+            
+            if self.onc_client:
+                # Use official ONC package
+                params = query_params or {}
+                data_products = self.onc_client.getDataProducts(params)
+                
+                # Organize results by category
+                result = {
+                    'status': 'success',
+                    'total_products': len(data_products),
+                    'products': data_products,
+                    'categories': self._categorize_data_products(data_products),
+                    'filters_applied': params,
+                    'discovery_time': datetime.utcnow().isoformat()
+                }
+                
+                logger.info(f"Discovered {len(data_products)} data products")
+                return result
+            else:
+                # Fallback using custom API client
+                return self._discover_products_with_custom_client(query_params)
+            
+        except Exception as e:
+            logger.error(f"Error discovering data products: {e}")
+            return {
+                'status': 'error',
+                'message': str(e),
+                'products': [],
+                'total_products': 0
+            }
+    
+    def _discover_products_with_custom_client(self, query_params: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Discover data products using custom API client"""
+        try:
+            params = query_params or {}
+            location_code = params.get('locationCode')
+            device_category = params.get('deviceCategoryCode')
+            
+            if not location_code:
+                location_code = 'CBYIP'  # Default to Cambridge Bay
+            
+            # Get available devices as a proxy for data products
+            devices = self.api_client.get_devices(location_code, device_category)
+            
+            # Simulate data product discovery
+            simulated_products = []
+            for device in devices:
+                device_code = device.get('deviceCode', '')
+                device_name = device.get('deviceName', 'Unknown Device')
+                
+                # Create simulated data products for common formats
+                for ext in ['csv', 'json']:
+                    product = {
+                        'dataProductCode': 'TSSD' if ext == 'csv' else 'RAW',
+                        'dataProductName': f'Time Series Data - {device_name}',
+                        'extension': ext,
+                        'hasDeviceData': True,
+                        'hasPropertyData': True,
+                        'deviceCode': device_code,
+                        'locationCode': location_code
+                    }
+                    simulated_products.append(product)
+            
+            result = {
+                'status': 'success',
+                'total_products': len(simulated_products),
+                'products': simulated_products,
+                'categories': self._categorize_data_products(simulated_products),
+                'filters_applied': params,
+                'discovery_time': datetime.utcnow().isoformat(),
+                'note': 'Simulated data products based on available devices (custom API client)'
+            }
+            
+            logger.info(f"Discovered {len(simulated_products)} simulated data products")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in custom data products discovery: {e}")
+            return {
+                'status': 'error',
+                'message': f"Custom discovery failed: {str(e)}",
+                'products': [],
+                'total_products': 0
+            }
+    
+    def get_archived_files(self, query_params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Get list of archived files with advanced filtering
+        Based on Sprint 3 download_archived_files.py
+        
+        Args:
+            query_params: Dictionary with parameters:
+                - deviceCode: Specific device code
+                - deviceCategoryCode: Device category
+                - locationCode: Location code
+                - extension: File extension filter
+                - dateFrom: Start date (ISO format)
+                - dateTo: End date (ISO format)
+                
+        Returns:
+            Dictionary with file information
+        """
+        try:
+            logger.info(f"Getting archived files with params: {query_params}")
+            
+            # Get archived files
+            archived_files = self.onc_client.getArchivefile(query_params)
+            
+            # Process and organize results
+            result = {
+                'status': 'success',
+                'total_files': len(archived_files),
+                'files': archived_files,
+                'size_summary': self._calculate_size_summary(archived_files),
+                'time_range': self._extract_time_range(archived_files),
+                'file_types': self._get_file_type_summary(archived_files),
+                'query_params': query_params
+            }
+            
+            logger.info(f"Found {len(archived_files)} archived files")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error getting archived files: {e}")
+            return {
+                'status': 'error',
+                'message': str(e),
+                'files': [],
+                'total_files': 0
+            }
+    
+    def download_data_product(self, product_params: Dict[str, Any], 
+                             output_dir: str = "downloads",
+                             background_mode: bool = False) -> Dict[str, Any]:
+        """
+        Download data products with processing options
+        Based on Sprint 3 download_data_products.py
+        
+        Args:
+            product_params: Dictionary with parameters:
+                - locationCode: Location code
+                - deviceCategoryCode: Device category
+                - dataProductCode: Product code (e.g., "TSSD", "TSSP")
+                - extension: File format
+                - dateFrom: Start date
+                - dateTo: End date
+                - dpo_qualityControl: Quality control option
+                - dpo_resample: Resampling option
+                - dpo_dataGaps: Data gaps option
+            output_dir: Directory to save downloaded files
+            
+        Returns:
+            Dictionary with download results
+        """
+        try:
+            logger.info(f"Downloading data product with params: {product_params}")
+            
+            # Ensure output directory exists
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            
+            if self.onc_client:
+                # Use official ONC package with timeout handling
+                logger.info(f"Starting ONC data product order in background mode: {background_mode}")
+                
+                try:
+                    import signal
+                    
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("Download timeout after 300 seconds")
+                    
+                    # Set timeout for 5 minutes
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(300)  # 5 minutes timeout
+                    
+                    try:
+                        # Change to output directory before making ONC API calls
+                        original_cwd = os.getcwd()
+                        logger.info(f"🔧 DEBUG: Advanced downloader changing from {original_cwd} to {os.path.abspath(output_dir)}")
+                        os.chdir(output_dir)
+                        logger.info(f"🔧 DEBUG: Advanced downloader now in: {os.getcwd()}")
+                        
+                        try:
+                            # First try with metadata file included
+                            try:
+                                logger.info(f"Making ONC API call: orderDataProduct with metadata")
+                                result = self.onc_client.orderDataProduct(
+                                    product_params, 
+                                    includeMetadataFile=True
+                                )
+                                logger.info(f"ONC data product order completed with metadata")
+                                logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
+                            except Exception as metadata_error:
+                                # If metadata fails, try without it (many data products don't support metadata)
+                                error_str = str(metadata_error)
+                                if any(keyword in error_str for keyword in [
+                                    "Metadata file not valid", 
+                                    "index=meta", 
+                                    "API Error 127",
+                                    "Bad Request",
+                                    "RuntimeWarning: Metadata file not downloaded"
+                                ]):
+                                    logger.warning(f"Metadata file not supported for this data product: {error_str}")
+                                    logger.info("Retrying download without metadata file...")
+                                    result = self.onc_client.orderDataProduct(product_params)
+                                    logger.info(f"ONC data product order completed successfully without metadata")
+                                    logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
+                                else:
+                                    # Re-raise if it's a different error
+                                    raise metadata_error
+                        finally:
+                            # Always restore the original working directory
+                            os.chdir(original_cwd)
+                            
+                            # Move any files that were created in the original directory to the target output directory
+                            if original_cwd != os.path.abspath(output_dir):
+                                self._move_files_to_output_dir(original_cwd, output_dir)
+                    finally:
+                        signal.alarm(0)  # Cancel the alarm
+                        
+                except TimeoutError as timeout_error:
+                    logger.error(f"ONC orderDataProduct timed out: {timeout_error}")
+                    return {
+                        'status': 'error',
+                        'message': f"Download timed out after 5 minutes. This may indicate an issue with the API or network connection.",
+                        'download_result': None
+                    }
+                except Exception as onc_error:
+                    logger.error(f"ONC orderDataProduct failed: {onc_error}")
+                    return {
+                        'status': 'error',
+                        'message': f"ONC data product order failed: {str(onc_error)}",
+                        'download_result': None
+                    }
+                
+                # Process download result
+                download_info = {
+                    'status': 'success',
+                    'download_result': result,
+                    'output_directory': output_dir,
+                    'product_params': product_params,
+                    'download_time': datetime.utcnow().isoformat()
+                }
+                
+                # Add file information if available
+                if isinstance(result, dict) and 'files' in result:
+                    download_info['downloaded_files'] = result['files']
+                    download_info['file_count'] = len(result['files'])
+                elif isinstance(result, list):
+                    download_info['downloaded_files'] = result
+                    download_info['file_count'] = len(result)
+                else:
+                    download_info['downloaded_files'] = []
+                    download_info['file_count'] = 0
+                
+                logger.info(f"Successfully downloaded data product")
+                return download_info
+            else:
+                # Fallback using custom API client
+                return self._download_data_product_with_custom_client(product_params, output_dir)
+            
+        except Exception as e:
+            logger.error(f"Error downloading data product: {e}")
+            return {
+                'status': 'error',
+                'message': str(e),
+                'download_result': None
+            }
+    
+    def _download_data_product_with_custom_client(self, product_params: Dict[str, Any], 
+                                                 output_dir: str) -> Dict[str, Any]:
+        """Download data product using custom API client as fallback"""
+        try:
+            location_code = product_params.get('locationCode')
+            device_category = product_params.get('deviceCategoryCode')
+            date_from = product_params.get('dateFrom')
+            date_to = product_params.get('dateTo')
+            extension = product_params.get('extension', 'csv')
+            
+            if extension == 'csv':
+                # For CSV, use our CSV download method
+                return self._download_csv_with_custom_client(
+                    location_code, device_category, date_from, date_to,
+                    output_dir, True, "none"
+                )
+            else:
+                # For other formats, return a message that we can't handle them
+                return {
+                    'status': 'error',
+                    'message': f"Custom API client only supports CSV downloads. Requested format: {extension}",
+                    'download_result': None
+                }
+                
+        except Exception as e:
+            logger.error(f"Error in custom data product download: {e}")
+            return {
+                'status': 'error',
+                'message': f"Custom data product download failed: {str(e)}",
+                'download_result': None
+            }
+    
+    def bulk_download_archived_files(self, query_params: Dict[str, Any], 
+                                   output_dir: str = "downloads", 
+                                   generate_urls_only: bool = False) -> Dict[str, Any]:
+        """
+        Bulk download archived files or generate download URLs
+        
+        Args:
+            query_params: Query parameters for file selection
+            output_dir: Directory to save files
+            generate_urls_only: If True, only generate URLs without downloading
+            
+        Returns:
+            Dictionary with download results or URLs
+        """
+        try:
+            if generate_urls_only:
+                # Generate download URLs for external download manager
+                urls = self.onc_client.getArchivefileUrls(query_params, joinedWithNewline=True)
+                
+                return {
+                    'status': 'success',
+                    'download_urls': urls.split('\n') if isinstance(urls, str) else urls,
+                    'url_count': len(urls.split('\n')) if isinstance(urls, str) else len(urls),
+                    'query_params': query_params
+                }
+            else:
+                # Direct bulk download
+                Path(output_dir).mkdir(parents=True, exist_ok=True)
+                
+                # Change to output directory before downloading
+                original_cwd = os.getcwd()
+                os.chdir(output_dir)
+                
+                try:
+                    # Download all matching files
+                    download_result = self.onc_client.downloadDirectArchivefile(query_params)
+                finally:
+                    # Always restore the original working directory
+                    os.chdir(original_cwd)
+                    
+                    # Move any files that were created in the original directory to the target output directory
+                    if original_cwd != os.path.abspath(output_dir):
+                        self._move_files_to_output_dir(original_cwd, output_dir)
+                
+                return {
+                    'status': 'success',
+                    'download_result': download_result,
+                    'output_directory': output_dir,
+                    'query_params': query_params,
+                    'download_time': datetime.utcnow().isoformat()
+                }
+                
+        except Exception as e:
+            logger.error(f"Error in bulk download: {e}")
+            return {
+                'status': 'error',
+                'message': str(e),
+                'download_result': None
+            }
+    
+    def download_csv_data(self, location_code: str, device_category: str,
+                         date_from: str, date_to: str,
+                         output_dir: str = "csv_downloads",
+                         quality_control: bool = True,
+                         resample: str = "none",
+                         background_mode: bool = False,
+                         progress_callback: Optional[callable] = None,
+                         force_download: bool = False,
+                         user_query: str = None,
+                         session_id: str = None) -> Dict[str, Any]:
+        """
+        Download CSV data for a specific location and device with duplicate prevention
+        Optimized for CSV data export functionality with background support
+        
+        Args:
+            location_code: Location code (e.g., "SEVIP", "BACAX", "CBYIP")
+            device_category: Device category (e.g., "CTD", "ADCP2MHZ")
+            date_from: Start date in ISO format
+            date_to: End date in ISO format
+            output_dir: Directory to save CSV files
+            quality_control: Apply quality control
+            resample: Resampling option ("none", "average", "minMax", "minMaxAvg")
+            background_mode: Whether running in background (affects logging/progress)
+            progress_callback: Optional callback for progress updates
+            force_download: Skip duplicate checking if True
+            user_query: Original user query for duplicate detection
+            session_id: Session ID for conversation-aware deduplication
+            
+        Returns:
+            Dictionary with download results and CSV file paths
+        """
+        try:
+            # Check for duplicates first unless forced
+            if not force_download:
+                from .download_manager import get_download_manager
+                
+                dm = get_download_manager(session_id)
+                download_params = {
+                    'location_code': location_code,
+                    'device_category': device_category,
+                    'date_from': date_from,
+                    'date_to': date_to,
+                    'quality_control': quality_control,
+                    'resample': resample
+                }
+                
+                duplicate_info = dm.check_for_duplicate_request(download_params, user_query or f"CSV data: {device_category} @ {location_code}")
+                if duplicate_info:
+                    if duplicate_info['type'] == 'active_download':
+                        logger.info(f"Active download detected: {duplicate_info['download_id']}")
+                        return {
+                            'status': 'duplicate_active',
+                            'message': f"Similar download already in progress: {duplicate_info['download_id']}",
+                            'csv_files': [],
+                            'duplicate_info': duplicate_info
+                        }
+                    elif duplicate_info['type'] == 'recent_download':
+                        logger.info(f"Recent download detected, reusing files: {duplicate_info['file_count']} files")
+                        return {
+                            'status': 'duplicate_recent',
+                            'message': f"Using recently downloaded data ({duplicate_info['file_count']} files)",
+                            'csv_files': duplicate_info.get('files_created', []),
+                            'duplicate_info': duplicate_info
+                        }
+            
+            log_level = logging.DEBUG if background_mode else logging.INFO
+            logger.log(log_level, f"Downloading CSV data for {device_category} at {location_code} (background: {background_mode})")
+            
+            # Report progress if callback provided
+            if progress_callback:
+                progress_callback("Starting download...", 0)
+            
+            if self.onc_client:
+                # Use official ONC package
+                result = self._download_csv_with_onc_package(
+                    location_code, device_category, date_from, date_to, 
+                    output_dir, quality_control, resample, background_mode, progress_callback
+                )
+            else:
+                # Use custom API client fallback
+                result = self._download_csv_with_custom_client(
+                    location_code, device_category, date_from, date_to,
+                    output_dir, quality_control, resample, background_mode, progress_callback
+                )
+            
+            # Add to download manager's recent cache if successful
+            if result.get('status') == 'success' and not force_download:
+                try:
+                    from .download_manager import get_download_manager
+                    dm = get_download_manager(session_id)
+                    download_params = {
+                        'location_code': location_code,
+                        'device_category': device_category,
+                        'date_from': date_from,
+                        'date_to': date_to,
+                        'quality_control': quality_control,
+                        'resample': resample
+                    }
+                    download_key = dm._generate_download_key(download_params)
+                    dm._add_to_recent_downloads(download_key, {
+                        'download_id': f"csv_{location_code}_{device_category}_{hash(date_from)}",
+                        'status': 'completed',
+                        'files_created': result.get('csv_files', []),
+                        'params': download_params
+                    })
+                    logger.debug(f"Added CSV download to recent cache: {download_key}")
+                except Exception as e:
+                    logger.warning(f"Failed to add to download cache: {e}")
+            
+            # Final progress update
+            if progress_callback and result.get('status') == 'success':
+                file_count = len(result.get('csv_files', []))
+                progress_callback(f"Download completed - {file_count} files created", 100)
+            
+            # Post-process to move files to correct location and update result
+            if result.get('status') == 'success':
+                result = self._post_process_download_result(result, output_dir)
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error downloading CSV data: {e}")
+            return {
+                'status': 'error',
+                'message': str(e),
+                'csv_files': []
+            }
+    
+    def _download_csv_with_onc_package(self, location_code: str, device_category: str,
+                                      date_from: str, date_to: str, output_dir: str,
+                                      quality_control: bool, resample: str,
+                                      background_mode: bool = False,
+                                      progress_callback: Optional[callable] = None) -> Dict[str, Any]:
+        """Download CSV using official ONC package"""
+        # Parameters for CSV data download
+        params = {
+            "locationCode": location_code,
+            "deviceCategoryCode": device_category,
+            "dataProductCode": "TSSD",  # Time Series Scalar Data
+            "extension": "csv",
+            "dateFrom": date_from,
+            "dateTo": date_to,
+            "dpo_qualityControl": 1 if quality_control else 0,
+            "dpo_resample": resample,
+            "dpo_dataGaps": 0
+        }
+        
+        # Show API call summary before download starts
+        print("\n" + "🔍 **ONC API Call Summary**")
+        print("\n**📋 Request Parameters:**")
+        print(f"• **Location**: `{location_code}`")
+        print(f"• **Device Type**: `{device_category}`") 
+        print(f"• **Data Product**: `TSSD`")
+        print(f"• **File Format**: `csv`")
+        print(f"• **Start Date**: `{date_from}`")
+        print(f"• **End Date**: `{date_to}`")
+        
+        print("\n**⚙️ Processing Options:**")
+        print(f"• **Quality Control**: `{'Enabled' if quality_control else 'Disabled'}`")
+        print(f"• **Resampling**: `{resample}`")
+        print("• **Data Gaps**: `No gap markers`")
+        
+        print("\n**🌐 API Endpoint:**")
+        print("```")
+        print("orderDataProduct")
+        print("```")
+        
+        print("\n**📡 Full API Call:**")
+        param_string = "&".join([f"{k}={v}" for k, v in params.items()])
+        api_call = f"https://data.oceannetworks.ca/api/orderDataProduct?{param_string}&token=YOUR_TOKEN"
+        print("```")
+        print(api_call)
+        print("```")
+        
+        print(f"\n**💡 What this does:** Orders TSSD from {device_category} at {location_code} for the period {date_from} to {date_to}.")
+        
+        print("\n" + "─" * 70)
+        print("\n🚀 **Starting download...**")
+        print()
+
+        # Download the CSV data
+        logger.info(f"Calling download_data_product with params: {params}")
+        download_result = self.download_data_product(params, output_dir, background_mode)
+        logger.info(f"download_data_product returned: status={download_result.get('status', 'NO_STATUS')}")
+        logger.info(f"download_data_product keys: {list(download_result.keys()) if isinstance(download_result, dict) else 'Not a dict'}")
+        
+        if download_result['status'] == 'success':
+            # First, try to move files from current directory to expected location
+            download_result = self._post_process_download_result(download_result, output_dir)
+            
+            # Process CSV files for additional metadata
+            logger.info(f"Download status is success, looking for CSV files in: {output_dir}")
+            csv_files = self._find_csv_files(download_result, output_dir)
+            logger.info(f"Found {len(csv_files)} CSV files: {csv_files}")
+            
+            # Check if we actually got data files
+            if not csv_files:
+                logger.warning(f"Download completed but no CSV files found for {location_code} {device_category} {date_from} to {date_to}")
+                # Return a specific status for no-data scenarios
+                return {
+                    'status': 'no_data',
+                    'message': f'Download completed but no data available for the requested time period ({date_from} to {date_to})',
+                    'csv_files': [],
+                    'location_code': location_code,
+                    'device_category': device_category,
+                    'date_range': f"{date_from} to {date_to}"
+                }
+            
+            # Skip heavy CSV analysis in background mode to avoid blocking
+            if background_mode:
+                csv_info = {'file_count': len(csv_files), 'files': [], 'background_mode': True}
+                if progress_callback:
+                    progress_callback("Skipping detailed analysis in background mode", 95)
+            else:
+                csv_info = self._analyze_csv_files(csv_files)
+            
+            download_result.update({
+                'csv_files': csv_files,
+                'csv_analysis': csv_info,
+                'location_code': location_code,
+                'device_category': device_category,
+                'date_range': f"{date_from} to {date_to}"
+            })
+        
+        return download_result
+    
+    def _download_csv_with_custom_client(self, location_code: str, device_category: str,
+                                        date_from: str, date_to: str, output_dir: str,
+                                        quality_control: bool, resample: str,
+                                        background_mode: bool = False,
+                                        progress_callback: Optional[callable] = None) -> Dict[str, Any]:
+        """Download CSV using custom API client as fallback"""
+        try:
+            # Create output directory
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            
+            # Use our existing API client to get scalar data
+            log_level = logging.DEBUG if background_mode else logging.INFO
+            logger.log(log_level, "Using custom API client for CSV data download")
+            
+            if progress_callback:
+                progress_callback("Finding devices...", 10)
+            
+            # Get devices at location
+            devices = self.api_client.get_devices(location_code, device_category)
+            if not devices:
+                return {
+                    'status': 'error',
+                    'message': f"No {device_category} devices found at {location_code}",
+                    'csv_files': []
+                }
+            
+            if progress_callback:
+                progress_callback(f"Found {len(devices)} devices, downloading data...", 20)
+            
+            csv_files = []
+            all_data = []
+            
+            # Get data from each device
+            total_devices = min(len(devices), 3)  # Limit to first 3 devices for demo
+            for idx, device in enumerate(devices[:total_devices]):
+                device_code = device.get('deviceCode')
+                if not device_code:
+                    continue
+                
+                try:
+                    # Update progress
+                    if progress_callback:
+                        device_progress = 20 + (idx / total_devices) * 60  # 20-80% for device processing
+                        progress_callback(f"Processing device {idx+1}/{total_devices}: {device_code}", device_progress)
+                    
+                    # Get scalar data for temperature property
+                    property_code = 'seawatertemperature' if 'temperature' in device_category.lower() else None
+                    
+                    data = self.api_client.get_scalar_data(
+                        device_code=device_code,
+                        property_code=property_code,
+                        date_from=date_from,
+                        date_to=date_to,
+                        row_limit=10000
+                    )
+                    
+                    if data and 'sensorData' in data:
+                        sensor_data = data['sensorData']
+                        if sensor_data:
+                            # Convert to CSV format
+                            csv_filename = f"{device_code}_{location_code}_{date_from[:10]}_to_{date_to[:10]}.csv"
+                            csv_path = os.path.join(output_dir, csv_filename)
+                            
+                            # Create DataFrame and save as CSV
+                            df = pd.DataFrame(sensor_data)
+                            df.to_csv(csv_path, index=False)
+                            
+                            csv_files.append(csv_path)
+                            all_data.extend(sensor_data)
+                            
+                            log_msg = f"Created CSV file: {csv_filename} with {len(sensor_data)} records"
+                            logger.log(log_level, log_msg)
+                    
+                except Exception as e:
+                    logger.warning(f"Could not get data for device {device_code}: {e}")
+                    continue
+            
+            if csv_files:
+                if progress_callback:
+                    progress_callback("Finalizing CSV files...", 90)
+                
+                return {
+                    'status': 'success',
+                    'message': f"Downloaded CSV data to {len(csv_files)} files",
+                    'csv_files': csv_files,
+                    'output_directory': output_dir,
+                    'file_count': len(csv_files),
+                    'location_code': location_code,
+                    'device_category': device_category,
+                    'date_range': f"{date_from} to {date_to}",
+                    'total_records': len(all_data)
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'message': f"No data available for {device_category} at {location_code} for the specified date range",
+                    'csv_files': []
+                }
+                
+        except Exception as e:
+            logger.error(f"Error in custom CSV download: {e}")
+            return {
+                'status': 'error',
+                'message': f"CSV download failed: {str(e)}",
+                'csv_files': []
+            }
+    
+    def get_data_summary(self, location_code: str = None, 
+                        device_category: str = None,
+                        date_from: str = None, date_to: str = None) -> Dict[str, Any]:
+        """
+        Get comprehensive data availability summary
+        
+        Args:
+            location_code: Optional location filter
+            device_category: Optional device category filter  
+            date_from: Optional start date filter
+            date_to: Optional end date filter
+            
+        Returns:
+            Summary of available data and products
+        """
+        try:
+            # Build filter parameters
+            filters = {}
+            if location_code:
+                filters['locationCode'] = location_code
+            if device_category:
+                filters['deviceCategoryCode'] = device_category
+            
+            # Get data products
+            products_result = self.discover_data_products(filters)
+            
+            # Get archived files if date range provided
+            archived_files = {}
+            if date_from and date_to:
+                archive_filters = filters.copy()
+                archive_filters.update({
+                    'dateFrom': date_from,
+                    'dateTo': date_to
+                })
+                archived_files = self.get_archived_files(archive_filters)
+            
+            # Compile summary
+            summary = {
+                'status': 'success',
+                'location_code': location_code,
+                'device_category': device_category,
+                'date_range': f"{date_from} to {date_to}" if date_from and date_to else "All time",
+                'data_products': {
+                    'total': products_result.get('total_products', 0),
+                    'categories': products_result.get('categories', {}),
+                    'available_formats': self._extract_available_formats(products_result.get('products', []))
+                },
+                'archived_files': {
+                    'total': archived_files.get('total_files', 0),
+                    'size_summary': archived_files.get('size_summary', {}),
+                    'file_types': archived_files.get('file_types', {})
+                },
+                'summary_time': datetime.utcnow().isoformat()
+            }
+            
+            return summary
+            
+        except Exception as e:
+            logger.error(f"Error getting data summary: {e}")
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
+    
+    # Helper methods
+    def _categorize_data_products(self, products: List[Dict]) -> Dict[str, int]:
+        """Categorize data products by type"""
+        categories = {}
+        for product in products:
+            category = product.get('dataProductCode', 'Unknown')
+            categories[category] = categories.get(category, 0) + 1
+        return categories
+    
+    def _calculate_size_summary(self, files: List[Dict]) -> Dict[str, Any]:
+        """Calculate size summary for archived files"""
+        if not files:
+            return {'total_size': 0, 'average_size': 0, 'file_count': 0}
+        
+        total_size = sum(file.get('fileSize', 0) for file in files)
+        return {
+            'total_size': total_size,
+            'total_size_mb': round(total_size / (1024 * 1024), 2),
+            'average_size': total_size // len(files) if files else 0,
+            'file_count': len(files)
+        }
+    
+    def _extract_time_range(self, files: List[Dict]) -> Dict[str, str]:
+        """Extract time range from archived files"""
+        if not files:
+            return {'earliest': None, 'latest': None}
+        
+        timestamps = []
+        for file in files:
+            if 'dateFrom' in file:
+                timestamps.append(file['dateFrom'])
+            if 'dateTo' in file:
+                timestamps.append(file['dateTo'])
+        
+        if timestamps:
+            return {
+                'earliest': min(timestamps),
+                'latest': max(timestamps)
+            }
+        return {'earliest': None, 'latest': None}
+    
+    def _get_file_type_summary(self, files: List[Dict]) -> Dict[str, int]:
+        """Get summary of file types"""
+        types = {}
+        for file in files:
+            ext = file.get('extension', 'unknown')
+            types[ext] = types.get(ext, 0) + 1
+        return types
+    
+    def _find_csv_files(self, download_result: Dict, output_dir: str) -> List[str]:
+        """Find CSV files from download result"""
+        csv_files = []
+        
+        # Check download result for file paths
+        if 'downloaded_files' in download_result:
+            for file_info in download_result['downloaded_files']:
+                if isinstance(file_info, dict):
+                    filename = file_info.get('filename', '')
+                elif isinstance(file_info, str):
+                    filename = file_info
+                else:
+                    continue
+                
+                if filename.endswith('.csv'):
+                    csv_files.append(os.path.join(output_dir, filename))
+        
+        # Also scan output directory
+        output_path = Path(output_dir)
+        if output_path.exists():
+            csv_files.extend([str(f) for f in output_path.glob("*.csv")])
+        
+        # Additionally scan current working directory (where ONC package actually creates files)
+        current_dir = Path(os.getcwd())
+        if current_dir != output_path:
+            logger.info(f"Also scanning current working directory for CSV files: {current_dir}")
+            cwd_csv_files = list(current_dir.glob("*.csv"))
+            logger.info(f"Found {len(cwd_csv_files)} CSV files in current directory")
+            for f in cwd_csv_files:
+                size = f.stat().st_size if f.exists() else 0
+                logger.info(f"  File: {f.name}, size: {size} bytes")
+                if size > 0:
+                    csv_files.append(str(f))
+                    logger.info(f"    -> Added to csv_files list")
+        
+        # Remove duplicates and check for actual content
+        final_files = []
+        for csv_file in set(csv_files):
+            if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
+                final_files.append(csv_file)
+        
+        return final_files
+    
+    def _analyze_csv_files(self, csv_files: List[str]) -> Dict[str, Any]:
+        """Analyze CSV files for metadata"""
+        analysis = {
+            'file_count': len(csv_files),
+            'files': []
+        }
+        
+        for csv_file in csv_files:
+            try:
+                if os.path.exists(csv_file):
+                    # Try to read CSV with error handling for malformed files
+                    try:
+                        df = pd.read_csv(csv_file, on_bad_lines='skip')
+                    except Exception as read_error:
+                        # If pandas fails, try with different parameters
+                        logger.warning(f"Standard CSV read failed for {csv_file}, trying with error handling: {read_error}")
+                        try:
+                            df = pd.read_csv(csv_file, on_bad_lines='skip', sep=',', quoting=1)
+                        except Exception as fallback_error:
+                            logger.warning(f"Could not read CSV file {csv_file} even with error handling: {fallback_error}")
+                            # Still create file info with basic details
+                            file_info = {
+                                'filename': os.path.basename(csv_file),
+                                'path': csv_file,
+                                'rows': 'unknown (parsing error)',
+                                'columns': 'unknown (parsing error)',
+                                'column_names': [],
+                                'file_size_bytes': os.path.getsize(csv_file),
+                                'parsing_error': str(fallback_error)
+                            }
+                            analysis['files'].append(file_info)
+                            continue
+                    
+                    file_info = {
+                        'filename': os.path.basename(csv_file),
+                        'path': csv_file,
+                        'rows': len(df),
+                        'columns': len(df.columns),
+                        'column_names': df.columns.tolist(),
+                        'file_size_bytes': os.path.getsize(csv_file)
+                    }
+                    analysis['files'].append(file_info)
+                    
+            except Exception as e:
+                logger.warning(f"Could not analyze CSV file {csv_file}: {e}")
+                # Add basic file info even if analysis fails
+                if os.path.exists(csv_file):
+                    file_info = {
+                        'filename': os.path.basename(csv_file),
+                        'path': csv_file,
+                        'rows': 'unknown (analysis error)',
+                        'columns': 'unknown (analysis error)', 
+                        'column_names': [],
+                        'file_size_bytes': os.path.getsize(csv_file),
+                        'analysis_error': str(e)
+                    }
+                    analysis['files'].append(file_info)
+        
+        return analysis
+    
+    def _move_files_to_output_dir(self, source_dir: str, target_dir: str) -> None:
+        """
+        Move any ONC-generated files from source directory to target directory.
+        
+        Args:
+            source_dir: Directory where ONC package may have created files
+            target_dir: Target output directory
+        """
+        try:
+            import shutil
+            source_path = Path(source_dir)
+            target_path = Path(target_dir)
+            
+            # Ensure target directory exists
+            target_path.mkdir(parents=True, exist_ok=True)
+            
+            # Look for files that match ONC naming patterns
+            patterns = [
+                "*.csv",
+                "*.xml", 
+                "*CambridgeBay*",
+                "*CTD*",
+                "*TSSD*"
+            ]
+            
+            moved_files = []
+            for pattern in patterns:
+                for file_path in source_path.glob(pattern):
+                    if file_path.is_file():
+                        target_file = target_path / file_path.name
+                        # Only move if the file doesn't already exist in target
+                        if not target_file.exists():
+                            shutil.move(str(file_path), str(target_file))
+                            moved_files.append(str(target_file))
+                            logger.info(f"Moved ONC file from {file_path} to {target_file}")
+            
+            if moved_files:
+                logger.info(f"Successfully moved {len(moved_files)} ONC files to correct output directory")
+            else:
+                logger.debug("No ONC files found to move")
+                
+        except Exception as e:
+            logger.warning(f"Error moving ONC files to output directory: {e}")
+    
+    def _post_process_download_result(self, result: Dict[str, Any], expected_output_dir: str) -> Dict[str, Any]:
+        """
+        Post-process download results to handle ONC package file location issues.
+        
+        The ONC package creates files in the current working directory, but we want them
+        in the specified output directory. This method:
+        1. Scans for newly created ONC files in the current directory
+        2. Moves them to the expected output directory  
+        3. Updates the result with correct file paths
+        
+        Args:
+            result: Download result dictionary
+            expected_output_dir: Where files should be located
+            
+        Returns:
+            Updated result with corrected file paths
+        """
+        try:
+            current_dir = os.getcwd()
+            target_dir = os.path.abspath(expected_output_dir)
+            
+            logger.info(f"Post-processing download result - scanning {current_dir} for ONC files")
+            
+            # Find files that look like ONC outputs in current directory
+            onc_files = []
+            current_path = Path(current_dir)
+            
+            # Look for recent files matching ONC patterns
+            import time
+            recent_threshold = time.time() - 600  # Files created in last 10 minutes
+            logger.info(f"Looking for files newer than {recent_threshold} (current time: {time.time()})")
+            
+            patterns = [
+                "*CambridgeBay*.csv",
+                "*CambridgeBay*.xml", 
+                "*CTD*.csv",
+                "*TSSD*.csv",
+                "*.csv"  # Any CSV as fallback
+            ]
+            
+            for pattern in patterns:
+                for file_path in current_path.glob(pattern):
+                    if file_path.is_file():
+                        mtime = file_path.stat().st_mtime
+                        logger.info(f"Found file {file_path.name} with mtime {mtime} (threshold: {recent_threshold})")
+                        if mtime > recent_threshold:
+                            onc_files.append(file_path)
+                            logger.info(f"  -> Added to onc_files list")
+                        else:
+                            logger.info(f"  -> Too old, skipping")
+            
+            # Remove duplicates and sort by modification time (newest first)
+            onc_files = list(set(onc_files))
+            onc_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+            
+            logger.info(f"Found {len(onc_files)} potential ONC files: {[f.name for f in onc_files]}")
+            
+            if not onc_files:
+                logger.warning("No recent ONC files found in current directory")
+                return result
+            
+            # Ensure target directory exists
+            Path(target_dir).mkdir(parents=True, exist_ok=True)
+            
+            # Move files to target directory
+            moved_files = []
+            csv_files = []
+            
+            for file_path in onc_files:
+                target_file = Path(target_dir) / file_path.name
+                
+                try:
+                    if target_file.exists():
+                        logger.info(f"Target file already exists, skipping: {target_file}")
+                        # Still add to results if it's a CSV
+                        if file_path.suffix.lower() == '.csv':
+                            csv_files.append(str(target_file))
+                    else:
+                        import shutil
+                        shutil.move(str(file_path), str(target_file))
+                        moved_files.append(str(target_file))
+                        logger.info(f"Moved {file_path.name} to {target_dir}")
+                        
+                        # Add CSV files to result
+                        if target_file.suffix.lower() == '.csv':
+                            csv_files.append(str(target_file))
+                            
+                except Exception as e:
+                    logger.error(f"Error moving {file_path} to {target_file}: {e}")
+            
+            # Update result with corrected file paths
+            if csv_files:
+                result['csv_files'] = csv_files
+                result['output_directory'] = target_dir
+                logger.info(f"Updated result with {len(csv_files)} CSV files in correct location")
+            
+            if moved_files:
+                logger.info(f"Successfully moved {len(moved_files)} files to {target_dir}")
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in post-processing download result: {e}")
+            return result
+    
+    def _extract_available_formats(self, products: List[Dict]) -> List[str]:
+        """Extract available file formats from products"""
+        formats = set()
+        for product in products:
+            ext = product.get('extension')
+            if ext:
+                formats.add(ext)
+        return sorted(list(formats))

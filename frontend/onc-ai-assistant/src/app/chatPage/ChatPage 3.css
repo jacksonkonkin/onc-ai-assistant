@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  height: 100vh;
+  padding-top: 2rem;
+  background-color: white;
+  font-family: "Arial", sans-serif;
+}
+
+.chat-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.chat-header h2 {
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.chat-body {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.messages {
+  width: 100%;
+  padding: 0 1rem;
+  flex-grow: 1; 
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.message {
+  background-color: #f0f0f0;
+  border-radius: 1.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  max-width: 80%;
+  overflow-wrap: anywhere;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  background-color: #d4d4d4;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 50px;
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  outline: none;
+  font-size: 1rem;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.5;
+  max-height: 15rem;
+}
+
+.chat-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-input::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.chat-input::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.chat-input::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.send-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-left: 0.5rem;
+}
+
+.send-icon {
+  transition: fill 0.3s ease;
+  margin-bottom: 50%;
+}
+
+.send-button:hover .send-icon {
+  opacity: 0.7;
+  transition: color 0.3s ease;
+}
+
+.fish-logo {
+  align-items: center;
+  justify-content: center;
+  display: inline-flex;
+}
+
+.user-msg {
+  background-color: #f0f0f0;
+  align-self: flex-end;
+  color: black;
+}
+
+.ai-msg {
+  background-color: #e0f2fe; /* Tailwind's blue-100 */
+  align-self: flex-start;
+  color: #0c4a6e; /* Tailwind's blue-900 */
+}
+
+.thinking-animation {
+  display: inline-block;
+}
+
+.thinking-char {
+  display: inline-block;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+/* CSV Download Button Styling */
+.csv-download-section {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.csv-download-btn {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.csv-download-btn:hover {
+  background-color: #005c99;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.3);
+}
+
+.csv-download-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 122, 204, 0.3);
+}
+
+.csv-download-section small {
+  display: block;
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+

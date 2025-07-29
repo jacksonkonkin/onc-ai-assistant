@@ -13,6 +13,8 @@ from transformers import BertForSequenceClassification, BertTokenizer
 from huggingface_hub import hf_hub_download
 import torch
 import pickle
+import pandas as pd
+from sentence_transformers import SentenceTransformer, util
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,8 @@ class QueryType(Enum):
     DATABASE_SEARCH = "database_search"
     HYBRID_SEARCH = "hybrid_search"
     DIRECT_LLM = "direct_llm"
+    DATA_DOWNLOAD = "data_download"  # New type for data download queries
+    STATISTICAL_ANALYSIS = "statistical_analysis"  # New type for statistical analysis queries
 
 
 class QueryRouter:
@@ -44,6 +48,12 @@ class QueryRouter:
         self.bert_tokenizer = None
         self.label_encoder = None
         
+        # Initialize Sprint 3 Sentence Transformer classifier as fallback
+        self.sentence_model = None
+        self.sprint3_questions = None
+        self.sprint3_labels = None
+        self.sprint3_embeddings = None
+        
         try:
             repo_id = "kgosal03/bert-query-classifier"
             self.bert_model = BertForSequenceClassification.from_pretrained(repo_id)
@@ -60,6 +70,13 @@ class QueryRouter:
         except Exception as e:
             logger.warning(f"Failed to initialize BERT model: {e}")
         
+        # Initialize Sprint 3 Sentence Transformer classifier
+        try:
+            self._initialize_sprint3_classifier()
+            logger.info("Sprint 3 Sentence Transformer classifier enabled")
+        except Exception as e:
+            logger.warning(f"Failed to initialize Sprint 3 classifier: {e}")
+        
         # Initialize LLM client for fallback routing
         self.groq_client = None
         if os.getenv('GROQ_API_KEY'):
@@ -69,9 +86,18 @@ class QueryRouter:
             except Exception as e:
                 logger.warning(f"Failed to initialize LLM client: {e}")
         
-        # Enable/disable BERT routing (prefer BERT over LLM)
-        self.use_bert_routing = self.config.get('use_bert_routing', True) and self.bert_model is not None
+        # Enable/disable routing methods (order of preference: BERT > Sprint3 > LLM > Keyword)
+        # Disable BERT routing to prioritize Sprint 3 classifier
+        self.use_bert_routing = self.config.get('use_bert_routing', False) and self.bert_model is not None
+        self.use_sprint3_routing = self.config.get('use_sprint3_routing', True) and self.sentence_model is not None
         self.use_llm_routing = self.config.get('use_llm_routing', True) and self.groq_client is not None
+        
+        # Debug logging for classifier priority
+        logger.info(f"🔧 Query Router Configuration:")
+        logger.info(f"   BERT routing: {'ENABLED' if self.use_bert_routing else 'DISABLED'}")
+        logger.info(f"   Sprint3 routing: {'ENABLED' if self.use_sprint3_routing else 'DISABLED'}")
+        logger.info(f"   LLM routing: {'ENABLED' if self.use_llm_routing else 'DISABLED'}")
+        logger.info(f"   Primary classifier: {'Sprint 3 Sentence Transformer' if self.use_sprint3_routing else 'LLM' if self.use_llm_routing else 'Keyword-based'}")
     
     def _load_vector_keywords(self) -> List[str]:
         """Load keywords that indicate vector search should be used."""
@@ -91,16 +117,357 @@ class QueryRouter:
             # Data request terms
             "data", "measurement", "sensor", "instrument", "value", "reading",
             "latest", "current", "recent", "today", "yesterday", "now",
+            # Download/Export terms
+            "download", "export", "csv", "file", "files", "save", "extract",
+            "download data", "export data", "get data", "csv data", "data file",
             # Location terms
             "cambridge bay", "station", "location", "coordinates", "site",
             # Time terms  
-            "time series", "when", "since", "from", "to", "between",
+            "time series", "when", "since", "from", "to", "between", "at", "pm", "am", 
+            "o'clock", "hour", "minute", "morning", "afternoon", "evening", "night",
             # Request patterns
             "get", "show", "find", "retrieve", "what is the", "how much",
             "give me", "tell me"
         ]
         return self.config.get('database_keywords', default_keywords)
     
+    def _initialize_sprint3_classifier(self):
+        """Initialize Sprint 3 Sentence Transformer classifier."""
+        # Load Sprint 3 training data from CSV files
+        csv_files = [
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/deployments.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_info.csv", 
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/property.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_category.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/locations.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/deployments_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_info_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/property_2.csv", 
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/device_category_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/locations_2.csv",
+            "Data-Engineering/Sprint_3/Query_Router/Simple_Python_File_Method/data_and_knowledge_queries.csv"
+        ]
+        
+        # Try to load CSV files from current directory or absolute paths
+        dfs = []
+        for csv_file in csv_files:
+            try:
+                # Try relative path first, then absolute
+                if os.path.exists(csv_file):
+                    df = pd.read_csv(csv_file)
+                    dfs.append(df)
+                else:
+                    # Try from project root
+                    root_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), csv_file)
+                    if os.path.exists(root_path):
+                        df = pd.read_csv(root_path)  
+                        dfs.append(df)
+            except Exception as e:
+                logger.debug(f"Could not load Sprint 3 CSV file {csv_file}: {e}")
+        
+        if not dfs:
+            raise Exception("No Sprint 3 training data found")
+        
+        # Combine all dataframes
+        df_all = pd.concat(dfs, ignore_index=True)
+        self.sprint3_questions = df_all["question"].tolist()
+        self.sprint3_labels = df_all["label"].tolist()
+        
+        # Load sentence transformer model
+        self.sentence_model = SentenceTransformer("all-MiniLM-L6-v2")
+        
+        # Pre-compute embeddings for Sprint 3 questions
+        self.sprint3_embeddings = self.sentence_model.encode(
+            self.sprint3_questions, 
+            normalize_embeddings=True
+        )
+        self.sprint3_embeddings = torch.tensor(self.sprint3_embeddings)
+        
+        logger.info(f"Loaded {len(self.sprint3_questions)} Sprint 3 training examples")
+    
+    def _sprint3_classify_query(self, query: str, top_k: int = 3) -> Dict[str, Any]:
+        """
+        Classify query using Sprint 3 Sentence Transformer approach.
+        
+        Args:
+            query: User query
+            top_k: Number of top matches to consider
+            
+        Returns:
+            Classification result with confidence
+        """
+        if not self.sentence_model:
+            raise Exception("Sprint 3 classifier not initialized")
+        
+        # Encode the query
+        query_embedding = self.sentence_model.encode(query, normalize_embeddings=True)
+        query_tensor = torch.tensor(query_embedding)
+        
+        # Calculate similarities
+        similarities = util.cos_sim(query_tensor, self.sprint3_embeddings)[0]
+        
+        # Get top matches
+        top_results = similarities.topk(top_k)
+        top_indices = top_results.indices
+        top_scores = top_results.values
+        
+        # Get the top classification
+        best_index = top_indices[0].item()
+        best_score = top_scores[0].item()
+        classification = self.sprint3_labels[best_index]
+        
+        # Calculate confidence based on score difference and absolute score
+        confidence = float(best_score)
+        if len(top_scores) > 1:
+            score_gap = float(top_scores[0] - top_scores[1])
+            confidence = (confidence + score_gap) / 2  # Balance absolute score and gap
+        
+        return {
+            'classification': classification,
+            'confidence': confidence,
+            'top_matches': [
+                {
+                    'question': self.sprint3_questions[idx.item()],
+                    'label': self.sprint3_labels[idx.item()],
+                    'similarity': float(score)
+                }
+                for idx, score in zip(top_indices, top_scores)
+            ]
+        }
+    
+    def _detect_greeting_or_social(self, query: str) -> bool:
+        """
+        Detect greetings and social queries that should bypass classification.
+        
+        Args:
+            query: User query string
+            
+        Returns:
+            True if query is a greeting/social interaction, False otherwise
+        """
+        query_lower = query.lower().strip()
+        
+        # Exact matches for common greetings and social interactions
+        exact_greetings = {
+            'hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening',
+            'thanks', 'thank you', 'bye', 'goodbye', 'see you', 'how are you',
+            "what's up", "how's it going", 'nice to meet you', 'pleased to meet you',
+            'good day', 'good night', 'howdy', 'greetings', 'salutations'
+        }
+        
+        # Check for exact matches
+        if query_lower in exact_greetings:
+            return True
+        
+        # Check for greeting patterns in short queries (≤4 words)
+        words = query_lower.split()
+        if len(words) <= 4:
+            greeting_words = {'hello', 'hi', 'hey', 'thanks', 'thank', 'bye', 'goodbye', 'morning', 'afternoon', 'evening'}
+            if any(word in greeting_words for word in words):
+                return True
+        
+        # Very short non-technical queries (1-2 words)
+        if len(words) <= 2:
+            # Technical keywords that indicate oceanographic queries
+            tech_keywords = {
+                'temperature', 'data', 'sensor', 'pressure', 'oxygen', 'depth', 'salinity',
+                'conductivity', 'ph', 'turbidity', 'chlorophyll', 'fluorescence', 'density',
+                'ctd', 'hydrophone', 'adcp', 'cambridge', 'bay', 'cby', 'onc', 'ocean',
+                'marine', 'underwater', 'deployment', 'device', 'instrument', 'measurement'
+            }
+            
+            # If no technical keywords in very short query, likely greeting/social
+            if not any(tech_word in query_lower for tech_word in tech_keywords):
+                return True
+        
+        # Check for common social question patterns
+        social_patterns = [
+            'how are you', 'what\'s up', 'how\'s it going', 'how do you do',
+            'what time is it', 'what\'s the weather', 'tell me a joke',
+            'who are you', 'what are you', 'how old are you'
+        ]
+        
+        if any(pattern in query_lower for pattern in social_patterns):
+            return True
+        
+        return False
+    
+    def _check_recent_download_activity(self, query: str, context: Dict[str, Any]) -> bool:
+        """
+        Check if there's recent download activity that should prevent new downloads
+        
+        Args:
+            query: User query
+            context: Context including conversation history
+            
+        Returns:
+            True if recent download activity should prevent new download routing
+        """
+        try:
+            # Skip check if not a potential download query
+            if not self._detect_download_request(query) and not self._detect_statistical_request(query):
+                return False
+            
+            # Import here to avoid circular imports
+            from ..database_search.download_manager import get_download_manager
+            
+            # Get session ID from context if available
+            session_id = context.get('session_id')
+            dm = get_download_manager(session_id)
+            
+            # Check for active downloads
+            active_downloads = dm.list_active_downloads()
+            if active_downloads:
+                logger.info(f"Found {len(active_downloads)} active downloads, may prevent duplicate routing")
+                
+                # If many active downloads, suggest waiting
+                if len(active_downloads) > 2:
+                    return True
+            
+            # Check recent download activity from conversation context
+            conversation_context = context.get('conversation_context', '')
+            if 'download' in conversation_context.lower() and 'completed' in conversation_context.lower():
+                # Recent download mentioned in conversation
+                logger.debug("Recent download activity detected in conversation context")
+                return False  # Let normal duplicate checking handle this
+            
+            return False
+            
+        except Exception as e:
+            logger.debug(f"Error checking recent download activity: {e}")
+            return False
+
+    def _detect_download_request(self, query: str) -> bool:
+        """
+        Detect if a query is explicitly requesting data download/export.
+        
+        Args:
+            query: User query to check
+            
+        Returns:
+            bool: True if query contains explicit download/export keywords
+        """
+        query_lower = query.lower()
+        
+        # Explicit download/export keywords
+        download_keywords = [
+            'download', 'export', 'csv', 'download data', 'export data',
+            'get csv', 'csv file', 'data file', 'save data', 'extract data',
+            'download csv', 'export csv', 'csv data', 'download file',
+            'export file', 'data export', 'data download'
+        ]
+        
+        # Check for download keywords combined with data context
+        has_download_keyword = any(keyword in query_lower for keyword in download_keywords)
+        
+        # Additional data context keywords
+        data_context_keywords = [
+            'data', 'temperature', 'pressure', 'ctd', 'sensor', 'measurement',
+            'cambridge bay', 'cby', 'onc', 'ocean', 'instrument'
+        ]
+        
+        has_data_context = any(keyword in query_lower for keyword in data_context_keywords)
+        
+        # Return True if we have download keywords with data context
+        return has_download_keyword and has_data_context
+
+    def _detect_statistical_request(self, query: str) -> bool:
+        """
+        Detect if a query is requesting statistical analysis.
+        
+        Args:
+            query: User query to check
+            
+        Returns:
+            bool: True if query contains statistical analysis keywords
+        """
+        query_lower = query.lower()
+        
+        # Statistical operation keywords
+        statistical_keywords = [
+            'min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean',
+            'sum', 'total', 'count', 'median', 'mode', 'std', 'stdev',
+            'variance', 'var', 'range', 'trend', 'correlation'
+        ]
+        
+        # Statistical analysis phrases
+        statistical_phrases = [
+            'what is the average', 'what is the maximum', 'what is the minimum',
+            'show me the trend', 'calculate the', 'statistical analysis',
+            'give me statistics', 'how much does', 'compare', 'analysis of',
+            'over time', 'seasonal', 'monthly average', 'daily average',
+            'yearly trend', 'rising', 'falling', 'increasing', 'decreasing'
+        ]
+        
+        # Comparison keywords that suggest statistical analysis
+        comparison_keywords = [
+            'higher', 'lower', 'greater', 'less', 'above', 'below',
+            'exceeds', 'under', 'compared to', 'vs', 'versus', 'difference'
+        ]
+        
+        # Time aggregation keywords
+        time_aggregation_keywords = [
+            'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'seasonal',
+            'by hour', 'by day', 'by week', 'by month', 'by year'
+        ]
+        
+        # Check for statistical keywords
+        has_statistical_keyword = any(keyword in query_lower for keyword in statistical_keywords)
+        
+        # Check for statistical phrases
+        has_statistical_phrase = any(phrase in query_lower for phrase in statistical_phrases)
+        
+        # Check for comparison keywords
+        has_comparison = any(keyword in query_lower for keyword in comparison_keywords)
+        
+        # Check for time aggregation
+        has_time_aggregation = any(keyword in query_lower for keyword in time_aggregation_keywords)
+        
+        # Additional data context keywords for statistical queries
+        data_context_keywords = [
+            'data', 'temperature', 'temp', 'pressure', 'salinity', 'oxygen', 'ph',
+            'sensor', 'measurement', 'cambridge bay', 'onc', 'ocean', 'conductivity',
+            'chlorophyll', 'turbidity', 'density', 'fluorescence', 'depth'
+        ]
+        
+        has_data_context = any(keyword in query_lower for keyword in data_context_keywords)
+        
+        # Return True if we have statistical indicators with data context
+        return (has_statistical_keyword or has_statistical_phrase or 
+                has_comparison or has_time_aggregation) and has_data_context
+
+    def _log_routing_decision(self, query: str, routing_decision: Dict[str, Any], method: str) -> None:
+        """
+        Log detailed routing decision for debugging and monitoring.
+        
+        Args:
+            query: Original user query
+            routing_decision: The routing decision made
+            method: Classification method used (e.g., "Greeting Filter", "Sprint 3", "LLM")
+        """
+        route_type = routing_decision['type'].value if hasattr(routing_decision['type'], 'value') else str(routing_decision['type'])
+        classification = routing_decision.get('classification', 'N/A')
+        confidence = routing_decision.get('confidence', 'N/A')
+        
+        logger.info(f"🎯 {method} Routing Decision:")
+        logger.info(f"   Query: '{query[:80]}{'...' if len(query) > 80 else ''}'")
+        logger.info(f"   📍 Route: {route_type.upper()}")
+        logger.info(f"   🏷️  Classification: {classification}")
+        logger.info(f"   📊 Confidence: {confidence}")
+        
+        # Add specific confidence scores if available
+        if 'sprint3_confidence' in routing_decision:
+            logger.info(f"   🎯 Sprint 3 confidence: {routing_decision['sprint3_confidence']:.3f}")
+        if 'bert_confidence' in routing_decision:
+            logger.info(f"   🧠 BERT confidence: {routing_decision['bert_confidence']:.3f}")
+        
+        # Add parameters info
+        params = routing_decision.get('parameters', {})
+        if params:
+            key_params = {k: v for k, v in params.items() if k in ['reason', 'search_type', 'download_type', 'fallback_applied']}
+            if key_params:
+                logger.info(f"   ⚙️  Key parameters: {key_params}")
+
     def route_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Route a query to the appropriate processing pipeline.
@@ -114,11 +481,100 @@ class QueryRouter:
         """
         context = context or {}
         
+        # PRE-ROUTING FILTER: Check for recent downloads to prevent loops
+        if self._check_recent_download_activity(query, context):
+            routing_decision = {
+                'type': QueryType.DIRECT_LLM,
+                'classification': 'recent_download_detected',
+                'confidence': 'high',
+                'parameters': {
+                    'reason': 'Recent similar download detected, preventing duplicate',
+                    'download_prevention': True
+                }
+            }
+            self._log_routing_decision(query, routing_decision, "Download Prevention Filter")
+            return routing_decision
+        
+        # PRE-ROUTING FILTER: Handle greetings and social queries first
+        if self._detect_greeting_or_social(query):
+            routing_decision = {
+                'type': QueryType.DIRECT_LLM,
+                'classification': 'social_greeting',
+                'confidence': 'high',
+                'parameters': {
+                    'reason': 'Greeting or social query detected',
+                    'bypass_classification': True,
+                    'greeting_detected': True
+                }
+            }
+            self._log_routing_decision(query, routing_decision, "Greeting Filter")
+            return routing_decision
+        
+        # PRE-ROUTING FILTER: Handle explicit download/export requests
+        if self._detect_download_request(query):
+            has_database = context.get('has_database', False)
+            if has_database:
+                routing_decision = {
+                    'type': QueryType.DATA_DOWNLOAD,
+                    'classification': 'explicit_download_request',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Explicit download/export keywords detected',
+                        'download_type': 'csv_export',
+                        'keyword_override': True,
+                        'search_type': 'structured'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Download Filter")
+                return routing_decision
+            else:
+                routing_decision = {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': 'download_no_database',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Download request but no database available',
+                        'download_type': 'csv_export'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Download Filter")
+                return routing_decision
+        
+        # PRE-ROUTING FILTER: Handle statistical analysis requests
+        if self._detect_statistical_request(query):
+            has_database = context.get('has_database', False)
+            if has_database:
+                routing_decision = {
+                    'type': QueryType.STATISTICAL_ANALYSIS,
+                    'classification': 'statistical_analysis_request',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Statistical analysis keywords detected',
+                        'analysis_type': 'statistical',
+                        'keyword_override': True,
+                        'search_type': 'statistical'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Statistical Filter")
+                return routing_decision
+            else:
+                routing_decision = {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': 'statistical_no_database',
+                    'confidence': 'high',
+                    'parameters': {
+                        'reason': 'Statistical request but no database available',
+                        'analysis_type': 'statistical'
+                    }
+                }
+                self._log_routing_decision(query, routing_decision, "Statistical Filter")
+                return routing_decision
+        
         # Check for conversation context and follow-up detection
         conversation_context = context.get('conversation_context', '')
         follow_up_info = context.get('follow_up_info', {})
         
-        # Use BERT-based routing if available, otherwise fall back to LLM, then keyword-based
+        # Use BERT-based routing if available, otherwise fall back to Sprint 3, then LLM, then keyword-based
         if self.use_bert_routing:
             try:
                 routing_decision = self._bert_route_query(query, context)
@@ -132,9 +588,25 @@ class QueryRouter:
                 logger.info(f"BERT routed query to: {routing_decision['type']}")
                 return routing_decision
             except Exception as e:
-                logger.warning(f"BERT routing failed, falling back to LLM: {e}")
+                logger.warning(f"BERT routing failed, falling back to Sprint 3: {e}")
         
-        # Fallback to LLM-based routing if BERT fails
+        # Fallback to Sprint 3 Sentence Transformer routing
+        if self.use_sprint3_routing:
+            try:
+                routing_decision = self._sprint3_route_query(query, context)
+                
+                # Enhance routing decision with conversation context
+                if conversation_context or follow_up_info.get('is_follow_up'):
+                    routing_decision = self._enhance_routing_with_context(
+                        routing_decision, query, context
+                    )
+                
+                self._log_routing_decision(query, routing_decision, "Sprint 3")
+                return routing_decision
+            except Exception as e:
+                logger.warning(f"Sprint 3 routing failed, falling back to LLM: {e}")
+        
+        # Fallback to LLM-based routing if Sprint 3 fails
         if self.use_llm_routing:
             try:
                 routing_decision = self._llm_route_query(query, context)
@@ -145,7 +617,7 @@ class QueryRouter:
                         routing_decision, query, context
                     )
                 
-                logger.info(f"LLM routed query to: {routing_decision['type']}")
+                self._log_routing_decision(query, routing_decision, "LLM")
                 return routing_decision
             except Exception as e:
                 logger.warning(f"LLM routing failed, falling back to keyword-based: {e}")
@@ -165,7 +637,7 @@ class QueryRouter:
             vector_score, database_score, context
         )
         
-        logger.info(f"Keyword routed query to: {routing_decision['type']}")
+        self._log_routing_decision(query, routing_decision, "Keyword-based")
         return routing_decision
     
     def _bert_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -269,6 +741,94 @@ class QueryRouter:
                 return "observation_query"
         
         return predicted_label
+
+    def _is_device_discovery_query(self, query: str) -> bool:
+        """
+        Check if a deployment_info query is specifically about device discovery
+        
+        Args:
+            query: User query string
+            
+        Returns:
+            True if query is about device discovery, False otherwise
+        """
+        if not query:
+            return False
+        
+        query_lower = query.lower()
+        
+        # Device discovery indicators
+        device_terms = [
+            'device', 'sensor', 'instrument', 'equipment',
+            'ctd', 'hydrophone', 'oxygen sensor', 'ph sensor',
+            'weather station', 'ice profiler', 'camera', 'fluorometer'
+        ]
+        
+        device_discovery_patterns = [
+            'what devices', 'what sensors', 'what instruments',
+            'show me devices', 'show me sensors', 'show me instruments',
+            'find devices', 'find sensors', 'find instruments',
+            'list devices', 'list sensors', 'list instruments',
+            'hydrophone devices', 'ctd sensors', 'oxygen sensors',
+            'devices are at', 'sensors are at', 'instruments are at',
+            'devices at cambridge bay', 'sensors at cambridge bay'
+        ]
+        
+        # Check for device discovery patterns
+        if any(pattern in query_lower for pattern in device_discovery_patterns):
+            return True
+        
+        # Check for device terms combined with location/deployment context
+        has_device_term = any(term in query_lower for term in device_terms)
+        has_location_context = any(term in query_lower for term in [
+            'cambridge bay', 'cambridge', 'at', 'deployed', 'location'
+        ])
+        
+        # If query has both device terms and location context, likely device discovery
+        if has_device_term and has_location_context:
+            return True
+        
+        return False
+    
+    def _is_data_products_query(self, query: str) -> bool:
+        """
+        Check if a query is about data products discovery or download
+        
+        Args:
+            query: User query string
+            
+        Returns:
+            True if query is about data products, False otherwise
+        """
+        if not query:
+            return False
+        
+        query_lower = query.lower()
+        
+        # Data products discovery patterns
+        data_products_patterns = [
+            'data products', 'available data products', 'what data products',
+            'data product', 'download data', 'data download', 'get data',
+            'data files', 'download files', 'csv data', 'data export',
+            'export data', 'data formats', 'file formats'
+        ]
+        
+        # Check for data products patterns
+        if any(pattern in query_lower for pattern in data_products_patterns):
+            return True
+        
+        # Check for download-related terms with data context
+        download_terms = ['download', 'export', 'get', 'file', 'csv', 'format']
+        data_terms = ['data', 'measurements', 'readings', 'values']
+        
+        has_download_term = any(term in query_lower for term in download_terms)
+        has_data_term = any(term in query_lower for term in data_terms)
+        
+        # If query has both download and data terms, likely data products
+        if has_download_term and has_data_term:
+            return True
+        
+        return False
     
     def _map_bert_classification_to_route(self, classification: str, confidence: float, 
                                         context: Dict[str, Any], query: str) -> Dict[str, Any]:
@@ -291,28 +851,77 @@ class QueryRouter:
         confidence_level = 'high' if confidence > 0.8 else 'medium' if confidence > 0.6 else 'low'
         
         if classification == "observation_query" and has_database:
-            return {
-                'type': QueryType.DATABASE_SEARCH,
-                'classification': classification,
-                'confidence': confidence_level,
-                'bert_confidence': confidence,
-                'parameters': {
-                    'search_type': 'structured',
-                    'bert_classified': True
+            # Check if this is actually a data products query
+            if self._is_data_products_query(query):
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'data_products',
+                        'bert_classified': True
+                    }
                 }
-            }
+            else:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'structured',
+                        'bert_classified': True
+                    }
+                }
         
-        elif classification == "deployment_info" and has_vector_store:
-            return {
-                'type': QueryType.VECTOR_SEARCH,
-                'classification': classification,
-                'confidence': confidence_level,
-                'bert_confidence': confidence,
-                'parameters': {
-                    'search_type': 'semantic',
-                    'bert_classified': True
+        elif classification == "deployment_info":
+            # Check if this is a data products query that should go to database
+            if self._is_data_products_query(query) and has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'data_products',
+                        'bert_classified': True
+                    }
                 }
-            }
+            # Check if this is a device discovery query that should go to database
+            elif self._is_device_discovery_query(query) and has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'device_discovery',
+                        'bert_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'bert_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'bert_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'structured',
+                        'bert_classified': True
+                    }
+                }
         
         elif classification == "document_search" and has_vector_store:
             return {
@@ -399,6 +1008,236 @@ class QueryRouter:
                     'parameters': {
                         'reason': f'No data sources available, classification: {classification}',
                         'bert_classified': True
+                    }
+                }
+    
+    def _sprint3_route_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Use Sprint 3 Sentence Transformer to classify and route the query.
+        
+        Args:
+            query: User query
+            context: Additional context for routing
+            
+        Returns:
+            Dict: Routing decision with type and parameters
+        """
+        # Classify using Sprint 3 approach
+        sprint3_result = self._sprint3_classify_query(query)
+        classification = sprint3_result['classification']
+        confidence = sprint3_result['confidence']
+        
+        logger.debug(f"Sprint 3 classified query as: {classification} (confidence: {confidence:.3f})")
+        
+        # CONFIDENCE THRESHOLD CHECK: Reject low-confidence classifications
+        MIN_CONFIDENCE_THRESHOLD = self.config.get('sprint3_min_confidence', 0.25)
+        
+        if confidence < MIN_CONFIDENCE_THRESHOLD:
+            logger.warning(f"⚠️  Low Sprint 3 confidence ({confidence:.3f}) for query: '{query[:50]}{'...' if len(query) > 50 else ''}'")
+            logger.info(f"   Original classification: {classification}")
+            logger.info(f"   Top matches: {[match['label'] for match in sprint3_result.get('top_matches', [])[:3]]}")
+            
+            # Fall back to Direct LLM for low-confidence cases
+            return {
+                'type': QueryType.DIRECT_LLM,
+                'classification': 'low_confidence_fallback',
+                'confidence': 'low',
+                'sprint3_confidence': confidence,
+                'parameters': {
+                    'reason': f'Sprint 3 confidence ({confidence:.3f}) below threshold ({MIN_CONFIDENCE_THRESHOLD})',
+                    'original_classification': classification,
+                    'top_matches': sprint3_result.get('top_matches', [])[:3],
+                    'sprint3_classified': True,
+                    'fallback_applied': True
+                }
+            }
+        
+        # Map Sprint 3 classification to routing decision if confidence is acceptable
+        return self._map_sprint3_classification_to_route(classification, confidence, context, query)
+    
+    def _map_sprint3_classification_to_route(self, classification: str, confidence: float, 
+                                           context: Dict[str, Any], query: str) -> Dict[str, Any]:
+        """
+        Map Sprint 3 classification to routing decision.
+        
+        Args:
+            classification: Sprint 3 classification result
+            confidence: Classification confidence score
+            context: Context information
+            query: Original query
+            
+        Returns:
+            Dict: Routing decision
+        """
+        has_vector_store = context.get('has_vector_store', True)
+        has_database = context.get('has_database', False)
+        
+        # Determine confidence level
+        confidence_level = 'high' if confidence > 0.8 else 'medium' if confidence > 0.6 else 'low'
+        
+        # Map Sprint 3 categories to route types
+        if classification == "data_download_instance" or classification == "data_download_interval":
+            # Treat all data requests as intervals - instance is just a minimal interval
+            if has_database:
+                return {
+                    'type': QueryType.DATA_DOWNLOAD,  # Use DATA_DOWNLOAD for all data requests
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'download_type': 'interval',  # All data requests are intervals now
+                        'interval_scope': 'instant' if classification == "data_download_instance" else 'period',
+                        'sprint3_classified': True
+                    }
+                }
+            else:
+                # Fallback to direct LLM if no database
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'reason': 'Data download request but no database available',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        elif classification == "data_discovery":
+            # Device/sensor discovery queries
+            if has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'device_discovery',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        elif classification == "general_knowledge":
+            # General knowledge queries
+            if has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'sprint3_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'reason': 'General knowledge query without vector store',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        elif classification == "data_and_knowledge_query":
+            # Complex queries requiring both data and knowledge
+            if has_database and has_vector_store:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'vector_weight': 0.4,
+                        'database_weight': 0.6,
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'structured',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': confidence_level,
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'sprint3_classified': True
+                    }
+                }
+        
+        # Fallback for unknown classifications
+        else:
+            if has_database and has_vector_store:
+                return {
+                    'type': QueryType.HYBRID_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'vector_weight': 0.5,
+                        'database_weight': 0.5,
+                        'reason': f'Unknown Sprint 3 classification: {classification}',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Unknown Sprint 3 classification: {classification}',
+                        'sprint3_classified': True
+                    }
+                }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'search_type': 'fallback',
+                        'reason': f'Unknown Sprint 3 classification: {classification}',
+                        'sprint3_classified': True
+                    }
+                }
+            else:
+                return {
+                    'type': QueryType.DIRECT_LLM,
+                    'classification': classification,
+                    'confidence': 'low',
+                    'sprint3_confidence': confidence,
+                    'parameters': {
+                        'reason': f'No data sources available, classification: {classification}',
+                        'sprint3_classified': True
                     }
                 }
     
@@ -497,16 +1336,38 @@ Respond with ONLY the category name: deployment_info, observation_query, general
                 }
             }
         
-        elif classification == "deployment_info" and has_vector_store:
-            return {
-                'type': QueryType.VECTOR_SEARCH,
-                'classification': classification,
-                'confidence': 'high',
-                'parameters': {
-                    'search_type': 'semantic',
-                    'llm_classified': True
+        elif classification == "deployment_info":
+            # Check if this is a device discovery query that should go to database
+            if self._is_device_discovery_query(query) and has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'high',
+                    'parameters': {
+                        'search_type': 'device_discovery',
+                        'llm_classified': True
+                    }
                 }
-            }
+            elif has_vector_store:
+                return {
+                    'type': QueryType.VECTOR_SEARCH,
+                    'classification': classification,
+                    'confidence': 'high',
+                    'parameters': {
+                        'search_type': 'semantic',
+                        'llm_classified': True
+                    }
+                }
+            elif has_database:
+                return {
+                    'type': QueryType.DATABASE_SEARCH,
+                    'classification': classification,
+                    'confidence': 'high',
+                    'parameters': {
+                        'search_type': 'structured',
+                        'llm_classified': True
+                    }
+                }
         
         elif classification == "document_search" and has_vector_store:
             return {
@@ -654,13 +1515,17 @@ Respond with ONLY the category name: deployment_info, observation_query, general
         if 'route_type' in last_metadata:
             last_route = last_metadata['route_type']
             
-            # Apply follow-up bias - slightly favor the same route type
-            bias_strength = confidence * 0.3  # Up to 30% boost
+            # Apply follow-up bias - favor the same route type more strongly
+            bias_strength = confidence * 0.5  # Up to 50% boost
             
             if last_route == 'vector_search':
                 vector_score += bias_strength
             elif last_route == 'database_search':
                 database_score += bias_strength
+                # Extra boost for database search follow-ups with time references
+                if any(time_word in follow_up_info.get('context_info', {}).get('last_query', '').lower() 
+                       for time_word in ['time', 'data', 'temperature', 'oxygen', 'sensor']):
+                    database_score += 0.3  # Additional boost for data-related follow-ups
             elif last_route in ['hybrid_search']:
                 # For hybrid, boost both slightly
                 vector_score += bias_strength * 0.5

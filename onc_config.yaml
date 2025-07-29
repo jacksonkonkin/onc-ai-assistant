@@ -35,10 +35,20 @@ query_routing:
   vector_threshold: 0.1
   database_threshold: 0.05
   hybrid_threshold: 0.15
+  sprint3_min_confidence: 0.25  # Minimum confidence for Sprint 3 classification (prevents random assignments)
 
 conversation:
   max_history_length: 10  # Maximum conversation exchanges to remember
   context_window_minutes: 30  # Minutes after which context becomes less relevant
+
+query_refinement:
+  enable_ambiguity_detection: true  # Enable query ambiguity detection and clarification requests
+  enable_result_suggestions: true  # Enable result refinement suggestions
+  enable_feedback_prompts: false   # Disable feedback prompts (for web interface)
+  ambiguity_threshold: 0.6         # Threshold for requesting clarification
+  excessive_results_threshold: 50  # Threshold for too many results
+  high_results_threshold: 20       # Threshold for high result count
+  moderate_results_threshold: 10   # Threshold for moderate result count
 
 ocean_responses:
   enhanced_formatting: false  # Enable natural language responses for ocean data (temporarily disabled for debugging)
