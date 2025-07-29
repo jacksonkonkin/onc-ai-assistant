@@ -1,0 +1,218 @@
+This property is Absolute Barometric Pressure, and this property's code is absolutebarometricpressure.
+This property is Absolute Humidity, and this property's code is absolutehumidity.
+This property is Absorbance, and this property's code is absorbance.
+This property is Acceleration, and this property's code is acceleration.
+This property is Air Density, and this property's code is airdensity.
+This property is Air Temperature, and this property's code is airtemperature.
+This property is Altitude, and this property's code is altitude.
+This property is Altitude Source, and this property's code is altitudesource.
+This property is Amperage, and this property's code is amperage.
+This property is Amplitude Beam 1, and this property's code is amplitudebeam1.
+This property is Amplitude Beam 2, and this property's code is amplitudebeam2.
+This property is Amplitude Beam 3, and this property's code is amplitudebeam3.
+This property is Angular rate, and this property's code is angularrate.
+This property is Aperture, and this property's code is aperture.
+This property is AR Computation Time, and this property's code is arcomputationtime.
+This property is Auto Exposure, and this property's code is autoexposure.
+This property is Auto Focus State, and this property's code is autofocusstate.
+This property is Barometric Trend, and this property's code is barometrictrend.
+This property is Battery Capacity, and this property's code is batterycapacity.
+This property is Battery Charge, and this property's code is batterycharge.
+This property is Battery Position, and this property's code is batteryposition.
+This property is Beam Position, and this property's code is beamposition.
+This property is Bender Electrical Resistance, and this property's code is benderelectricalresistance.
+This property is Biofouling Prevention, and this property's code is biofoulingprevention.
+This property is Port Fault Code, and this property's code is board_fault_code.
+This property is Board Fault Code, and this property's code is boardfaultcode.
+This property is Bottom Lock, and this property's code is bottomlock.
+This property is Brightness, and this property's code is brightness.
+This property is Calibrated Phase Angle, and this property's code is calibratedphaseangle.
+This property is Camera Light, and this property's code is cameralight.
+This property is Camera Pan, and this property's code is camerapan.
+This property is Camera Strobe, and this property's code is camerastrobe.
+This property is Camera Tilt, and this property's code is cameratilt.
+This property is CDOM, and this property's code is cdom.
+This property is CDOM Fluorescence, and this property's code is cdomfluorescence.
+This property is Chlorophyll, and this property's code is chlorophyll.
+This property is Clock, and this property's code is clock.
+This property is CO2 Concentration, and this property's code is co2concentration.
+This property is CO2 Concentration Linearized, and this property's code is co2concentrationlinearized.
+This property is CO2 Partial Pressure, and this property's code is co2partialpressure.
+This property is Compensated Phase Angle, and this property's code is compensatedphaseangle.
+This property is Conductivity, and this property's code is conductivity.
+This property is Contrast, and this property's code is contrast.
+This property is Correction Age, and this property's code is correctionage.
+This property is Correlation, and this property's code is correlation.
+This property is Crude Oil Fluorescence, and this property's code is crudeoilfluoroscence.
+This property is Current Direction, and this property's code is currentdirection.
+This property is Current Velocity, and this property's code is currentvelocity.
+This property is Current Velocity Beam1-X-East, and this property's code is currentvelocitybeam1xeast.
+This property is Current Velocity Beam2-Y-North, and this property's code is currentvelocitybeam2ynorth.
+This property is Current Velocity Beam3-Z-Up, and this property's code is currentvelocitybeam3zup.
+This property is Defog, and this property's code is defog.
+This property is Defog Effect, and this property's code is defog_effect.
+This property is Density, and this property's code is density.
+This property is Depth, and this property's code is depth.
+This property is Detection Ratio, and this property's code is detectionratio.
+This property is Memory Size, and this property's code is devicememorysize.
+This property is Memory Usage Bytes, and this property's code is devicememoryusage.
+This property is Memory Usage Percent, and this property's code is devicememoryusagepercent.
+This property is Dew Point, and this property's code is dewpoint.
+This property is Differential Pressure Gauge, and this property's code is differentialpressuregauge.
+This property is Differential Temperature, and this property's code is differentialtemperature.
+This property is Displacement, and this property's code is displacement.
+This property is Dissolved Gas Pressure, and this property's code is dissolvedgaspressure.
+This property is Downward Atmospheric Long-Wave Radiation, and this property's code is downwardatmosphericlongwaveradiation.
+This property is Easting, and this property's code is easting.
+This property is Electrical Resistance, and this property's code is electricalresistance.
+This property is Electric Charge, and this property's code is electriccharge.
+This property is Engineering Count, and this property's code is engineeringcount.
+This property is Engineering Count 1000s, and this property's code is engineeringcount1000s.
+This property is Error Code, and this property's code is errorcode.
+This property is Event Count, and this property's code is eventcount.
+This property is Exposure Level, and this property's code is exposure_level.
+This property is Exposure Mode, and this property's code is exposure_mode.
+This property is Exposure Value, and this property's code is exposurevalue.
+This property is Fault Flags, and this property's code is faultflag.
+This property is File Count, and this property's code is filecount.
+This property is Focus, and this property's code is focus.
+This property is Forward Range, and this property's code is forwardrange.
+This property is Frequency, and this property's code is frequency.
+This property is Gas Saturation, and this property's code is gassaturation.
+This property is Gas Stream Pressure, and this property's code is gasstreampressure.
+This property is Gimbal Delay Time , and this property's code is gimbaldelay.
+This property is GPS Interval Time of Week, and this property's code is gpsintervaltimeofweek.
+This property is Gravitational Acceleration, and this property's code is gravitationalacceleration.
+This property is Gravity, and this property's code is gravity.
+This property is Gregorian Time, and this property's code is gregoriantime.
+This property is Ground Fault, and this property's code is groundfault.
+This property is Heave, and this property's code is heave.
+This property is Ice Draft, and this property's code is icedraft.
+This property is Ice Thickness, and this property's code is icethickness.
+This property is Image Gain, and this property's code is image_gain.
+This property is Instrument level, and this property's code is instrumentlevel.
+This property is Internal Humidity, and this property's code is internalhumidity.
+This property is Internal pH, and this property's code is internalph.
+This property is Internal Pressure, and this property's code is internalpressure.
+This property is Internal Temperature, and this property's code is internaltemperature.
+This property is Internal Vacuum Pressure, and this property's code is internalvacuumpressure.
+This property is IR Threshold, and this property's code is ir_threshold.
+This property is Iron Concentration, and this property's code is ironconcentration.
+This property is ISO, and this property's code is iso.
+This property is Laser, and this property's code is laser.
+This property is Laser Diode, and this property's code is laserdiode.
+This property is Laser Pulsewidth, and this property's code is laserpulsewidth.
+This property is Latitude, and this property's code is latitude.
+This property is Length, and this property's code is length.
+This property is Length Standard Deviation, and this property's code is lengthstddev.
+This property is Lock Aperture, and this property's code is lock_aperture.
+This property is Longitude, and this property's code is longitude.
+This property is Magnetic Declination, and this property's code is magneticdeclination.
+This property is Magnetic Heading, and this property's code is magneticheading.
+This property is Magnetometer, and this property's code is magnetometer.
+This property is Magnet Unitless Sensor, and this property's code is magnetunitlesssensor.
+This property is Magnitude, and this property's code is magnitude.
+This property is Mass Position, and this property's code is massposition.
+This property is Maximum Gain, and this property's code is max_gain.
+This property is Max Exposure Time, and this property's code is max_shutter.
+This property is Maximum Wave Height, and this property's code is maximumwaveheight.
+This property is Maximum Wave Period, and this property's code is maximumwaveperiod.
+This property is Mean Wave Direction, and this property's code is meanwavedirection.
+This property is Mean Wave Spread, and this property's code is meanwavespread.
+This property is Methane Concentration, and this property's code is methaneconcentration.
+This property is Methane Molar Concentration, and this property's code is methanemolarconcentration.
+This property is Methane Partial Pressure, and this property's code is methanepartialpressure.
+This property is Micro-g Acceleration, and this property's code is microgacceleration.
+This property is Mixing Ratio, and this property's code is mixingratio.
+This property is Modified Mercalli Intensity, and this property's code is modifiedmercalliintensity.
+This property is Motor Power, and this property's code is motorpower.
+This property is Motor Speed, and this property's code is motorspeed.
+This property is Net Radiation, and this property's code is netradiation.
+This property is Nitrate Concentration, and this property's code is nitrateconcentration.
+This property is Northing, and this property's code is northing.
+This property is On/Off Sensor, and this property's code is onoffsensor.
+This property is Other, and this property's code is other.
+This property is ORP, and this property's code is oxidationreductionpotential.
+This property is Oxygen, and this property's code is oxygen.
+This property is PADIWA , and this property's code is padiwa.
+This property is PAR Photon-based, and this property's code is parphotonbased.
+This property is Peak Ground Displacement, and this property's code is peakgrounddisplacement.
+This property is Peak Period, and this property's code is peakperiod.
+This property is Peak Position, and this property's code is peakposition.
+This property is pH, and this property's code is ph.
+This property is Pressure Inverted Echo Sounder, and this property's code is pies.
+This property is Ping Time, and this property's code is pingtime.
+This property is Pitch, and this property's code is pitch.
+This property is Port State, and this property's code is portstate.
+This property is Position Offset, and this property's code is positionoffset.
+This property is Power, and this property's code is power.
+This property is Pressure, and this property's code is pressure.
+This property is Pump Flow, and this property's code is pumpflow.
+This property is Rainfall Rate, and this property's code is rainfallrate.
+This property is Redox, and this property's code is redox.
+This property is Refined Fuel Fluorescence, and this property's code is refinedfuelfluorescene.
+This property is Relative Barometric Pressure, and this property's code is relativebarometricpressure.
+This property is Relative Humidity, and this property's code is relativehumidity.
+This property is Resevoir Volume, and this property's code is resevoirvolume.
+This property is Roll, and this property's code is roll.
+This property is Runtime Sensor, and this property's code is runtimesensor.
+This property is Salinity, and this property's code is salinity.
+This property is Satellite Count, and this property's code is satellitecount.
+This property is Saturation, and this property's code is saturation.
+This property is Scientific Count, and this property's code is scientificcount.
+This property is Seafloor depth below Sea Surface, and this property's code is seafloordepthbelowseasurface.
+This property is Sea Ice Temperature, and this property's code is seaicetemperature.
+This property is Sea Water Temperature, and this property's code is seawatertemperature.
+This property is Sediment Surface Temperature, and this property's code is sedimentsurfacetemperature.
+This property is Sediment Temperature, and this property's code is sedimenttemperature.
+This property is Sharpness, and this property's code is sharpness.
+This property is Ship Course, and this property's code is shipcourse.
+This property is Shutter Speed, and this property's code is shutterspeed.
+This property is Sigma-t, and this property's code is sigmat.
+This property is Sigma-theta, and this property's code is sigmatheta.
+This property is Significant Wave Height, and this property's code is significantwaveheight.
+This property is Significant Wave Period, and this property's code is significantwaveperiod.
+This property is Snow Thickness, and this property's code is snowthickness.
+This property is Solar Radiation, and this property's code is solarradiation.
+This property is Sound Pressure Level, and this property's code is soundpressurelevel.
+This property is Sound Speed, and this property's code is soundspeed.
+This property is Specific Enthalpy, and this property's code is specificenthalpy.
+This property is Speed over Ground, and this property's code is speedoverground.
+This property is SRSL Ice Balance Buoy Temperature, and this property's code is srslicebalancebuoytemperature.
+This property is Status Code, and this property's code is statuscode.
+This property is Tank Level, and this property's code is tanklevel.
+This property is Target Persistence, and this property's code is targetpersistence.
+This property is Tension, and this property's code is tension.
+This property is Tilt, and this property's code is tilt.
+This property is Time of flight, and this property's code is timeofflight.
+This property is Timeout, and this property's code is timeout.
+This property is Tone Mapping, and this property's code is tone_mapping.
+This property is Torque, and this property's code is torque.
+This property is Total Computation Time, and this property's code is totalcomputationtime.
+This property is Total Pressure, and this property's code is totalpressure.
+This property is Transmission, and this property's code is transmission.
+This property is True Heading, and this property's code is trueheading.
+This property is Turbidity FTU, and this property's code is turbidityftu.
+This property is Turbidity NTU, and this property's code is turbidityntu.
+This property is Upward Irradiance of Detector, and this property's code is upwardirradianceofdetector.
+This property is UTM Zone, and this property's code is utmzone.
+This property is UV Index, and this property's code is uvindex.
+This property is Vector Direction, and this property's code is vectordirection.
+This property is Velocity, and this property's code is velocity.
+This property is Vent Fluid Temperature, and this property's code is ventfluidtemperature.
+This property is Voltage, and this property's code is voltage.
+This property is Wave Direction at Peak Period, and this property's code is wavedirectionatpeakperiod.
+This property is Wet Bulb Temperature, and this property's code is wetbulbtemperature.
+This property is Axis White Balance, and this property's code is white_balance.
+This property is Z3 White Balance, and this property's code is white_balance_z3.
+This property is White Balance, and this property's code is whitebalance.
+This property is Wind Chill Temperature, and this property's code is windchilltemperature.
+This property is Wind Direction, and this property's code is winddirection.
+This property is Wind Direction Corrected by Compass, and this property's code is winddirectioncorrectedbycompass.
+This property is Wind Direction Uncorrected by Compass, and this property's code is winddirectionuncorrectedbycompass.
+This property is Wind Speed, and this property's code is windspeed.
+This property is Wind Speed Maximum, and this property's code is windspeedmax.
+This property is Yaw, and this property's code is yaw.
+This property is Z3 Camera Auto Focus State, and this property's code is z3autofocusstate.
+This property is Zoom, and this property's code is zoom.
+This property is Zoom Step Size, and this property's code is zoom_step_size.

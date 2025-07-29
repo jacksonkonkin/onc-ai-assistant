@@ -1,6 +1,6 @@
 import './adminPanel.css';
 import {FormEvent, Key, useState} from "react";
-import data from './messages.json';
+// import data from './messages.json';
 
 type Message = {
     text: String;
@@ -23,6 +23,7 @@ export default function ReviewQueries() {
 
     const [queries, setQueries] = useState<Message[]>(sampleMessages);
 
+    /* --------------
     // temp function to test handling jsons
     const rateFilter = (r: Number) => {
         const json: any = data
@@ -36,8 +37,8 @@ export default function ReviewQueries() {
             }
         }
         return messages
-
     }
+    ---------------- */
 
     const fetchMessage = async(r: Number) => {
         try {
@@ -69,6 +70,7 @@ export default function ReviewQueries() {
         const event = e.target as HTMLFormElement;
         const rate = event.value;
     
+        /* -----------------------
         let retrieved: Message[] = []
         
         if (rate == 2) {
@@ -83,6 +85,9 @@ export default function ReviewQueries() {
         //    fetchMessage(rate); //fetch only for the rating chosen
             retrieved = rateFilter(rate)
         }
+        -------------------------*/
+
+        const retrieved = (rate == 2) ? sampleMessages : sampleMessages.filter((message) => message.rating = rate)
         
         setQueries(retrieved);
     }
