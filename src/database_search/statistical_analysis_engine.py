@@ -536,12 +536,17 @@ class StatisticalAnalysisEngine:
             
             # Use minMaxAvg to get all three basic statistics in one download
             if needs_basic_stats:
+                # Use absolute path for output directory to ensure consistency
+                import os
+                project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+                output_dir = os.path.join(project_root, 'output')
+                
                 download_params = {
                     'location_code': data_params['location_code'],
                     'device_category': data_params.get('device_category', 'CTD'),
                     'date_from': data_params['start_time'],
                     'date_to': data_params['end_time'],
-                    'output_dir': 'output',
+                    'output_dir': output_dir,
                     'quality_control': True,
                     'resample': 'minMaxAvg'  # Get min, max, and average in one download
                 }
@@ -559,11 +564,18 @@ class StatisticalAnalysisEngine:
                 signal.alarm(300)  # 5 minutes timeout
                 
                 try:
+                    logger.info(f"Starting statistical download with params: {download_params}")
                     download_result = self.data_downloader.download_csv_data(
                         **download_params,
                         session_id=self.session_id,
                         user_query=query[:100]  # Pass truncated query for duplicate detection
                     )
+                    logger.info(f"Download completed with status: {download_result.get('status', 'unknown')}")
+                    logger.info(f"Download result keys: {list(download_result.keys()) if isinstance(download_result, dict) else 'Not a dict'}")
+                    if download_result.get('csv_files'):
+                        logger.info(f"CSV files returned: {len(download_result['csv_files'])} files")
+                    else:
+                        logger.warning("No CSV files returned from download")
                 except TimeoutError as timeout_error:
                     logger.error(f"Statistical analysis download timed out: {timeout_error}")
                     return {
@@ -630,6 +642,13 @@ class StatisticalAnalysisEngine:
                         'message': f"No data available for the requested time period: {download_result.get('date_range', 'Unknown range')}",
                         'data': []
                     }
+                elif download_result['status'] == 'error':
+                    logger.error(f"Download failed with error: {download_result.get('message', 'Unknown error')}")
+                    return {
+                        'status': 'error',
+                        'message': f"Failed to download statistical data: {download_result.get('message', 'Download failed')}",
+                        'data': []
+                    }
                 elif download_result['status'] == 'duplicate_active':
                     logger.info("Active download detected for minMaxAvg processing, waiting...")
                     return {
@@ -638,11 +657,14 @@ class StatisticalAnalysisEngine:
                         'data': []
                     }
                 else:
-                    logger.error(f"minMaxAvg download failed: {download_result.get('message', 'Unknown error')}")
+                    # Log the unexpected status and full result for debugging
+                    logger.error(f"minMaxAvg download failed with unexpected status: {download_result.get('status', 'NO_STATUS')}")
+                    logger.error(f"Full download result: {download_result}")
                     # Don't continue with infinite retries - return error immediately
+                    fallback_message = f"Unexpected status: {download_result.get('status', 'unknown')}"
                     return {
                         'status': 'error',
-                        'message': f"Failed to download minMaxAvg data: {download_result.get('message', 'Download failed')}",
+                        'message': f"Failed to download minMaxAvg data: {download_result.get('message', fallback_message)}",
                         'data': []
                     }
             
@@ -681,7 +703,7 @@ class StatisticalAnalysisEngine:
                         'device_category': data_params.get('device_category', 'CTD'),
                         'date_from': data_params['start_time'],
                         'date_to': data_params['end_time'],
-                        'output_dir': 'output',
+                        'output_dir': output_dir,  # Use the same output directory
                         'quality_control': True,
                         'resample': 'none'  # Raw data for complex statistical operations
                     }

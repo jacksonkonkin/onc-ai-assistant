@@ -3,8 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import "./ChatPage.css";
-import { FiSend, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
+import { FiSend, FiThumbsUp, FiThumbsDown, FiDownload } from "react-icons/fi";
 import ReactMarkdown from "react-markdown";
+
+type DownloadFile = {
+  filename: string;
+  download_url: string;
+  size: number;
+};
 
 type Message = {
   id: string;
@@ -13,6 +19,7 @@ type Message = {
   isThinking?: boolean;
   userQuery?: string; // Store the original user query for feedback
   feedback?: "thumbs_up" | "thumbs_down" | null;
+  downloads?: DownloadFile[];
 };
 
 export default function ChatPage() {
@@ -26,7 +33,7 @@ export default function ChatPage() {
     setPageLoaded(true);
   }, []);
 
-  const fetchAIResponse = async (prompt: string): Promise<string> => {
+  const fetchAIResponse = async (prompt: string): Promise<{text: string, downloads?: DownloadFile[]}> => {
     try {
       const response = await fetch(
         "http://localhost:8000/query",
@@ -44,10 +51,13 @@ export default function ChatPage() {
       }
 
       const data = await response.json();
-      return data.response ?? "No response from AI.";
+      return {
+        text: data.response ?? "No response from AI.",
+        downloads: data.downloads
+      };
     } catch (error) {
       console.error("Error fetching AI response:", error);
-      return "Sorry, something went wrong.";
+      return { text: "Sorry, something went wrong." };
     }
   };
 
@@ -72,14 +82,15 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMessage, aiMessage]);
     setInput("");
 
-    const aiText = await fetchAIResponse(userQuery);
+    const aiResponse = await fetchAIResponse(userQuery);
 
-    // Stop thinking
+    // Stop thinking and add downloads if any
     setMessages((prev) => {
       const updated = [...prev];
       updated[updated.length - 1] = {
         ...updated[updated.length - 1],
         isThinking: false,
+        downloads: aiResponse.downloads
       };
       return updated;
     });
@@ -92,14 +103,14 @@ export default function ChatPage() {
         const currentAiMsg = updated[updated.length - 1];
         updated[updated.length - 1] = {
           ...currentAiMsg,
-          text: aiText.slice(0, index + 1),
+          text: aiResponse.text.slice(0, index + 1),
         };
         return updated;
       });
 
       index++;
 
-      if (index >= aiText.length) {
+      if (index >= aiResponse.text.length) {
         clearInterval(typeInterval);
       }
     }, 10);
@@ -223,29 +234,53 @@ export default function ChatPage() {
                 {renderMessageText(msg)}
               </div>
               {msg.sender === "ai" && !msg.isThinking && msg.text && (
-                <div className="feedback-buttons">
-                  <button
-                    onClick={() => submitFeedback(msg.id, "thumbs_up")}
-                    className={`feedback-btn ${msg.feedback === "thumbs_up" ? "active" : ""}`}
-                    disabled={msg.feedback !== null}
-                    title="Helpful"
-                  >
-                    <FiThumbsUp size={16} />
-                  </button>
-                  <button
-                    onClick={() => submitFeedback(msg.id, "thumbs_down")}
-                    className={`feedback-btn ${msg.feedback === "thumbs_down" ? "active" : ""}`}
-                    disabled={msg.feedback !== null}
-                    title="Not helpful"
-                  >
-                    <FiThumbsDown size={16} />
-                  </button>
-                  {msg.feedback && (
-                    <span className="feedback-thanks">
-                      Thanks for your feedback!
-                    </span>
+                <>
+                  <div className="feedback-buttons">
+                    <button
+                      onClick={() => submitFeedback(msg.id, "thumbs_up")}
+                      className={`feedback-btn ${msg.feedback === "thumbs_up" ? "active" : ""}`}
+                      disabled={msg.feedback !== null}
+                      title="Helpful"
+                    >
+                      <FiThumbsUp size={16} />
+                    </button>
+                    <button
+                      onClick={() => submitFeedback(msg.id, "thumbs_down")}
+                      className={`feedback-btn ${msg.feedback === "thumbs_down" ? "active" : ""}`}
+                      disabled={msg.feedback !== null}
+                      title="Not helpful"
+                    >
+                      <FiThumbsDown size={16} />
+                    </button>
+                    {msg.feedback && (
+                      <span className="feedback-thanks">
+                        Thanks for your feedback!
+                      </span>
+                    )}
+                  </div>
+                  {msg.downloads && msg.downloads.length > 0 && (
+                    <div className="download-section">
+                      <h4 className="download-title">Available Downloads:</h4>
+                      <div className="download-buttons">
+                        {msg.downloads.map((file, index) => (
+                          <a
+                            key={index}
+                            href={`http://localhost:8000${file.download_url}`}
+                            download={file.filename}
+                            className="download-btn"
+                            title={`Download ${file.filename} (${(file.size / 1024 / 1024).toFixed(2)} MB)`}
+                          >
+                            <FiDownload size={16} />
+                            <span className="download-filename">{file.filename}</span>
+                            <span className="download-size">
+                              ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                </div>
+                </>
               )}
             </div>
           ))}

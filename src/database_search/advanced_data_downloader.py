@@ -260,11 +260,13 @@ class AdvancedDataDownloader:
                     try:
                         # First try with metadata file included
                         try:
+                            logger.info(f"Making ONC API call: orderDataProduct with metadata")
                             result = self.onc_client.orderDataProduct(
                                 product_params, 
                                 includeMetadataFile=True
                             )
                             logger.info(f"ONC data product order completed with metadata")
+                            logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
                         except Exception as metadata_error:
                             # If metadata fails, try without it (many data products don't support metadata)
                             error_str = str(metadata_error)
@@ -279,6 +281,7 @@ class AdvancedDataDownloader:
                                 logger.info("Retrying download without metadata file...")
                                 result = self.onc_client.orderDataProduct(product_params)
                                 logger.info(f"ONC data product order completed successfully without metadata")
+                                logger.info(f"ONC result type: {type(result)}, length: {len(result) if hasattr(result, '__len__') else 'N/A'}")
                             else:
                                 # Re-raise if it's a different error
                                 raise metadata_error
@@ -591,11 +594,16 @@ class AdvancedDataDownloader:
         print()
 
         # Download the CSV data
+        logger.info(f"Calling download_data_product with params: {params}")
         download_result = self.download_data_product(params, output_dir, background_mode)
+        logger.info(f"download_data_product returned: status={download_result.get('status', 'NO_STATUS')}")
+        logger.info(f"download_data_product keys: {list(download_result.keys()) if isinstance(download_result, dict) else 'Not a dict'}")
         
         if download_result['status'] == 'success':
             # Process CSV files for additional metadata
+            logger.info(f"Download status is success, looking for CSV files in: {output_dir}")
             csv_files = self._find_csv_files(download_result, output_dir)
+            logger.info(f"Found {len(csv_files)} CSV files: {csv_files}")
             
             # Check if we actually got data files
             if not csv_files:
