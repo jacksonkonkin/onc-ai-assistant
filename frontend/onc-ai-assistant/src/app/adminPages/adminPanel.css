@@ -43,6 +43,19 @@
     padding: 10px 20px;
 }
 
+.module button {
+    padding: 12px 24px;
+    margin: 0 0 10px 0;
+    align-self: center;
+    background-color: #129DC0;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: "Open Sans", sans-serif;
+}
+
 .frequent-queries {
     padding: 5px 20px;
 }
@@ -104,15 +117,6 @@
     border-width: 0 0 2px 0;
 }
 
-.module button {
-    padding: 12px 24px;
-    margin: 0 0 10px 0;
+.chartDisplay {
     align-self: center;
-    background-color: #129DC0;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: "Open Sans", sans-serif;
 }

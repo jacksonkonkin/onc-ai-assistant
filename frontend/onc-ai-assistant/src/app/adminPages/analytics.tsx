@@ -1,5 +1,5 @@
 import './adminPanel.css';
-import {BarChart, Bar, CartesianGrid, XAxis, YAxis} from 'recharts';
+import {BarChart, Bar, CartesianGrid, XAxis, YAxis, ResponsiveContainer} from 'recharts';
 import data from './messages.json';
 import {Component, useState} from 'react';
 
@@ -7,16 +7,6 @@ type Message = {
     text: String;
     rating: Number;
     timestamp: Date;
-}
-
-type AnalyticsData = {
-    key: String,
-    val: any
-}
-
-type AnalyticsDisplay = {
-    metric: String;
-    data: AnalyticsData[]
 }
 
 type RatingFrequency = {
@@ -76,15 +66,6 @@ export default function Analytics() {
             }
         }
 
-        // const posData: AnalyticsData = {key: "Positive", val: posCount}
-        // const neutralData: AnalyticsData = {key: "Not Rated", val: neutralCount}
-        // const negData: AnalyticsData = {key: "Negative", val: negCount}
-
-        // const frequency: AnalyticsDisplay = {metric: "Rating Frequency", data: [posData, neutralData, negData]}
-        // return frequency;
-
-        // const frequency: RatingFrequency = {Positive: posCount, Unrated: neutralCount, Negative: negCount}
-
         const posFreq: RatingFrequency = {rating: "Positive", count: posCount}
         const neutralFreq: RatingFrequency = {rating: "Not Rated", count: neutralCount}
         const negFreq: RatingFrequency = {rating: "Negative", count: negCount}
@@ -92,24 +73,20 @@ export default function Analytics() {
         return [posFreq, neutralFreq, negFreq]
         
     }
-
-    
-
     
     return(
         <div className="module">
         <h2>View Analytics</h2>
         <button onClick={setupData}>Reload Data</button>
         <div className="analytics"> 
-            <div className="chartDisplay"></div>
-
-            <BarChart width={730} height={250} data={ratingFrequency()}>
+            <div className="chartDisplay">
+            <BarChart width={500} height={500} data={ratingFrequency()}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="rating" />
                 <YAxis />
                 <Bar dataKey="count" fill="#123253"/>
             </BarChart>
-
+            </div>
             </div>
         </div>
     );
