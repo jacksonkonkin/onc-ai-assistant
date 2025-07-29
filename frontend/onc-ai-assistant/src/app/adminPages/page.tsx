@@ -2,6 +2,7 @@
 
 import './adminPanel.css';
 import ReviewQueries from './reviewQueries';
+import Analytics from './analytics';
 
 export default function AdminPage() {
 
@@ -13,12 +14,7 @@ export default function AdminPage() {
 
         <div className="dash-column">
           {/* Analytics: will need to create (?) / display graphs and stats */}
-          <div className="module">
-            <h2>View Analytics</h2>
-            <div className="analytics"> 
-              {/* Will pull statistics/analytics from backend and render as graph. */}
-            </div>
-          </div>
+          <Analytics />
         </div>
 
         <div className="dash-column">
