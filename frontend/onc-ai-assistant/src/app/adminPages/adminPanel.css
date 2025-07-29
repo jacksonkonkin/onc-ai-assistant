@@ -86,6 +86,7 @@
 
 .rating-filter {
     padding: 10px;
+    box-shadow: 0 4px 2px -1px #BFBFBF;
 }
 
 .rating-filter label {
@@ -93,7 +94,12 @@
 }
 
 .query-display {
-    border: 2px solid black;
-    height: fit-content(10%);
+    height: 15rem;
     overflow: auto;
+}
+
+.query-display li {
+    padding: 10px;
+    border-radius: 0;
+    border-width: 0 0 2px 0;
 }

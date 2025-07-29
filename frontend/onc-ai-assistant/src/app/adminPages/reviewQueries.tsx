@@ -20,23 +20,27 @@ const sampleMessages: Message[] = [m1, m2, m3, m4, m5, m6, m7]
 
 export default function ReviewQueries() {
 
-    const [queries, setQueries] = useState<Message[]>([]);
+    const [queries, setQueries] = useState<Message[]>(sampleMessages);
 
     const fetchMessage = async(r: Number) => {
         try {
             const response = await fetch(`https://onc-assistant-822f952329ee.herokuapp.com/api/messages-by-rating?rating=${r}`,
                 {
-                method: "GET",       
+                method: "GET",     
+                headers: {
+                    "Content-Type": "application/json",
+                }  
             })
 
             if (!response.ok) {
                 throw new Error("API request failed");
             }
 
-            const messages = await response.json();
-            console.log(messages.response)
+            const json = await response.json();
+            // const messages = JSON.parse(json);
+            // console.log(messages)
             // need to format for display still
-            return messages.response;
+            // return messages.response;
         } catch (error) {
             console.error("Error: ", error);
             return "Error retrieving messages.";
@@ -47,14 +51,14 @@ export default function ReviewQueries() {
     const retrieveQueries = (e: FormEvent) => {
         const event = e.target as HTMLFormElement;
         const rate = event.value;
-        
-
+    
         const retrieved: Message[] = rate == 2 ? sampleMessages : sampleMessages.filter(msg => msg.rating == rate);
         
-
-        // const retrieved: Message[] = fetchMessage(0).toArray();
-        // fetchMessage(rate)
-
+        if (rate == 2) {
+            // fetch all
+        } else {
+           fetchMessage(rate); //fetch only for the rating chosen
+        }
         
 
         setQueries(retrieved);
@@ -68,7 +72,7 @@ export default function ReviewQueries() {
             <div className="rating-filter">
                 <label htmlFor="rating">Select messages to show:</label>
                 <select id="rating" name="rating" onChange={(e) => retrieveQueries(e)}>
-                    <option value={2}>All Messages</option>
+                    <option value={2} selected>All Messages</option>
                     <option value={1}>Positive</option>
                     <option value={-1}>Negative</option>
                     <option value={0}>Not Rated</option>
