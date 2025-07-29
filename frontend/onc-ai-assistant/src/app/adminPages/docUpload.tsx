@@ -41,12 +41,10 @@ export default function DocUpload() {
 
     const addFromBrowse = (e: any) => {
         addFiles(Array.from(e.target.files))
-        console.log("add from browse")
     }
 
-    // eventually this will contain sending to backend (or wherever they need to go)
+    
     const uploadFiles = () => {
-        console.log("uploading: " + files.length);
         for (let i = 0; i < files.length; i++) {
             let file: File = files[i];
             console.log(file.name)
@@ -55,7 +53,6 @@ export default function DocUpload() {
         setHasFiles(false);
     }
 
-    //overflow of filenames listed in the drag and drop isn't being handled but it can take 9 or 10 filenames and display them currently
     return (
         <div className="module">
             <h2>Upload Documents</h2>

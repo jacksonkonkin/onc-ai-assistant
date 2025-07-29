@@ -68,14 +68,14 @@
     justify-content: center;
 }
 
-.fileList p {
-    text-align: center;
-    font-family: "Open Sans", sans-serif;
-}
-
 .fileList {
     max-height: 50rem;
     padding: 5px
+}
+
+.fileList p {
+    text-align: center;
+    font-family: "Open Sans", sans-serif;
 }
 
 .upload {
