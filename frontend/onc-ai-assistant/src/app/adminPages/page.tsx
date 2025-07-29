@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import './adminPanel.css';
+import DocUpload from './docUpload';
 import ReviewQueries from './reviewQueries';
 
 export default function AdminPage() {
@@ -52,18 +53,7 @@ export default function AdminPage() {
         <div className="dash-column">
           <ReviewQueries />
 
-          {/* Document upload */}
-          <div className="module">
-            <h2>Upload Documents</h2>
-            <div className="upload"> 
-              <p><i>Drag and drop/upload files here to enhance the assistant's model.</i></p>
-              <label>
-                Browse
-                <input type="file" id="file" style={{display: 'none'}}/>
-                {/* eventually will use hooks to store + upload files. currently just pops file picker open */}
-              </label>
-            </div>
-          </div>
+          <DocUpload />
         </div>
       </main>
     </div>
