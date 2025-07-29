@@ -111,14 +111,14 @@ async def query(query: Query):
         # Check for CSV files to include in download response
         download_files = []
         
-        # Check if this was a duplicate data response (no new files created)
-        is_duplicate_response = "Similar Data Already Downloaded" in response or "duplicate download request" in response.lower()
+        # Check if this was a duplicate data response that mentions specific files or download IDs
+        is_duplicate_response = "Similar Data Already Downloaded" in response and ("Files Created:" in response or "CSV files" in response)
         
         if is_duplicate_response:
-            logger.info("🔄 Duplicate data detected - including existing CSV files in response")
-            # Include recent CSV files from all directories since this is duplicate data
+            logger.info("🔄 Duplicate data detected with file references - including existing CSV files in response")
+            # Include recent CSV files from all directories since this is duplicate data with file references
             import time
-            recent_threshold = time.time() - 3600  # Files created in last hour for duplicates
+            recent_threshold = time.time() - 1800  # Files created in last 30 minutes for duplicates (more restrictive)
             
             # Check main output directory for recent files
             if output_dir.exists():
