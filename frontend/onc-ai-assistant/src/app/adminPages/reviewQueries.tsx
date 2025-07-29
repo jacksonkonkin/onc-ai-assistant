@@ -1,5 +1,6 @@
 import './adminPanel.css';
 import {FormEvent, Key, useState} from "react";
+import data from './messages.json';
 
 type Message = {
     text: String;
@@ -21,6 +22,22 @@ const sampleMessages: Message[] = [m1, m2, m3, m4, m5, m6, m7]
 export default function ReviewQueries() {
 
     const [queries, setQueries] = useState<Message[]>(sampleMessages);
+
+    // temp function to test handling jsons
+    const rateFilter = (r: Number) => {
+        const json: any = data
+        console.log(json)
+        const messages: Message[] = []
+
+        for (let i in json) {
+            if (json[i].rating == r) {
+                const m: Message = {text: json[i].text, rating: json[i].rating}
+                messages.push(m)
+            }
+        }
+        return messages
+
+    }
 
     const fetchMessage = async(r: Number) => {
         try {
@@ -52,15 +69,21 @@ export default function ReviewQueries() {
         const event = e.target as HTMLFormElement;
         const rate = event.value;
     
-        const retrieved: Message[] = rate == 2 ? sampleMessages : sampleMessages.filter(msg => msg.rating == rate);
+        let retrieved: Message[] = []
         
         if (rate == 2) {
             // fetch all
+            const pos = rateFilter(1)
+            const neutral = rateFilter(0)
+            const neg = rateFilter(-1)
+
+            retrieved = pos.concat(neutral, neg) 
+
         } else {
-           fetchMessage(rate); //fetch only for the rating chosen
+        //    fetchMessage(rate); //fetch only for the rating chosen
+            retrieved = rateFilter(rate)
         }
         
-
         setQueries(retrieved);
     }
 
@@ -71,8 +94,8 @@ export default function ReviewQueries() {
         <div className="frequent-queries">
             <div className="rating-filter">
                 <label htmlFor="rating">Select messages to show:</label>
-                <select id="rating" name="rating" onChange={(e) => retrieveQueries(e)}>
-                    <option value={2} selected>All Messages</option>
+                <select id="rating" name="rating" onChange={(e) => retrieveQueries(e)} defaultValue={2}>
+                    <option value={2}>All Messages</option>
                     <option value={1}>Positive</option>
                     <option value={-1}>Negative</option>
                     <option value={0}>Not Rated</option>
