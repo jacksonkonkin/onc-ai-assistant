@@ -1,7 +1,7 @@
 from onc import ONC
 import re
 
-onc = ONC("45b4e105-43ed-411e-bd1b-1d2799eda3c4")
+onc = ONC("TOKEN")
 
 # Step 1: Get CBY and all its child locations
 location_info = onc.getLocations({
