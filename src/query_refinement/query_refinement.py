@@ -86,13 +86,14 @@ class QueryRefinementManager:
         
         logger.info("Query refinement manager initialized")
     
-    def analyze_query_clarity(self, query: str, context: Optional[Dict[str, Any]] = None) -> QueryAnalysis:
+    def analyze_query_clarity(self, query: str, context: Optional[Dict[str, Any]] = None, parameter_extractor=None) -> QueryAnalysis:
         """
         Analyze query clarity and identify ambiguities.
         
         Args:
             query: User query to analyze
             context: Additional context for analysis
+            parameter_extractor: Enhanced parameter extractor for validation
             
         Returns:
             QueryAnalysis object with results
@@ -115,10 +116,10 @@ class QueryRefinementManager:
         ambiguity_issues = self._detect_ambiguity_issues(query)
         missing_context = self._detect_missing_context(query)
         
-        # Enhanced validation for data download queries
+        # Enhanced validation for data download queries using parameter extractor
         missing_data_parameters = []
         if is_data_query:
-            missing_data_parameters = self._validate_data_query_parameters(query, context)
+            missing_data_parameters = self._validate_data_query_parameters(query, context, parameter_extractor)
             # For data queries, missing parameters should increase ambiguity
             if missing_data_parameters:
                 missing_context.extend(missing_data_parameters)
@@ -236,21 +237,23 @@ class QueryRefinementManager:
         return False
 
     def _is_data_download_query(self, query: str) -> bool:
-        """Determine if this is a data download/retrieval query."""
+        """Determine if this is a database/data query that may need parameter validation."""
         query_lower = query.lower()
         
         # Skip if this is a device discovery query
         if self._is_device_discovery_query(query):
             return False
         
-        # Data request patterns
+        # Data request patterns - broader than before to catch database queries
         data_request_patterns = [
-            r'\b(get|show|give|find|retrieve|download|fetch)\s+(me\s+)?(the\s+)?data\b',
+            r'\b(get|show|give|find|retrieve|download|fetch)\s+(me\s+)?(the\s+)?(data|temperature|salinity|pressure)\b',
             r'\b(what\s+(was|is)\s+the)\s+(temperature|salinity|pressure|ph|oxygen|conductivity)\b',
-            r'\b(temperature|salinity|pressure|ph|oxygen|conductivity|chlorophyll|turbidity|density|fluorescence)\s+(data|reading|measurement|value)\b',
+            r'\b(temperature|salinity|pressure|ph|oxygen|conductivity|chlorophyll|turbidity|density|fluorescence)\s+(data|reading|measurement|value|at|from|in)\b',
             r'\b(data|measurement|reading|value)\s+(from|at|in|for)\b',
             r'\b(latest|current|recent)\s+(temperature|salinity|pressure|ph|oxygen|conductivity)\b',
-            r'\b(sensor|instrument)\s+(data|reading|measurement)\b'
+            r'\b(sensor|instrument)\s+(data|reading|measurement)\b',
+            r'\b(how\s+(hot|cold|warm))\b',  # Temperature requests
+            r'\b(what.*temperature|tell.*about.*temperature)\b'
         ]
         
         for pattern in data_request_patterns:
@@ -260,120 +263,130 @@ class QueryRefinementManager:
         # Check for parameter names that typically indicate data requests
         parameter_names = [
             'temperature', 'salinity', 'pressure', 'ph', 'oxygen', 'conductivity',
-            'chlorophyll', 'turbidity', 'density', 'fluorescence'
+            'chlorophyll', 'turbidity', 'density', 'fluorescence', 'depth'
         ]
         
-        # If query contains parameter name + location/time, likely a data query
+        # Broader matching - parameter + any context suggests data query
         has_parameter = any(param in query_lower for param in parameter_names)
-        has_location = re.search(r'\b(cambridge bay|cbyip|station|at|in|from)\b', query_lower)
-        has_time = re.search(r'\b(yesterday|today|last|this|on|at|from|to|between|\d{4}|\d{1,2}[-/]\d{1,2})\b', query_lower)
+        has_data_context = bool(re.search(r'\b(cambridge bay|cbyip|station|data|measurement|sensor|yesterday|today|last|this|now|current|at|from|in)\b', query_lower))
         
-        # Check if this is a data query based on parameter + location/time
-        is_likely_data_query = has_parameter and (has_location or has_time)
-        
-        if is_likely_data_query:
-            # But check if it's a download query with COMPLETE temporal information
-            download_keywords = ['download', 'export', 'get data', 'retrieve data', 'order']
-            has_download_intent = any(keyword in query_lower for keyword in download_keywords)
-            
-            if has_download_intent:
-                # Check for specific date patterns (flexible matching)
-                date_patterns = [
-                    r'\b\d{4}-\d{2}-\d{2}\b',  # 2025-01-23
-                    r'\b\d{1,2}[-/]\d{1,2}[-/]\d{4}\b',  # 1/23/2025 or 23/1/2025
-                    r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}\b',  # January 23, 2025
-                    r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}\b'  # January 23
-                ]
-                has_specific_date = any(re.search(pattern, query_lower) for pattern in date_patterns)
-                
-                # Check for specific time patterns  
-                time_patterns = [
-                    r'\b\d{1,2}:\d{2}(\s*(am|pm))?\b',  # 14:00 or 2:00 PM
-                    r'\b\d{1,2}\s*(am|pm)\b',  # 2 PM
-                    r'\bat\s+\d{1,2}(:\d{2})?\b'  # at 2 or at 14:00
-                ]
-                has_specific_time = any(re.search(pattern, query_lower) for pattern in time_patterns)
-                
-                # If this is a download query with BOTH specific date AND time, don't treat as ambiguous
-                if has_specific_date and has_specific_time:
-                    return False
-            
-            # Otherwise, it's an ambiguous data query
+        # If query contains parameter name + any data context, likely a data query
+        if has_parameter and has_data_context:
             return True
+        
+        # Check for implicit data queries (questions about ocean conditions)
+        implicit_data_patterns = [
+            r'\bhow\s+(hot|cold|warm|salty)\b',
+            r'\bwhat.*temperature.*cambridge bay\b',
+            r'\bwhat.*salinity\b',
+            r'\bwhat.*pressure\b',
+            r'\bcambridge bay.*temperature\b',
+            r'\bcambridge bay.*salinity\b',
+            r'\bcambridge bay.*pressure\b'
+        ]
+        
+        for pattern in implicit_data_patterns:
+            if re.search(pattern, query_lower):
+                return True
         
         return False
     
-    def _validate_data_query_parameters(self, query: str, context: Optional[Dict[str, Any]] = None) -> List[str]:
-        """Validate that a data query has all required parameters, considering conversation context."""
+    def _validate_data_query_parameters(self, query: str, context: Optional[Dict[str, Any]] = None, parameter_extractor=None) -> List[str]:
+        """Validate that a data query has all required parameters using the parameter extractor."""
         missing = []
-        query_lower = query.lower()
         
         # Get conversation context to check for previously provided information
         conversation_context = ""
         if context and 'conversation_context' in context:
-            conversation_context = context['conversation_context'].lower()
+            conversation_context = context['conversation_context']
         
         # Combined context: current query + conversation history
-        combined_context = f"{conversation_context} {query_lower}".strip()
+        combined_context = f"{conversation_context} {query}".strip()
         
-        # Required parameters for data queries
+        # Try parameter extraction to see what's missing
+        if parameter_extractor:
+            try:
+                extraction_result = parameter_extractor.extract_parameters(combined_context)
+                
+                if extraction_result.get("status") == "success":
+                    params = extraction_result.get("parameters", {})
+                    
+                    # Check for missing or invalid location
+                    location_code = params.get("location_code")
+                    if not location_code or location_code not in parameter_extractor.location_devices:
+                        missing.append("Specific location (e.g., 'Cambridge Bay', 'CBYIP station', or coordinates)")
+                    
+                    # Check for missing or invalid property/parameter type
+                    property_code = params.get("property_code")
+                    device_category = params.get("device_category")
+                    if not property_code:
+                        missing.append("Specific parameter type (e.g., 'temperature', 'salinity', 'pressure', 'oxygen')")
+                    elif device_category and property_code not in parameter_extractor.device_properties.get(device_category, []):
+                        missing.append("Valid parameter type for the selected device/location")
+                    
+                    # Check for missing temporal information
+                    start_time = params.get("start_time")
+                    end_time = params.get("end_time")
+                    temporal_ref = params.get("temporal_reference")
+                    
+                    if not start_time or not end_time or not temporal_ref:
+                        missing.append("Specific date and time (e.g., 'June 25, 2024 at 2:00 PM', 'yesterday at noon', 'last week')")
+                    else:
+                        # Check if time range is too vague (e.g., whole day without specific hours)
+                        try:
+                            from datetime import datetime
+                            start_dt = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+                            end_dt = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+                            time_diff = end_dt - start_dt
+                            
+                            # If the time range is more than 24 hours and no specific time was mentioned
+                            if time_diff.total_seconds() > 86400:  # More than 1 day
+                                has_specific_time = bool(re.search(r'\b(\d{1,2}:\d{2}|\d{1,2}\s*(am|pm)|morning|afternoon|evening|night|noon|midnight)\b', combined_context.lower()))
+                                if not has_specific_time:
+                                    missing.append("Specific time or time range (what time of day? e.g., '2:00 PM - 4:00 PM', 'morning', 'afternoon')")
+                        except (ValueError, TypeError):
+                            # If we can't parse the times, ask for clarification
+                            missing.append("Valid date and time format")
+                    
+                    # Check for device category validation
+                    if not device_category or (location_code and device_category not in parameter_extractor.location_devices.get(location_code, [])):
+                        # Only ask for device clarification if it's truly ambiguous
+                        if property_code and len([d for d in parameter_extractor.location_devices.get(location_code, []) 
+                                               if property_code in parameter_extractor.device_properties.get(d, [])]) > 1:
+                            missing.append("Specific sensor/device type (multiple devices can measure this parameter)")
+                    
+                else:
+                    # Parameter extraction failed, use fallback validation
+                    return self._fallback_parameter_validation(combined_context)
+                    
+            except Exception as e:
+                logger.warning(f"Parameter extraction failed during validation: {e}")
+                return self._fallback_parameter_validation(combined_context)
+        else:
+            # No parameter extractor available, use fallback
+            return self._fallback_parameter_validation(combined_context)
         
-        # 1. Specific location
-        has_specific_location = bool(re.search(r'\b(cambridge bay|cbyip|station\s+\w+|latitude|longitude|coordinates)\b', combined_context))
-        if not has_specific_location:
+        return missing
+    
+    def _fallback_parameter_validation(self, combined_context: str) -> List[str]:
+        """Fallback parameter validation when extractor is not available."""
+        missing = []
+        context_lower = combined_context.lower()
+        
+        # Check for location
+        has_location = bool(re.search(r'\b(cambridge bay|cbyip|station|location|coordinates|latitude|longitude)\b', context_lower))
+        if not has_location:
             missing.append("Specific location (e.g., 'Cambridge Bay', 'CBYIP station')")
         
-        # 2. Specific time/date and time range validation
-        has_specific_date = bool(re.search(r'\b(\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|january|february|march|april|may|june|july|august|september|october|november|december\s+\d{1,2}(?:\s*,?\s*\d{4})?|april\s+\d{1,2}|may\s+\d{1,2})\b', combined_context))
+        # Check for parameter type (including implicit references)
+        has_parameter = bool(re.search(r'\b(temperature|salinity|pressure|ph|oxygen|conductivity|chlorophyll|turbidity|density|fluorescence|hot|cold|warm|salty)\b', context_lower))
+        if not has_parameter:
+            missing.append("Specific parameter type (e.g., 'temperature', 'salinity', 'pressure')")
         
-        # Check for specific time ranges or hours
-        has_specific_time_range = bool(re.search(r'\b(\d{1,2}:\d{2}\s*(am|pm)?(\s*-\s*\d{1,2}:\d{2}\s*(am|pm)?)?|\d{1,2}\s*(am|pm)\s*-\s*\d{1,2}\s*(am|pm)|between\s+\d{1,2}:\d{2}|from\s+\d{1,2}:\d{2}|at\s+\d{1,2}:\d{2}|morning|afternoon|evening|night|noon|midnight)\b', combined_context, re.IGNORECASE))
-        
-        # Check for ambiguous date patterns that need year clarification
-        ambiguous_date_patterns = [
-            r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}\b(?!\s*,?\s*\d{4})',  # "June 5" without year
-            r'\b\d{1,2}[-/]\d{1,2}\b(?![-/]\d{2,4})',  # "6/5" without year
-            r'\bon\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}\b(?!\s*,?\s*\d{4})',  # "on June 5" without year
-        ]
-        
-        has_ambiguous_date = any(re.search(pattern, combined_context, re.IGNORECASE) for pattern in ambiguous_date_patterns)
-        
-        # Check for relative dates that need more specific times
-        has_relative_date = bool(re.search(r'\b(yesterday|today|tomorrow)\b', combined_context))
-        has_general_time_only = bool(re.search(r'\b(now|current|recently|lately)\b', combined_context)) and not has_specific_time_range
-        
-        # Time validation logic
-        if not has_specific_date and not has_relative_date:
-            missing.append("Specific date and time")
-        elif has_ambiguous_date:
-            missing.append("Year for the date (which year are you asking about?)")
-        
-        # For relative dates (yesterday/today/tomorrow), require specific time ranges
-        if has_relative_date and not has_specific_time_range:
-            missing.append("Specific time or time range (what time of day? e.g., '2:00 PM', '9:00 AM - 11:00 AM', 'morning', 'afternoon')")
-        
-        # CRITICAL: Always require specific time ranges for data queries with specific dates
-        if has_specific_date and not has_specific_time_range and not has_relative_date:
-            missing.append("Specific time or time range (what time of day? e.g., '2:00 PM - 4:00 PM', '9:00 AM', 'morning', 'afternoon')")
-        
-        # Handle other vague time references
-        if has_general_time_only:
-            if 'current' in combined_context or 'now' in combined_context:
-                missing.append("Specific current time reference (current hour, day, or latest available?)")
-            elif 'recently' in combined_context or 'lately' in combined_context:
-                missing.append("Specific time period (how recent? last week, month, or year?)")
-        
-        if re.search(r'\b(this day last year|that day)\b', combined_context):
-            missing.append("Specific date (what exact date are you referring to?)")
-        
-        # 3. Specific parameter type with measurement context
-        parameter_specificity_issues = self._check_parameter_specificity(combined_context)
-        missing.extend(parameter_specificity_issues)
-        
-        # 4. Sensor/measurement type clarification
-        sensor_clarification = self._check_sensor_specificity(combined_context)
-        if sensor_clarification:
-            missing.append(sensor_clarification)
+        # Check for temporal information
+        has_time = bool(re.search(r'\b(\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|january|february|march|april|may|june|july|august|september|october|november|december|yesterday|today|tomorrow|last|this|now|current|\d{1,2}:\d{2})\b', context_lower))
+        if not has_time:
+            missing.append("Specific date and time (e.g., 'June 25, 2024', 'yesterday', 'last week')")
         
         return missing
     
@@ -493,37 +506,41 @@ class QueryRefinementManager:
             if is_data_query and missing_data_parameters:
                 conversation_context = context.get('conversation_context', '') if context else ''
                 
-                prompt = f"""You are an expert at helping users refine their oceanographic data queries to ensure they have all required information.
+                prompt = f"""You are an expert at helping users refine their oceanographic data queries for Ocean Networks Canada.
 
 User's Current Query: "{query}"
 
 {f'''Previous Conversation Context:
 {conversation_context}
 
-''' if conversation_context else ''}This is a DATA DOWNLOAD/RETRIEVAL query that requires specific parameters.
+''' if conversation_context else ''}This query needs data from Ocean Networks Canada sensors, but some required parameters are missing.
 
-Missing Required Parameters (that haven't been provided in the conversation yet):
+Missing Required Parameters:
 {chr(10).join(f"- {param}" for param in missing_data_parameters) if missing_data_parameters else "- None"}
 
-General Issues:
-{chr(10).join(f"- {issue}" for issue in issues) if issues else "- None"}
+IMPORTANT: Check the conversation context carefully. Only ask for information that is truly missing - don't re-ask for details already provided in previous messages.
 
-Additional Missing Context:
-{chr(10).join(f"- {item}" for item in missing if item not in missing_data_parameters) if missing else "- None"}
+Generate 1-3 specific clarifying questions to collect the missing information. Focus on:
 
-IMPORTANT: Look at the conversation context to see what information the user has ALREADY PROVIDED. Only ask for information that is still missing. If the user has already specified location, time, parameter type, etc. in previous messages, DO NOT ask for that information again.
+1. **Location**: If missing, ask for specific ONC location (e.g., "Cambridge Bay", "CBYIP station")
+2. **Time/Date**: If missing, ask for specific date and time period needed
+3. **Parameter**: If missing, ask for specific oceanographic parameter (temperature, salinity, etc.)
+4. **Time Range**: If date is provided but time range is too broad, ask for specific hours
 
-Generate 1-4 specific clarifying questions that will collect ONLY the remaining missing information needed for a complete data request. Focus on:
+Make each question conversational and helpful. Format as simple questions, one per line, without bullets or numbers.
 
-1. **Location**: Only ask if not provided in conversation
-2. **Time/Date**: Only ask if not provided in conversation  
-3. **Parameter Type**: Only ask if ambiguous and not clarified in conversation
-4. **Sensor/Measurement**: Only ask if needed and not specified in conversation
+IMPORTANT FORMATTING:
+- Write ONLY the questions, one per line
+- DO NOT add introductory text like "Here are three clarifying questions"
+- DO NOT number the questions
+- DO NOT add explanatory text
 
-If the user has already provided most information, ask for only what's still missing (could be just 1-2 questions).
+Example good questions:
+Which specific location do you need data from? (e.g., Cambridge Bay, CBYIP station)
+What date and time period are you interested in? (e.g., June 15, 2024 from 2:00-4:00 PM)
+Which oceanographic parameter do you need? (e.g., water temperature, salinity, pressure)
 
-Format as a simple list, one question per line, without bullet points or numbers.
-Keep questions clear and specific."""
+Keep questions natural and specific to oceanographic data collection."""
             else:
                 prompt = f"""You are an expert at helping users refine their queries about oceanographic data.
 
@@ -603,15 +620,17 @@ Keep questions concise and natural."""
         if "Ambiguous location reference" in issues:
             suggestions.append("Could you specify the exact location or station name?")
         
-        # Remove duplicates while preserving order
+        # Remove duplicates while preserving order and avoid redundant questions
         seen = set()
         unique_suggestions = []
         for suggestion in suggestions:
-            if suggestion not in seen:
-                seen.add(suggestion)
+            # Normalize suggestion for duplicate detection
+            normalized = suggestion.lower().strip()
+            if normalized not in seen:
+                seen.add(normalized)
                 unique_suggestions.append(suggestion)
         
-        return unique_suggestions
+        return unique_suggestions[:3]  # Limit to 3 questions maximum
     
     def analyze_results(self, results: List[Any], query: str, search_type: str = "unknown") -> ResultAnalysis:
         """

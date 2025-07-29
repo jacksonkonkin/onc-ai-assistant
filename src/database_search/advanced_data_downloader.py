@@ -6,6 +6,7 @@ Provides comprehensive data product discovery and download capabilities with que
 import os
 import sys
 import logging
+import warnings
 from typing import Dict, Any, List, Optional, Union
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -13,6 +14,9 @@ import pandas as pd
 import json
 
 from .onc_api_client import ONCAPIClient
+
+# Suppress specific ONC package warnings about metadata downloads
+warnings.filterwarnings("ignore", message="Metadata file not downloaded.*", category=RuntimeWarning)
 
 logger = logging.getLogger(__name__)
 
@@ -244,11 +248,50 @@ class AdvancedDataDownloader:
                 logger.info(f"Starting ONC data product order in background mode: {background_mode}")
                 
                 try:
-                    result = self.onc_client.orderDataProduct(
-                        product_params, 
-                        includeMetadataFile=True
-                    )
-                    logger.info(f"ONC data product order completed")
+                    import signal
+                    
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("Download timeout after 300 seconds")
+                    
+                    # Set timeout for 5 minutes
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(300)  # 5 minutes timeout
+                    
+                    try:
+                        # First try with metadata file included
+                        try:
+                            result = self.onc_client.orderDataProduct(
+                                product_params, 
+                                includeMetadataFile=True
+                            )
+                            logger.info(f"ONC data product order completed with metadata")
+                        except Exception as metadata_error:
+                            # If metadata fails, try without it (many data products don't support metadata)
+                            error_str = str(metadata_error)
+                            if any(keyword in error_str for keyword in [
+                                "Metadata file not valid", 
+                                "index=meta", 
+                                "API Error 127",
+                                "Bad Request",
+                                "RuntimeWarning: Metadata file not downloaded"
+                            ]):
+                                logger.warning(f"Metadata file not supported for this data product: {error_str}")
+                                logger.info("Retrying download without metadata file...")
+                                result = self.onc_client.orderDataProduct(product_params)
+                                logger.info(f"ONC data product order completed successfully without metadata")
+                            else:
+                                # Re-raise if it's a different error
+                                raise metadata_error
+                    finally:
+                        signal.alarm(0)  # Cancel the alarm
+                        
+                except TimeoutError as timeout_error:
+                    logger.error(f"ONC orderDataProduct timed out: {timeout_error}")
+                    return {
+                        'status': 'error',
+                        'message': f"Download timed out after 5 minutes. This may indicate an issue with the API or network connection.",
+                        'download_result': None
+                    }
                 except Exception as onc_error:
                     logger.error(f"ONC orderDataProduct failed: {onc_error}")
                     return {
@@ -273,6 +316,9 @@ class AdvancedDataDownloader:
                 elif isinstance(result, list):
                     download_info['downloaded_files'] = result
                     download_info['file_count'] = len(result)
+                else:
+                    download_info['downloaded_files'] = []
+                    download_info['file_count'] = 0
                 
                 logger.info(f"Successfully downloaded data product")
                 return download_info
@@ -374,9 +420,12 @@ class AdvancedDataDownloader:
                          quality_control: bool = True,
                          resample: str = "none",
                          background_mode: bool = False,
-                         progress_callback: Optional[callable] = None) -> Dict[str, Any]:
+                         progress_callback: Optional[callable] = None,
+                         force_download: bool = False,
+                         user_query: str = None,
+                         session_id: str = None) -> Dict[str, Any]:
         """
-        Download CSV data for a specific location and device
+        Download CSV data for a specific location and device with duplicate prevention
         Optimized for CSV data export functionality with background support
         
         Args:
@@ -389,11 +438,47 @@ class AdvancedDataDownloader:
             resample: Resampling option ("none", "average", "minMax", "minMaxAvg")
             background_mode: Whether running in background (affects logging/progress)
             progress_callback: Optional callback for progress updates
+            force_download: Skip duplicate checking if True
+            user_query: Original user query for duplicate detection
+            session_id: Session ID for conversation-aware deduplication
             
         Returns:
             Dictionary with download results and CSV file paths
         """
         try:
+            # Check for duplicates first unless forced
+            if not force_download:
+                from .download_manager import get_download_manager
+                
+                dm = get_download_manager(session_id)
+                download_params = {
+                    'location_code': location_code,
+                    'device_category': device_category,
+                    'date_from': date_from,
+                    'date_to': date_to,
+                    'quality_control': quality_control,
+                    'resample': resample
+                }
+                
+                duplicate_info = dm.check_for_duplicate_request(download_params, user_query or f"CSV data: {device_category} @ {location_code}")
+                if duplicate_info:
+                    if duplicate_info['type'] == 'active_download':
+                        logger.info(f"Active download detected: {duplicate_info['download_id']}")
+                        return {
+                            'status': 'duplicate_active',
+                            'message': f"Similar download already in progress: {duplicate_info['download_id']}",
+                            'csv_files': [],
+                            'duplicate_info': duplicate_info
+                        }
+                    elif duplicate_info['type'] == 'recent_download':
+                        logger.info(f"Recent download detected, reusing files: {duplicate_info['file_count']} files")
+                        return {
+                            'status': 'duplicate_recent',
+                            'message': f"Using recently downloaded data ({duplicate_info['file_count']} files)",
+                            'csv_files': duplicate_info.get('files_created', []),
+                            'duplicate_info': duplicate_info
+                        }
+            
             log_level = logging.DEBUG if background_mode else logging.INFO
             logger.log(log_level, f"Downloading CSV data for {device_category} at {location_code} (background: {background_mode})")
             
@@ -413,6 +498,30 @@ class AdvancedDataDownloader:
                     location_code, device_category, date_from, date_to,
                     output_dir, quality_control, resample, background_mode, progress_callback
                 )
+            
+            # Add to download manager's recent cache if successful
+            if result.get('status') == 'success' and not force_download:
+                try:
+                    from .download_manager import get_download_manager
+                    dm = get_download_manager(session_id)
+                    download_params = {
+                        'location_code': location_code,
+                        'device_category': device_category,
+                        'date_from': date_from,
+                        'date_to': date_to,
+                        'quality_control': quality_control,
+                        'resample': resample
+                    }
+                    download_key = dm._generate_download_key(download_params)
+                    dm._add_to_recent_downloads(download_key, {
+                        'download_id': f"csv_{location_code}_{device_category}_{hash(date_from)}",
+                        'status': 'completed',
+                        'files_created': result.get('csv_files', []),
+                        'params': download_params
+                    })
+                    logger.debug(f"Added CSV download to recent cache: {download_key}")
+                except Exception as e:
+                    logger.warning(f"Failed to add to download cache: {e}")
             
             # Final progress update
             if progress_callback and result.get('status') == 'success':
@@ -487,6 +596,19 @@ class AdvancedDataDownloader:
         if download_result['status'] == 'success':
             # Process CSV files for additional metadata
             csv_files = self._find_csv_files(download_result, output_dir)
+            
+            # Check if we actually got data files
+            if not csv_files:
+                logger.warning(f"Download completed but no CSV files found for {location_code} {device_category} {date_from} to {date_to}")
+                # Return a specific status for no-data scenarios
+                return {
+                    'status': 'no_data',
+                    'message': f'Download completed but no data available for the requested time period ({date_from} to {date_to})',
+                    'csv_files': [],
+                    'location_code': location_code,
+                    'device_category': device_category,
+                    'date_range': f"{date_from} to {date_to}"
+                }
             
             # Skip heavy CSV analysis in background mode to avoid blocking
             if background_mode:
@@ -748,7 +870,13 @@ class AdvancedDataDownloader:
         if output_path.exists():
             csv_files.extend([str(f) for f in output_path.glob("*.csv")])
         
-        return list(set(csv_files))  # Remove duplicates
+        # Remove duplicates and check for actual content
+        final_files = []
+        for csv_file in set(csv_files):
+            if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
+                final_files.append(csv_file)
+        
+        return final_files
     
     def _analyze_csv_files(self, csv_files: List[str]) -> Dict[str, Any]:
         """Analyze CSV files for metadata"""

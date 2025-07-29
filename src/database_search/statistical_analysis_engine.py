@@ -32,17 +32,19 @@ class StatisticalAnalysisEngine:
     Handles complex queries like min/max/average calculations, trends, and correlations
     """
     
-    def __init__(self, onc_token: str = None, data_downloader: AdvancedDataDownloader = None):
+    def __init__(self, onc_token: str = None, data_downloader: AdvancedDataDownloader = None, session_id: str = None):
         """
         Initialize the statistical analysis engine
         
         Args:
             onc_token: ONC API token
             data_downloader: Existing data downloader instance (optional)
+            session_id: Session ID for conversation-aware duplicate prevention
         """
         self.data_downloader = data_downloader or AdvancedDataDownloader(onc_token)
         self.parameter_extractor = EnhancedParameterExtractor()
         self.visualizer = StatisticalVisualizer()
+        self.session_id = session_id
         
         # Statistical operation mappings
         self.statistical_operations = {
@@ -83,6 +85,45 @@ class StatisticalAnalysisEngine:
         
         logger.info("Statistical Analysis Engine initialized")
     
+    def _check_and_cleanup_active_downloads(self):
+        """
+        Check for and cleanup active downloads that might interfere with new statistical requests
+        """
+        try:
+            from .download_manager import get_download_manager
+            download_manager = get_download_manager()
+            
+            active_downloads = download_manager.list_active_downloads()
+            if active_downloads:
+                logger.warning(f"Found {len(active_downloads)} active downloads during statistical query")
+                
+                # Get summary for more details
+                summary = download_manager.get_summary()
+                logger.info(f"Download manager summary: {summary}")
+                
+                # If there are too many active downloads, this might indicate a problem
+                if len(active_downloads) > 2:
+                    logger.warning(f"Excessive active downloads ({len(active_downloads)}), may indicate download loop issue")
+                    
+                    # Cancel downloads that have been running too long (> 10 minutes)
+                    import time
+                    current_time = time.time()
+                    for download_id in active_downloads:
+                        download_info = download_manager.get_download_status(download_id)
+                        if download_info:
+                            elapsed = download_info.get('elapsed_seconds', 0)
+                            if elapsed > 600:  # 10 minutes
+                                logger.warning(f"Cancelling long-running download {download_id} (elapsed: {elapsed}s)")
+                                download_manager.cancel_download(download_id)
+                
+                # Brief wait to let any active downloads settle
+                import time
+                time.sleep(1)
+                
+        except Exception as e:
+            logger.warning(f"Error checking active downloads: {e}")
+            # Don't fail the statistical query if download checking fails
+    
     def process_statistical_query(self, query: str, include_metadata: bool = True) -> Dict[str, Any]:
         """
         Process a statistical query and return computed results
@@ -112,7 +153,7 @@ class StatisticalAnalysisEngine:
             data_params = stats_params['data_parameters']
             # Add statistical operations to data_params for API calls
             data_params['statistical_operations'] = stats_params['statistical_parameters']['operations']
-            raw_data_result = self._get_raw_data_for_analysis(data_params)
+            raw_data_result = self._get_raw_data_for_analysis(data_params, query)
             
             if raw_data_result['status'] != 'success':
                 return raw_data_result
@@ -296,10 +337,12 @@ class StatisticalAnalysisEngine:
             Dictionary with parsed data and metadata
         """
         try:
+            logger.info(f"Starting to parse ONC CSV file: {csv_file_path}")
             # Read the file and find where data starts (after ## END HEADER)
             with open(csv_file_path, 'r') as f:
                 lines = f.readlines()
             
+            logger.info(f"Read {len(lines)} lines from CSV file")
             data_start_idx = None
             header_info = {}
             
@@ -314,6 +357,7 @@ class StatisticalAnalysisEngine:
                         # Split by '/' and take the first part, then strip whitespace
                         sample_count = sample_part.split('/')[0].strip()
                         header_info['total_samples'] = int(sample_count)
+                        logger.info(f"Found total samples: {header_info['total_samples']}")
                     except (ValueError, IndexError):
                         header_info['total_samples'] = 0
                 elif line.startswith('#DATEFROM:'):
@@ -341,6 +385,8 @@ class StatisticalAnalysisEngine:
             if data_start_idx is None:
                 logger.warning(f"Could not find data section in {csv_file_path}")
                 return None
+                
+            logger.info(f"Found data starting at line {data_start_idx}")
             
             # Find the header line (contains column names in quotes)
             header_line_idx = None
@@ -350,16 +396,33 @@ class StatisticalAnalysisEngine:
                     break
             
             if header_line_idx is not None:
+                logger.info(f"Found header line at index {header_line_idx}")
                 # Extract column names from the header line
                 header_line = lines[header_line_idx].strip()
                 # Remove the # and parse the quoted column names
                 header_line = header_line[1:]  # Remove #
-                column_names = [col.strip().strip('"') for col in header_line.split('", "')]
-                # Fix the first and last column names
-                if column_names:
-                    column_names[0] = column_names[0].strip('"')
-                    column_names[-1] = column_names[-1].strip('"')
+                
+                # Handle complex CSV parsing with proper quote handling
+                import csv
+                from io import StringIO
+                header_buffer = StringIO(header_line)
+                csv_reader = csv.reader(header_buffer, delimiter=',', quotechar='"')
+                try:
+                    column_names = next(csv_reader)
+                    # Clean up column names
+                    column_names = [col.strip() for col in column_names]
+                    logger.info(f"Successfully parsed {len(column_names)} column names")
+                except Exception as e:
+                    logger.warning(f"Failed to parse CSV header with csv.reader: {e}")
+                    # Fallback to simple parsing
+                    column_names = [col.strip().strip('"') for col in header_line.split('", "')]
+                    # Fix the first and last column names
+                    if column_names:
+                        column_names[0] = column_names[0].strip('"')
+                        column_names[-1] = column_names[-1].strip('"')
+                    logger.info(f"Fallback parsing produced {len(column_names)} column names")
             else:
+                logger.warning("No header line found in CSV file")
                 column_names = None
             
             # Read the CSV data starting from the data section
@@ -369,11 +432,26 @@ class StatisticalAnalysisEngine:
             from io import StringIO
             data_buffer = StringIO(''.join(data_lines))
             
-            # Read into pandas DataFrame with proper column names
-            df = pd.read_csv(data_buffer, sep=',', header=None, names=column_names)
+            # Read into pandas DataFrame with proper column names and CSV parsing
+            try:
+                logger.info(f"Attempting to parse {len(data_lines)} data lines with pandas")
+                # Use pandas CSV parser with proper handling for complex CSV format
+                df = pd.read_csv(data_buffer, sep=',', header=None, names=column_names, 
+                               quotechar='"', skipinitialspace=True, on_bad_lines='skip')
+                logger.info(f"Successfully parsed DataFrame with shape: {df.shape}")
+            except Exception as e:
+                logger.warning(f"Failed to parse CSV data with pandas: {e}")
+                # Try with more lenient parsing
+                data_buffer.seek(0)  # Reset buffer position
+                df = pd.read_csv(data_buffer, sep=',', header=None, names=column_names, 
+                               on_bad_lines='skip', engine='python')
+                logger.info(f"Fallback parsing produced DataFrame with shape: {df.shape}")
             
             # Clean column names (remove extra spaces)
             df.columns = df.columns.str.strip()
+            
+            logger.info(f"Final DataFrame shape: {df.shape}, columns: {len(df.columns)}")
+            logger.info(f"Sample column names: {list(df.columns)[:5]}")
             
             return {
                 'dataframe': df,
@@ -386,37 +464,149 @@ class StatisticalAnalysisEngine:
             logger.error(f"Error parsing ONC CSV file {csv_file_path}: {e}")
             return None
     
-    def _get_raw_data_for_analysis(self, data_params: Dict[str, Any]) -> Dict[str, Any]:
+    def _get_raw_data_for_analysis(self, data_params: Dict[str, Any], query: str = "") -> Dict[str, Any]:
         """
         Get statistical data using ONC API's native aggregation capabilities
         
         Args:
             data_params: Data parameters extracted from query
+            query: Original user query for duplicate detection
             
         Returns:
             Statistical data result dictionary
         """
         try:
+            # Check for active downloads that might conflict
+            self._check_and_cleanup_active_downloads()
+            
             # Use ONC API's native statistical aggregation
             stats_operations = data_params.get('statistical_operations', ['average'])
             results = {}
             
-            # Map our operations to ONC resampling options
-            onc_resample_map = {
-                'average': 'average',
-                'mean': 'average', 
-                'avg': 'average',
-                'min': 'minMax',  # minMax gives both min and max
-                'minimum': 'minMax',
-                'max': 'minMax',  # minMax gives both min and max
-                'maximum': 'minMax'
-            }
+            # Determine what type of statistical data we need
+            needs_basic_stats = any(op in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean'] 
+                                   for op in stats_operations)
+            needs_other_stats = any(op not in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean'] 
+                                   for op in stats_operations)
             
-            # Get data for each requested statistical operation
-            for operation in stats_operations:
-                if operation in onc_resample_map:
-                    resample_type = onc_resample_map[operation]
+            # Use minMaxAvg to get all three basic statistics in one download
+            if needs_basic_stats:
+                download_params = {
+                    'location_code': data_params['location_code'],
+                    'device_category': data_params.get('device_category', 'CTD'),
+                    'date_from': data_params['start_time'],
+                    'date_to': data_params['end_time'],
+                    'output_dir': 'output',
+                    'quality_control': True,
+                    'resample': 'minMaxAvg'  # Get min, max, and average in one download
+                }
+                
+                logger.info("Downloading minMaxAvg data for comprehensive statistics")
+                
+                # Add timeout protection to prevent infinite downloads
+                import signal
+                
+                def timeout_handler(signum, frame):
+                    raise TimeoutError("Statistical download timeout after 300 seconds")
+                
+                # Set timeout for 5 minutes
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(300)  # 5 minutes timeout
+                
+                try:
+                    download_result = self.data_downloader.download_csv_data(
+                        **download_params,
+                        session_id=self.session_id,
+                        user_query=query[:100]  # Pass truncated query for duplicate detection
+                    )
+                except TimeoutError as timeout_error:
+                    logger.error(f"Statistical analysis download timed out: {timeout_error}")
+                    return {
+                        'status': 'error',
+                        'message': 'Statistical data download timed out after 5 minutes. This may indicate network issues or high server load.',
+                        'data': []
+                    }
+                finally:
+                    signal.alarm(0)  # Cancel the alarm
+                
+                if download_result['status'] in ['success', 'duplicate_recent']:
+                    csv_files = download_result.get('csv_files', [])
+                    if download_result['status'] == 'duplicate_recent':
+                        logger.info(f"Using {len(csv_files)} recently downloaded CSV files for minMaxAvg processing")
+                    else:
+                        logger.info(f"Downloaded {len(csv_files)} CSV files for minMaxAvg processing")
                     
+                    if csv_files:
+                        # Process the minMaxAvg CSV - it contains all three statistics
+                        for csv_file in csv_files:
+                            try:
+                                logger.info(f"Processing minMaxAvg CSV file: {csv_file}")
+                                # Read CSV with header processing for ONC format
+                                aggregated_data = self._parse_onc_csv_file(csv_file)
+                                logger.info(f"Parse result: {aggregated_data is not None}")
+                                if aggregated_data is not None:
+                                    logger.info(f"Aggregated data keys: {list(aggregated_data.keys()) if isinstance(aggregated_data, dict) else 'Not a dict'}")
+                                    if 'dataframe' in aggregated_data:
+                                        logger.info(f"DataFrame shape: {aggregated_data['dataframe'].shape}")
+                                        logger.info(f"DataFrame empty: {aggregated_data['dataframe'].empty}")
+                                        logger.info(f"DataFrame columns: {list(aggregated_data['dataframe'].columns)[:10]}")  # First 10 columns
+                                
+                                if aggregated_data is not None and 'dataframe' in aggregated_data and not aggregated_data['dataframe'].empty:
+                                    logger.info(f"Successfully parsed CSV data with {len(aggregated_data['dataframe'])} rows")
+                                    # Extract all operations from the minMaxAvg data
+                                    for operation in stats_operations:
+                                        if operation in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean']:
+                                            results[operation] = {
+                                                'data': aggregated_data,
+                                                'csv_file': csv_file,
+                                                'operation': operation,
+                                                'resample_type': 'minMaxAvg'
+                                            }
+                                            logger.info(f"Added operation '{operation}' to results")
+                                else:
+                                    if aggregated_data is None:
+                                        logger.warning(f"CSV file {csv_file} parsing returned None")
+                                    elif 'dataframe' not in aggregated_data:
+                                        logger.warning(f"CSV file {csv_file} parsing did not return dataframe")
+                                    elif aggregated_data['dataframe'].empty:
+                                        logger.warning(f"CSV file {csv_file} produced empty dataframe")
+                                    else:
+                                        logger.warning(f"CSV file {csv_file} produced unknown issue")
+                            except Exception as e:
+                                logger.error(f"Could not process minMaxAvg CSV file {csv_file}: {e}")
+                    else:
+                        logger.warning("No CSV files returned from minMaxAvg download")
+                elif download_result['status'] == 'no_data':
+                    logger.warning(f"No data available for minMaxAvg operation: {download_result.get('message', 'No data found')}")
+                    # Don't continue processing other operations if no data exists
+                    return {
+                        'status': 'error',
+                        'message': f"No data available for the requested time period: {download_result.get('date_range', 'Unknown range')}",
+                        'data': []
+                    }
+                elif download_result['status'] == 'duplicate_active':
+                    logger.info("Active download detected for minMaxAvg processing, waiting...")
+                    return {
+                        'status': 'error',
+                        'message': 'Data download is currently in progress for similar request. Please try again in a few moments.',
+                        'data': []
+                    }
+                else:
+                    logger.error(f"minMaxAvg download failed: {download_result.get('message', 'Unknown error')}")
+                    # Don't continue with infinite retries - return error immediately
+                    return {
+                        'status': 'error',
+                        'message': f"Failed to download minMaxAvg data: {download_result.get('message', 'Download failed')}",
+                        'data': []
+                    }
+            
+            # Handle other statistical operations that need raw data or special processing
+            if needs_other_stats:
+                other_operations = [op for op in stats_operations 
+                                  if op not in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean']]
+                
+                for operation in other_operations:
+                    # These operations need raw data for local computation
                     download_params = {
                         'location_code': data_params['location_code'],
                         'device_category': data_params.get('device_category', 'CTD'),
@@ -424,29 +614,48 @@ class StatisticalAnalysisEngine:
                         'date_to': data_params['end_time'],
                         'output_dir': 'output',
                         'quality_control': True,
-                        'resample': resample_type  # Use ONC's native statistical aggregation
+                        'resample': 'none'  # Raw data for complex statistical operations
                     }
                     
-                    # Download the aggregated data
-                    download_result = self.data_downloader.download_csv_data(**download_params)
+                    # Add timeout protection for other statistical operations
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(300)  # 5 minutes timeout
                     
-                    if download_result['status'] == 'success':
+                    try:
+                        download_result = self.data_downloader.download_csv_data(
+                            **download_params,
+                            session_id=self.session_id,
+                            user_query=f"{operation} for {query[:80]}"  # Pass operation context for duplicate detection
+                        )
+                    except TimeoutError as timeout_error:
+                        logger.error(f"Statistical analysis download timed out for operation {operation}: {timeout_error}")
+                        continue  # Skip this operation
+                    finally:
+                        signal.alarm(0)  # Cancel the alarm
+                    
+                    if download_result['status'] in ['success', 'duplicate_recent']:
                         csv_files = download_result.get('csv_files', [])
+                        if download_result['status'] == 'duplicate_recent':
+                            logger.info(f"Using {len(csv_files)} recently downloaded CSV files for {operation}")
                         if csv_files:
-                            # Process the aggregated CSV to extract statistical values
                             for csv_file in csv_files:
                                 try:
-                                    # Read CSV with header processing for ONC format
-                                    aggregated_data = self._parse_onc_csv_file(csv_file)
-                                    if aggregated_data:
+                                    raw_data = self._parse_onc_csv_file(csv_file)
+                                    if raw_data:
                                         results[operation] = {
-                                            'data': aggregated_data,
+                                            'data': raw_data,
                                             'csv_file': csv_file,
                                             'operation': operation,
-                                            'resample_type': resample_type
+                                            'resample_type': 'none'
                                         }
                                 except Exception as e:
-                                    logger.warning(f"Could not process aggregated CSV file {csv_file}: {e}")
+                                    logger.warning(f"Could not process raw CSV file {csv_file}: {e}")
+                    elif download_result['status'] == 'no_data':
+                        logger.warning(f"No data available for operation {operation}: {download_result.get('message', 'No data found')}")
+                        continue  # Skip this operation, no data available
+                    elif download_result['status'] == 'duplicate_active':
+                        logger.info(f"Active download detected for {operation}, skipping...")
+                        continue  # Skip this operation, try others
             
             if not results:
                 return {
@@ -578,7 +787,17 @@ class StatisticalAnalysisEngine:
         """Calculate minimum values"""
         result = {}
         for col in columns:
-            if col in data.columns:
+            # Check for minMaxAvg format columns first (e.g., temperature_min)
+            min_col = f"{col}_min"
+            if min_col in data.columns:
+                min_val = data[min_col].iloc[0] if not data[min_col].empty else None
+                result[col] = {
+                    'value': float(min_val) if pd.notna(min_val) else None,
+                    'timestamp': str(data.index[0]) if not data.empty else None,
+                    'unit': self._get_column_unit(col)
+                }
+            # Fallback to raw data calculation
+            elif col in data.columns:
                 min_val = data[col].min()
                 min_idx = data[col].idxmin()
                 result[col] = {
@@ -592,7 +811,17 @@ class StatisticalAnalysisEngine:
         """Calculate maximum values"""
         result = {}
         for col in columns:
-            if col in data.columns:
+            # Check for minMaxAvg format columns first (e.g., temperature_max)
+            max_col = f"{col}_max"
+            if max_col in data.columns:
+                max_val = data[max_col].iloc[0] if not data[max_col].empty else None
+                result[col] = {
+                    'value': float(max_val) if pd.notna(max_val) else None,
+                    'timestamp': str(data.index[0]) if not data.empty else None,
+                    'unit': self._get_column_unit(col)
+                }
+            # Fallback to raw data calculation
+            elif col in data.columns:
                 max_val = data[col].max()
                 max_idx = data[col].idxmax()
                 result[col] = {
@@ -606,7 +835,25 @@ class StatisticalAnalysisEngine:
         """Calculate average values"""
         result = {}
         for col in columns:
-            if col in data.columns:
+            # Check for minMaxAvg format columns first (e.g., temperature_avg or temperature_mean)
+            avg_col = f"{col}_avg"
+            mean_col = f"{col}_mean"
+            if avg_col in data.columns:
+                avg_val = data[avg_col].iloc[0] if not data[avg_col].empty else None
+                result[col] = {
+                    'value': float(avg_val) if pd.notna(avg_val) else None,
+                    'count': len(data) if not data.empty else 0,
+                    'unit': self._get_column_unit(col)
+                }
+            elif mean_col in data.columns:
+                avg_val = data[mean_col].iloc[0] if not data[mean_col].empty else None
+                result[col] = {
+                    'value': float(avg_val) if pd.notna(avg_val) else None,
+                    'count': len(data) if not data.empty else 0,
+                    'unit': self._get_column_unit(col)
+                }
+            # Fallback to raw data calculation
+            elif col in data.columns:
                 avg_val = data[col].mean()
                 result[col] = {
                     'value': float(avg_val) if pd.notna(avg_val) else None,

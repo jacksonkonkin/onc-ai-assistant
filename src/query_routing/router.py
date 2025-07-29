@@ -291,6 +291,51 @@ class QueryRouter:
             return True
         
         return False
+    
+    def _check_recent_download_activity(self, query: str, context: Dict[str, Any]) -> bool:
+        """
+        Check if there's recent download activity that should prevent new downloads
+        
+        Args:
+            query: User query
+            context: Context including conversation history
+            
+        Returns:
+            True if recent download activity should prevent new download routing
+        """
+        try:
+            # Skip check if not a potential download query
+            if not self._detect_download_request(query) and not self._detect_statistical_request(query):
+                return False
+            
+            # Import here to avoid circular imports
+            from ..database_search.download_manager import get_download_manager
+            
+            # Get session ID from context if available
+            session_id = context.get('session_id')
+            dm = get_download_manager(session_id)
+            
+            # Check for active downloads
+            active_downloads = dm.list_active_downloads()
+            if active_downloads:
+                logger.info(f"Found {len(active_downloads)} active downloads, may prevent duplicate routing")
+                
+                # If many active downloads, suggest waiting
+                if len(active_downloads) > 2:
+                    return True
+            
+            # Check recent download activity from conversation context
+            conversation_context = context.get('conversation_context', '')
+            if 'download' in conversation_context.lower() and 'completed' in conversation_context.lower():
+                # Recent download mentioned in conversation
+                logger.debug("Recent download activity detected in conversation context")
+                return False  # Let normal duplicate checking handle this
+            
+            return False
+            
+        except Exception as e:
+            logger.debug(f"Error checking recent download activity: {e}")
+            return False
 
     def _detect_download_request(self, query: str) -> bool:
         """
@@ -380,8 +425,9 @@ class QueryRouter:
         
         # Additional data context keywords for statistical queries
         data_context_keywords = [
-            'data', 'temperature', 'pressure', 'salinity', 'oxygen', 'ph',
-            'sensor', 'measurement', 'cambridge bay', 'onc', 'ocean'
+            'data', 'temperature', 'temp', 'pressure', 'salinity', 'oxygen', 'ph',
+            'sensor', 'measurement', 'cambridge bay', 'onc', 'ocean', 'conductivity',
+            'chlorophyll', 'turbidity', 'density', 'fluorescence', 'depth'
         ]
         
         has_data_context = any(keyword in query_lower for keyword in data_context_keywords)
@@ -434,6 +480,20 @@ class QueryRouter:
             Dict: Routing decision with type and parameters
         """
         context = context or {}
+        
+        # PRE-ROUTING FILTER: Check for recent downloads to prevent loops
+        if self._check_recent_download_activity(query, context):
+            routing_decision = {
+                'type': QueryType.DIRECT_LLM,
+                'classification': 'recent_download_detected',
+                'confidence': 'high',
+                'parameters': {
+                    'reason': 'Recent similar download detected, preventing duplicate',
+                    'download_prevention': True
+                }
+            }
+            self._log_routing_decision(query, routing_decision, "Download Prevention Filter")
+            return routing_decision
         
         # PRE-ROUTING FILTER: Handle greetings and social queries first
         if self._detect_greeting_or_social(query):

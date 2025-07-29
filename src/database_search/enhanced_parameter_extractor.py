@@ -461,6 +461,7 @@ Return ONLY the JSON object."""
     def _parse_temporal_reference(self, temporal_ref: str, temporal_type: str) -> Tuple[datetime, datetime]:
         """Convert natural language dates and times to datetime objects with enhanced interval support"""
         import re
+        from calendar import monthrange
         
         if not temporal_ref:
             # For no temporal reference, default to "latest" - very short window
@@ -475,6 +476,47 @@ Return ONLY the JSON object."""
         # This must come before single date parsing to catch ranges properly
         if ' to ' in temporal_ref_lower or ' - ' in temporal_ref_lower or '/' in temporal_ref:
             return self._parse_date_range(temporal_ref, now)
+        
+        # Handle "entire month" and "whole month" queries BEFORE other month parsing
+        entire_month_patterns = [
+            r'entire month of (\w+)(?:\s+(\d{4}))?',  # "entire month of April" or "entire month of April 2024"
+            r'whole month of (\w+)(?:\s+(\d{4}))?',   # "whole month of April" or "whole month of April 2024"
+            r'full month of (\w+)(?:\s+(\d{4}))?',    # "full month of April" or "full month of April 2024"
+            r'(\w+)\s+entire month(?:\s+(\d{4}))?',   # "April entire month" or "April entire month 2024"
+            r'(\w+)\s+whole month(?:\s+(\d{4}))?',    # "April whole month" or "April whole month 2024"
+            r'(\w+)\s+full month(?:\s+(\d{4}))?',     # "April full month" or "April full month 2024"
+        ]
+        
+        for pattern in entire_month_patterns:
+            match = re.search(pattern, temporal_ref_lower)
+            if match:
+                month_name = match.group(1).lower()
+                year_str = match.group(2) if len(match.groups()) > 1 and match.group(2) else None
+                
+                # Map month names to numbers
+                months = {
+                    'january': 1, 'jan': 1, 'february': 2, 'feb': 2, 'march': 3, 'mar': 3,
+                    'april': 4, 'apr': 4, 'may': 5, 'june': 6, 'jun': 6,
+                    'july': 7, 'jul': 7, 'august': 8, 'aug': 8, 'september': 9, 'sep': 9, 'sept': 9,
+                    'october': 10, 'oct': 10, 'november': 11, 'nov': 11, 'december': 12, 'dec': 12
+                }
+                
+                if month_name in months:
+                    month_num = months[month_name]
+                    year = int(year_str) if year_str else now.year
+                    
+                    # If no year specified and the month is in the future, use previous year
+                    if not year_str:
+                        test_date = datetime(year, month_num, 1)
+                        if test_date > now:
+                            year -= 1
+                    
+                    # Get the full month boundaries
+                    start_time = datetime(year, month_num, 1, 0, 0, 0)
+                    _, last_day = monthrange(year, month_num)
+                    end_time = datetime(year, month_num, last_day, 23, 59, 59)
+                    
+                    return start_time, end_time
         
         # Handle "week of" queries
         if 'week of' in temporal_ref_lower:
@@ -502,8 +544,8 @@ Return ONLY the JSON object."""
             r'past (\d+) days?': lambda m: (now - timedelta(days=int(m.group(1))), now),
             r'last (\d+) weeks?': lambda m: (now - timedelta(weeks=int(m.group(1))), now),
             r'past (\d+) weeks?': lambda m: (now - timedelta(weeks=int(m.group(1))), now),
-            r'last (\d+) months?': lambda m: (now - timedelta(days=int(m.group(1))*30), now),
-            r'past (\d+) months?': lambda m: (now - timedelta(days=int(m.group(1))*30), now),
+            r'last (\d+) months?': lambda m: self._calculate_months_ago(int(m.group(1)), now),
+            r'past (\d+) months?': lambda m: self._calculate_months_ago(int(m.group(1)), now),
             
             # Common intervals
             r'last hour': lambda m: (now - timedelta(hours=1), now),
@@ -512,12 +554,12 @@ Return ONLY the JSON object."""
             r'past 24 hours?': lambda m: (now - timedelta(hours=24), now),
             r'last week': lambda m: (now - timedelta(weeks=1), now),
             r'past week': lambda m: (now - timedelta(weeks=1), now),
-            r'last month': lambda m: (now - timedelta(days=30), now),
-            r'past month': lambda m: (now - timedelta(days=30), now),
+            r'last month': lambda m: self._calculate_months_ago(1, now),
+            r'past month': lambda m: self._calculate_months_ago(1, now),
             
-            # Specific timeframes
-            r'this week': lambda m: (now - timedelta(days=now.weekday()), now),
-            r'this month': lambda m: (now.replace(day=1, hour=0, minute=0, second=0), now),
+            # Specific timeframes - FIXED to span full periods
+            r'this week': lambda m: self._get_current_week_boundaries(now),
+            r'this month': lambda m: self._get_current_month_boundaries(now),
             
             # "Latest" and "current" - minimal intervals
             r'latest|current|now': lambda m: (now - timedelta(minutes=5), now),
@@ -827,6 +869,78 @@ Return ONLY the JSON object."""
                     continue
         
         return None
+
+    def _calculate_months_ago(self, months: int, now: datetime) -> Tuple[datetime, datetime]:
+        """
+        Calculate proper month boundaries going back N months
+        
+        Args:
+            months: Number of months to go back
+            now: Current datetime
+            
+        Returns:
+            Tuple of (start_time, end_time) for the complete target month
+        """
+        from calendar import monthrange
+        
+        # Calculate the target month and year
+        target_month = now.month - months
+        target_year = now.year
+        
+        # Handle year boundary crossing
+        while target_month <= 0:
+            target_month += 12
+            target_year -= 1
+        
+        # Get the first day of the target month
+        start_time = datetime(target_year, target_month, 1, 0, 0, 0)
+        
+        # Get the last day of the target month
+        _, last_day = monthrange(target_year, target_month)
+        end_time = datetime(target_year, target_month, last_day, 23, 59, 59)
+        
+        return start_time, end_time
+
+    def _get_current_week_boundaries(self, now: datetime) -> Tuple[datetime, datetime]:
+        """
+        Get the boundaries for the current week (Monday to Sunday)
+        
+        Args:
+            now: Current datetime
+            
+        Returns:
+            Tuple of (start_time, end_time) for the current week
+        """
+        # Calculate start of week (Monday)
+        days_since_monday = now.weekday()
+        week_start = now - timedelta(days=days_since_monday)
+        week_end = week_start + timedelta(days=6)
+        
+        start_time = datetime.combine(week_start.date(), datetime.min.time())
+        end_time = datetime.combine(week_end.date(), datetime.max.time())
+        
+        return start_time, end_time
+
+    def _get_current_month_boundaries(self, now: datetime) -> Tuple[datetime, datetime]:
+        """
+        Get the boundaries for the current month (1st to last day)
+        
+        Args:
+            now: Current datetime
+            
+        Returns:
+            Tuple of (start_time, end_time) for the current month
+        """
+        from calendar import monthrange
+        
+        # Get the first day of the current month
+        start_time = datetime(now.year, now.month, 1, 0, 0, 0)
+        
+        # Get the last day of the current month
+        _, last_day = monthrange(now.year, now.month)
+        end_time = datetime(now.year, now.month, last_day, 23, 59, 59)
+        
+        return start_time, end_time
 
     def _discover_location(self, query: str) -> Optional[str]:
         """

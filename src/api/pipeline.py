@@ -8,6 +8,7 @@ import os
 import numpy as np
 from typing import Dict, Any, List, Optional
 from pathlib import Path
+from datetime import datetime
 from sentence_transformers import CrossEncoder
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -198,7 +199,7 @@ class ONCPipeline:
             self.ocean_query_system = OceanQuerySystem(onc_token=onc_token)
             logger.info("Ocean Query System initialized with standard formatting")
         
-        # Statistical Analysis Engine
+        # Statistical Analysis Engine (will be updated with session ID when conversation manager is ready)
         if self.ocean_query_system:
             self.statistical_analysis_engine = StatisticalAnalysisEngine(
                 onc_token=onc_token,
@@ -272,24 +273,31 @@ class ONCPipeline:
             
             # Step 1: Analyze query clarity (check for ambiguity) WITH conversation context
             query_analysis = None
-            # if self.query_refinement_manager:
-            #     # Include conversation context in the analysis
-            #     analysis_context = context or {}
-            #     analysis_context['conversation_context'] = conversation_context
+            if self.query_refinement_manager:
+                # Include conversation context in the analysis
+                analysis_context = context or {}
+                analysis_context['conversation_context'] = conversation_context
                 
-            #     query_analysis = self.query_refinement_manager.analyze_query_clarity(question, analysis_context)
+                # Pass parameter extractor for better validation
+                parameter_extractor = None
+                if self.ocean_query_system and hasattr(self.ocean_query_system, 'extractor'):
+                    parameter_extractor = self.ocean_query_system.extractor
                 
-            #     # If query is highly ambiguous, request clarification
-            #     if self.query_refinement_manager.should_request_clarification(query_analysis):
-            #         clarification_request = self.query_refinement_manager.format_clarification_request(query_analysis)
-            #         # Add the clarification to conversation history before returning
-            #         if self.conversation_manager:
-            #             self.conversation_manager.add_assistant_message(clarification_request, {
-            #                 'type': 'clarification_request',
-            #                 'clarity_level': query_analysis.clarity_level.value,
-            #                 'missing_parameters': query_analysis.missing_data_parameters
-            #             })
-            #         return clarification_request
+                query_analysis = self.query_refinement_manager.analyze_query_clarity(
+                    question, analysis_context, parameter_extractor
+                )
+                
+                # If query is highly ambiguous, request clarification
+                if self.query_refinement_manager.should_request_clarification(query_analysis):
+                    clarification_request = self.query_refinement_manager.format_clarification_request(query_analysis)
+                    # Add the clarification to conversation history before returning
+                    if self.conversation_manager:
+                        self.conversation_manager.add_assistant_message(clarification_request, {
+                            'type': 'clarification_request',
+                            'clarity_level': query_analysis.clarity_level.value,
+                            'missing_parameters': query_analysis.missing_data_parameters
+                        })
+                    return clarification_request
             
             # Route the query with conversation context
             routing_context = context or {}
@@ -604,9 +612,18 @@ class ONCPipeline:
         try:
             logger.info(f"Processing statistical analysis query: '{question}'")
             
+            # Update statistical analysis engine with current session ID
+            if self.conversation_manager and hasattr(self.conversation_manager, 'session_id'):
+                self.statistical_analysis_engine.session_id = self.conversation_manager.session_id
+            
             # Use the statistical analysis engine to process the query
+            # For follow-up questions, include conversation context to resolve references like "that range"
+            query_with_context = question
+            if conversation_context.strip():
+                query_with_context = f"{conversation_context}\n\nCurrent question: {question}"
+            
             statistical_result = self.statistical_analysis_engine.process_statistical_query(
-                question, 
+                query_with_context, 
                 include_metadata=True
             )
             
@@ -716,12 +733,96 @@ class ONCPipeline:
             # Fallback to basic response
             return f"Statistical analysis completed. {statistical_result.get('statistical_results', {}).get('summary', '')}"
     
+    def _format_duplicate_download_response(self, duplicate_info: Dict[str, Any], duplicate_type: str, _question: str) -> str:
+        """
+        Format response for duplicate download requests
+        
+        Args:
+            duplicate_info: Information about the duplicate download
+            duplicate_type: Type of duplicate ('active' or 'recent')
+            question: Original user question
+            
+        Returns:
+            Formatted response explaining the duplicate situation
+        """
+        if duplicate_type == 'active':
+            status = duplicate_info.get('status', 'unknown').replace('_', ' ').title()
+            start_time = duplicate_info.get('start_time')
+            time_str = ""
+            if start_time:
+                elapsed = (datetime.utcnow() - start_time).total_seconds()
+                if elapsed < 60:
+                    time_str = f" (started {int(elapsed)} seconds ago)"
+                else:
+                    time_str = f" (started {int(elapsed/60)} minutes ago)"
+            
+            return f"""🔄 **Download Already in Progress**
+
+I found that a similar data download is already running{time_str}.
+
+**Current Status:** {status}
+**Download ID:** {duplicate_info.get('download_id', 'unknown')}
+
+I'll avoid starting a duplicate download. You can check the status using the 'downloads' command, or wait for the current download to complete."""
+        
+        elif duplicate_type == 'recent':
+            completion_time = duplicate_info.get('completion_time')
+            file_count = duplicate_info.get('file_count', 0)
+            time_str = ""
+            if completion_time:
+                elapsed = (datetime.utcnow() - completion_time).total_seconds()
+                if elapsed < 3600:  # Less than 1 hour
+                    time_str = f" {int(elapsed/60)} minutes ago"
+                else:
+                    time_str = f" {int(elapsed/3600)} hours ago"
+            
+            return f"""✅ **Similar Data Already Downloaded**
+
+I found that similar data was recently downloaded{time_str}.
+
+**Files Created:** {file_count} CSV files
+**Previous Download ID:** {duplicate_info.get('download_id', 'unknown')}
+
+To avoid duplicate downloads, I'm referencing the existing data. If you need to re-download this data, please specify "force download" in your request."""
+        
+        return f"Found duplicate download request ({duplicate_type}). Skipping to avoid duplication."
+    
     def _process_data_download_query_with_results(self, question: str, parameters: Dict[str, Any], conversation_context: str = "") -> tuple[str, List[Any]]:
-        """Process query for data downloads and CSV exports with concurrent preview + background download."""
+        """Process query for data downloads and CSV exports with duplicate prevention."""
         if not self.ocean_query_system:
             return self._process_direct_query(question, conversation_context), []
         
         try:
+            # Check for duplicate downloads first
+            from ..database_search.download_manager import get_download_manager
+            
+            # Get session ID from conversation manager if available
+            session_id = None
+            if self.conversation_manager:
+                session_id = getattr(self.conversation_manager, 'session_id', None)
+            
+            dm = get_download_manager(session_id)
+            
+            # Extract potential download parameters from the question for duplicate checking
+            if self.ocean_query_system and hasattr(self.ocean_query_system, 'extractor'):
+                try:
+                    extracted_params = self.ocean_query_system.extractor.extract_parameters(question)
+                    if extracted_params and extracted_params.get('status') == 'success':
+                        download_params = extracted_params.get('parameters', {})
+                        
+                        # Check for duplicates
+                        duplicate_info = dm.check_for_duplicate_request(download_params, question)
+                        if duplicate_info:
+                            if duplicate_info['type'] == 'active_download':
+                                # Active download found
+                                return self._format_duplicate_download_response(duplicate_info, 'active', question), []
+                            elif duplicate_info['type'] == 'recent_download':
+                                # Recent download found
+                                return self._format_duplicate_download_response(duplicate_info, 'recent', question), []
+                except Exception as e:
+                    logger.debug(f"Error checking for duplicate downloads: {e}")
+                    # Continue with normal processing if duplicate check fails
+            
             # Determine download type from parameters
             download_type = parameters.get('download_type', 'instance')
             search_type = parameters.get('search_type', 'structured')
@@ -895,12 +996,28 @@ class ONCPipeline:
         return {"message": "Conversation management not available"}
     
     def clear_conversation(self) -> None:
-        """Clear current conversation history."""
+        """Clear current conversation history and cleanup downloads."""
         if self.conversation_manager:
             self.conversation_manager.clear_conversation()
             logger.info("Conversation history cleared")
         else:
             logger.warning("Conversation manager not available")
+        
+        # Force cleanup of download manager to prevent download loops
+        try:
+            from ..database_search.download_manager import shutdown_download_manager, get_download_manager
+            dm = get_download_manager()
+            active = dm.list_active_downloads()
+            if active:
+                logger.warning(f"Forcing cleanup of {len(active)} active downloads during conversation clear")
+                for download_id in active:
+                    dm.cancel_download(download_id)
+                    logger.info(f"Cancelled active download: {download_id}")
+            shutdown_download_manager()
+            logger.info("Download manager cleaned up successfully")
+        except Exception as e:
+            logger.warning(f"Download cleanup error during conversation clear: {e}")
+            # Don't fail the conversation clear if download cleanup fails
     
     def save_conversation(self, filepath: str) -> bool:
         """Save current conversation to file."""
@@ -1003,6 +1120,7 @@ class ONCPipeline:
         print("-"*70)
         print("Ask about Ocean Networks Canada data and instruments")
         print("Commands: 'quit' to exit, 'clear' to clear conversation, 'status' for conversation summary")
+        print("         'downloads' to check download status")
         print("Feedback: After responses, you can rate with '👍' or '👎'")
         if self.conversation_manager:
             print("💬 Conversation memory: ENABLED - Follow-up questions supported!")
@@ -1033,7 +1151,7 @@ class ONCPipeline:
                 # Handle conversation management commands
                 if question.lower() == 'clear':
                     self.clear_conversation()
-                    print("🗑️  Conversation history cleared. Starting fresh!")
+                    print("🗑️  Conversation history and downloads cleared. Starting fresh!")
                     question_count = 0
                     continue
                 
@@ -1047,6 +1165,30 @@ class ONCPipeline:
                         print(f"   Data queries: {summary.get('data_queries_made', 0)}")
                     else:
                         print("⚠️  Conversation management not available")
+                    continue
+                
+                if question.lower() == 'downloads':
+                    try:
+                        from ..database_search.download_manager import get_download_manager
+                        dm = get_download_manager()
+                        summary = dm.get_summary()
+                        active = dm.list_active_downloads()
+                        
+                        print(f"📥 Download Manager Status:")
+                        print(f"   Total downloads: {summary['total_downloads']}")
+                        print(f"   Active downloads: {summary['active_downloads']}")
+                        print(f"   Pending downloads: {summary['pending_downloads']}")
+                        print(f"   Completed downloads: {summary['completed_downloads']}")
+                        print(f"   Failed downloads: {summary['failed_downloads']}")
+                        
+                        if active:
+                            print(f"   Active download IDs: {', '.join(active[:5])}")
+                            if len(active) > 5:
+                                print(f"   ... and {len(active) - 5} more")
+                        else:
+                            print("   No active downloads")
+                    except Exception as e:
+                        print(f"⚠️  Could not get download status: {e}")
                     continue
                 
                 # Handle feedback for previous response

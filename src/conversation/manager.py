@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum
 import json
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -49,21 +50,24 @@ class ConversationMessage:
 class ConversationManager:
     """Manages conversation context and memory."""
     
-    def __init__(self, max_history_length: int = 10, context_window_minutes: int = 30):
+    def __init__(self, max_history_length: int = 10, context_window_minutes: int = 30, session_id: str = None):
         """
         Initialize conversation manager.
         
         Args:
             max_history_length: Maximum number of message pairs to keep
             context_window_minutes: Minutes after which old context becomes less relevant
+            session_id: Optional session ID for tracking conversation sessions
         """
         self.max_history_length = max_history_length
         self.context_window_minutes = context_window_minutes
+        self.session_id = session_id or str(uuid.uuid4())[:8]
         self.conversation_history: List[ConversationMessage] = []
         self.session_start_time = datetime.now()
         self.last_query_metadata = {}
+        self.download_history: List[Dict[str, Any]] = []  # Track downloads in this session
         
-        logger.info(f"ConversationManager initialized with max_history={max_history_length}, context_window={context_window_minutes}min")
+        logger.info(f"ConversationManager initialized with max_history={max_history_length}, context_window={context_window_minutes}min, session={self.session_id}")
     
     def add_user_message(self, message: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         """
@@ -313,6 +317,83 @@ class ConversationManager:
             relevant_parts.append(f"Data source: {metadata['data_source']}")
         
         return ", ".join(relevant_parts)
+    
+    def add_download_activity(self, download_id: str, download_params: Dict[str, Any], status: str = 'started') -> None:
+        """
+        Track download activity in this conversation session
+        
+        Args:
+            download_id: Download ID
+            download_params: Download parameters
+            status: Download status ('started', 'completed', 'failed')
+        """
+        download_entry = {
+            'download_id': download_id,
+            'timestamp': datetime.now(),
+            'params': download_params.copy(),
+            'status': status
+        }
+        
+        self.download_history.append(download_entry)
+        
+        # Keep only recent downloads (last 10)
+        if len(self.download_history) > 10:
+            self.download_history = self.download_history[-10:]
+        
+        logger.debug(f"Added download activity: {download_id} ({status})")
+    
+    def get_recent_downloads(self, minutes: int = 30) -> List[Dict[str, Any]]:
+        """
+        Get downloads from recent time window
+        
+        Args:
+            minutes: Time window in minutes
+            
+        Returns:
+            List of recent download activities
+        """
+        cutoff_time = datetime.now() - timedelta(minutes=minutes)
+        return [
+            download for download in self.download_history
+            if download['timestamp'] >= cutoff_time
+        ]
+    
+    def has_similar_recent_download(self, download_params: Dict[str, Any], minutes: int = 30) -> Optional[Dict[str, Any]]:
+        """
+        Check if there's a similar download in recent history
+        
+        Args:
+            download_params: Parameters to check against
+            minutes: Time window to check
+            
+        Returns:
+            Similar download info if found, None otherwise
+        """
+        recent_downloads = self.get_recent_downloads(minutes)
+        
+        # Normalize parameters for comparison
+        def normalize_params(params):
+            return {
+                'location_code': str(params.get('location_code', '')).upper(),
+                'device_category': str(params.get('device_category', '')).upper(),
+                'date_from': params.get('date_from', ''),
+                'date_to': params.get('date_to', '')
+            }
+        
+        current_normalized = normalize_params(download_params)
+        
+        for download in recent_downloads:
+            if download.get('status') in ['completed', 'started']:
+                download_normalized = normalize_params(download.get('params', {}))
+                
+                # Check for exact match
+                if (current_normalized['location_code'] == download_normalized['location_code'] and
+                    current_normalized['device_category'] == download_normalized['device_category'] and
+                    current_normalized['date_from'] == download_normalized['date_from'] and
+                    current_normalized['date_to'] == download_normalized['date_to']):
+                    return download
+        
+        return None
     
     def _calculate_follow_up_confidence(self, has_indicators: bool, is_short: bool, has_recent_context: bool) -> float:
         """Calculate confidence score for follow-up detection."""
