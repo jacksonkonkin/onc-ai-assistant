@@ -164,6 +164,7 @@ class StatisticalAnalysisEngine:
             data_params = stats_params['data_parameters']
             # Add statistical operations to data_params for API calls
             data_params['statistical_operations'] = stats_params['statistical_parameters']['operations']
+            data_params['user_requested_operations'] = stats_params['statistical_parameters']['user_requested_operations']
             raw_data_result = self._get_raw_data_for_analysis(data_params, query)
             
             if raw_data_result['status'] != 'success':
@@ -597,8 +598,9 @@ class StatisticalAnalysisEngine:
                                 
                                 if aggregated_data is not None and 'dataframe' in aggregated_data and not aggregated_data['dataframe'].empty:
                                     logger.info(f"Successfully parsed CSV data with {len(aggregated_data['dataframe'])} rows")
-                                    # Extract all operations from the minMaxAvg data
-                                    for operation in stats_operations:
+                                    # Extract only user-requested operations from the minMaxAvg data
+                                    user_requested_ops = data_params.get('user_requested_operations', stats_operations)
+                                    for operation in user_requested_ops:
                                         if operation in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean']:
                                             results[operation] = {
                                                 'data': aggregated_data,
@@ -650,11 +652,13 @@ class StatisticalAnalysisEngine:
                                   if op not in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean']]
                 
                 # Check if we already have minMaxAvg data that might contain what we need
+                user_requested_ops = data_params.get('user_requested_operations', stats_operations)
                 if results and any(op in ['min', 'minimum', 'max', 'maximum', 'avg', 'average', 'mean'] for op in results.keys()):
                     logger.info("Attempting to derive other statistics from existing minMaxAvg data")
                     # Try to use existing data first before downloading raw data
                     for operation in other_operations:
-                        if operation in ['count', 'range']:
+                        # Only add operations that were actually requested by the user
+                        if operation in user_requested_ops and operation in ['count', 'range']:
                             # These can be derived from minMaxAvg data
                             first_result_key = next(iter(results.keys()))
                             if results[first_result_key].get('data'):
@@ -668,7 +672,7 @@ class StatisticalAnalysisEngine:
                                 continue
                 
                 # Only download raw data for operations that truly need it
-                remaining_operations = [op for op in other_operations if op not in results]
+                remaining_operations = [op for op in other_operations if op not in results and op in user_requested_ops]
                 
                 for operation in remaining_operations:
                     # These operations need raw data for local computation

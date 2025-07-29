@@ -376,7 +376,7 @@ class ONCPipeline:
             
             # Step 3: Analyze results and provide suggestions if needed
             final_response = response
-            if self.query_refinement_manager and initial_results is not None:
+            if self.query_refinement_manager and initial_results is not None and query_type.value != 'statistical_analysis':
                 result_analysis = self.query_refinement_manager.analyze_results(
                     initial_results, question, query_type.value
                 )
@@ -723,14 +723,6 @@ class ONCPipeline:
             if visualizations:
                 response_parts.extend(["", f"**Visualizations generated:** {len(visualizations)} charts"])
             
-            # Add helpful context
-            response_parts.extend([
-                "",
-                "💡 **Next steps:**",
-                "  • Ask for specific statistics: 'What was the maximum temperature?'",
-                "  • Request trends: 'Show me temperature trends over time'",
-                "  • Compare data: 'How does this compare to last month?'"
-            ])
             
             return "\n".join(response_parts)
             

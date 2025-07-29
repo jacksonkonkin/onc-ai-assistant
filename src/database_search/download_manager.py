@@ -614,7 +614,7 @@ class BackgroundDownloadManager:
                         if future:
                             future.cancel()
         
-        self.executor.shutdown(wait=wait, timeout=timeout)
+        self.executor.shutdown(wait=wait)
         
         # Clear all tracking data
         with self.lock:
