@@ -7,4 +7,6 @@ MONGO_URI = os.getenv("MONGO_URI")
 
 client = AsyncIOMotorClient(MONGO_URI)
 db = client["oncai"]  # Database name
-users_collection = db["users"]
+users_collection = db.users
+chats_collection = db.chats
+messages_collection = db.messages
