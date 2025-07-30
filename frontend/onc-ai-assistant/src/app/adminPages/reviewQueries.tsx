@@ -1,47 +1,29 @@
 import './adminPanel.css';
 import {FormEvent, Key, useState} from "react";
-// import data from './messages.json';
 
 type Message = {
     text: String;
-    rating: Number;
+    rating: "Positive" | "Negative" | "Not Rated";
 }
-
-// this whole section will get cleaned up when backend integration
-const m1: Message = {text: "test positive message", rating: 1}
-const m2: Message = {text: "test negative message", rating: -1}
-const m3: Message = {text: "test unrated message", rating: 0}
-const m4: Message = {text: "test another positive message", rating: 1}
-const m5: Message = {text: "test another negative message", rating: -1}
-const m6: Message = {text: "test another unrated message but long enough to overflow to newline for real this time", rating: 0}
-const m7: Message = {text: "test another message but long enough to overflow to newline for real this time", rating: -1}
-
-const sampleMessages: Message[] = [m1, m2, m3, m4, m5, m6, m7]
-// ------------------------------ //
 
 export default function ReviewQueries() {
 
-    const [queries, setQueries] = useState<Message[]>(sampleMessages);
+    const [queries, setQueries] = useState<Message[]>([]);
 
-    /* --------------
-    // temp function to test handling jsons
-    const rateFilter = (r: Number) => {
-        const json: any = data
-        console.log(json)
-        const messages: Message[] = []
-
-        for (let i in json) {
-            if (json[i].rating == r) {
-                const m: Message = {text: json[i].text, rating: json[i].rating}
-                messages.push(m)
-            }
+    const convertNumericalRating = (r: -1 | 0 | 1) => {
+        if (r == -1) {
+            return "Negative"
+        } else if (r == 0) {
+            return "Not Rated"
+        } else {
+            return "Positive"
         }
-        return messages
     }
-    ---------------- */
 
     const fetchMessage = async(r: Number) => {
         try {
+            const msgs: Message[] = [];
+
             const response = await fetch(`https://onc-assistant-822f952329ee.herokuapp.com/api/messages-by-rating?rating=${r}`,
                 {
                 method: "GET",     
@@ -54,44 +36,73 @@ export default function ReviewQueries() {
                 throw new Error("API request failed");
             }
 
-            const json = await response.json();
-            // const messages = JSON.parse(json);
-            // console.log(messages)
-            // need to format for display still
-            // return messages.response;
+
+            const res = await response.json();
+            for (let i in res) {
+                const m: Message = {
+                    text: res[i].text,
+                    rating: convertNumericalRating(res[i].rating)
+                }
+                msgs.push(m)
+            }
+
+            return msgs;
         } catch (error) {
+            const msgs: Message[] = [];
             console.error("Error: ", error);
-            return "Error retrieving messages.";
+            return msgs;
         }
     }
 
-    //eventually this will call the messages API endpoint
-    const retrieveQueries = (e: FormEvent) => {
+    const fetchAll = async() => {
+        try {
+            const msgs: Message[] = []
+
+            const response = await fetch(`https://onc-assistant-822f952329ee.herokuapp.com/api/messages-all`,
+                {
+                method: "GET",     
+                headers: {
+                    "Content-Type": "application/json",
+                }  
+            })
+
+            if (!response.ok) {
+                throw new Error("API request failed");
+            }
+
+            const res = await response.json();
+            
+            for (let i in res) {
+                const m: Message = {
+                    text: res[i].text,
+                    rating: convertNumericalRating(res[i].rating)
+                }
+                msgs.push(m)
+            }
+
+            return msgs;
+        } catch (error) {
+            const msgs: Message[] = []
+            console.error("Error: ", error);
+            return msgs;
+        }
+    }
+
+    const retrieveQueries = async(e: FormEvent) => {
         const event = e.target as HTMLFormElement;
         const rate = event.value;
     
-        /* -----------------------
         let retrieved: Message[] = []
         
         if (rate == 2) {
-            // fetch all
-            const pos = rateFilter(1)
-            const neutral = rateFilter(0)
-            const neg = rateFilter(-1)
-
-            retrieved = pos.concat(neutral, neg) 
-
+            retrieved =await(fetchAll())
+            
         } else {
-        //    fetchMessage(rate); //fetch only for the rating chosen
-            retrieved = rateFilter(rate)
+            retrieved =await(fetchMessage(rate))
         }
-        -------------------------*/
 
-        const retrieved = (rate == 2) ? sampleMessages : sampleMessages.filter((message) => message.rating = rate)
-        
         setQueries(retrieved);
     }
-
     
     return(
         <div className="module">
@@ -106,12 +117,9 @@ export default function ReviewQueries() {
                     <option value={0}>Not Rated</option>
                 </select>
             </div>
-            {/* <span className="query-display"> */}
                 <ul className='query-display'>
-                    {queries.map((message, i) => <li key={i}>{message.text}, {message.rating.toString()}</li>)}
-                </ul>
-            {/* </span> */}
-            
+                    {queries.map((message, i) => <li key={i}>{message.rating}: {message.text}</li>)}
+                </ul>            
         </div>
         </div>
     )
