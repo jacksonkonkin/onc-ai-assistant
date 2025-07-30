@@ -39,3 +39,8 @@ fastapi
 uvicorn[standard]
 gunicorn
 langchain-chroma
+motor
+python-dotenv
+bcrypt
+passlib[bcrypt]
+python-jose
