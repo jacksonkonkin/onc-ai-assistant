@@ -102,3 +102,18 @@ async def get_messages_by_rating(rating: int):
             "timestamp": msg["timestamp"]
         })
     return result
+
+@router.get("/api/messages-all")
+async def get_all_messages():
+    messages = messages_collection.find({}).sort("timestamp", 1)
+    result = []
+    async for msg in messages:
+        result.append({
+            "id": str(msg["_id"]),
+            "text": msg["text"],
+            "user_id": msg["user_id"],
+            "chat_id": msg["chat_id"],
+            "rating": msg["rating"],
+            "timestamp": msg["timestamp"]
+        })
+    return result
