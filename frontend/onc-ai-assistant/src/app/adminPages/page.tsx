@@ -42,7 +42,6 @@ export default function AdminPage() {
       <main className="admin-dashboard">
 
         <div className="dash-column">
-          {/* Analytics: will need to create (?) / display graphs and stats */}
           <Analytics />
         </div>
 

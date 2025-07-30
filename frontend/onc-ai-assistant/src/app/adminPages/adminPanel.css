@@ -43,9 +43,25 @@
     padding: 10px 20px;
 }
 
-.module button {
+.analytics {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.analytics h4 {
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #123253;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.reloadData {
     padding: 12px 24px;
-    margin: 0 0 10px 0;
+    margin: 0 10px;
     align-self: center;
     background-color: #129DC0;
     color: white;
@@ -126,8 +142,4 @@
     padding: 10px;
     border-radius: 0;
     border-width: 0 0 2px 0;
-}
-
-.chartDisplay {
-    align-self: center;
 }
