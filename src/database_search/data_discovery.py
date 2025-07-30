@@ -385,7 +385,7 @@ def discover_onc_data(query_type: str, **filters):
 
 if __name__ == "__main__":
     
-    print(discover_onc_data('locations', locationCode='CBY'))
+    print(discover_onc_data('locations', locationCode='CBY', deviceCategoryCode='CTD'))
 
     # print("\n" + "="*50 + "\n")
     # print(discover_onc_data('device_categories', locationCode="CBY"))

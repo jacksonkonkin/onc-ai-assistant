@@ -4,8 +4,12 @@ import time
 import json
 import os
 import math
+from dotenv import load_dotenv
 
-API_TOKEN = "b77b663d-e93b-40a3-a653-dfccb4a1b0cb"
+load_dotenv()
+
+API_TOKEN = os.getenv("ONC_API_KEY")
+# print(API_TOKEN)
 BASE_URL = "https://data.oceannetworks.ca/api"
 
 #Fucntion to download files:
@@ -391,6 +395,7 @@ def get_cambridge_bay_sensor_data(
             print(f"Step 2 (get data): {step2_time:.2f}s")
             
             sensor_data_list = data.get('sensorData', [])
+            print(json.dumps(sensor_data_list, indent=2))
             if not sensor_data_list:
                 print(f"No sensor data from {device_name}, trying next device...")
                 continue
@@ -440,10 +445,17 @@ def get_cambridge_bay_sensor_data(
 if __name__ == "__main__":
     end_time = datetime.now()
     start_time = end_time - timedelta(days=31)
-    result = get_cambridge_bay_sensor_data(start_time=start_time, end_time=end_time, analysis_type="all")
+    result = get_cambridge_bay_sensor_data(
+        location_code="CBYIP", 
+        device_category_code="CTD", 
+        property_code="seawatertemperature",
+        start_time=start_time, 
+        end_time=end_time, 
+        analysis_type="all"
+        )
     print(result)
-    result = get_cambridge_bay_sensor_data()
-    print(result)
+    # result = get_cambridge_bay_sensor_data()
+    # print(result)
     # default values: row_limit = 1 and resample_period= 1sec
     # if we want hourly data for 24 hours: row_limit = 24 and resample_period= 3600sec
     # if we want daily data for a month: row_limit = 31 and resample_period= 86400sec
