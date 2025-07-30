@@ -284,15 +284,35 @@ Return ONLY the JSON object."""
             # Parse JSON response
             try:
                 raw_params = json.loads(content)
-            except json.JSONDecodeError:
-                # Try to extract JSON from response
+            except json.JSONDecodeError as e:
+                logger.warning(f"Initial JSON parsing failed: {e}")
+                # Try to extract JSON from response with proper brace matching
                 json_start = content.find("{")
-                json_end = content.rfind("}") + 1
-                if json_start != -1 and json_end > json_start:
-                    json_content = content[json_start:json_end]
-                    raw_params = json.loads(json_content)
+                if json_start != -1:
+                    # Find the matching closing brace
+                    brace_count = 0
+                    json_end = json_start
+                    for i, char in enumerate(content[json_start:], json_start):
+                        if char == '{':
+                            brace_count += 1
+                        elif char == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                json_end = i + 1
+                                break
+                    
+                    if json_end > json_start:
+                        json_content = content[json_start:json_end]
+                        logger.info(f"Extracted JSON content: {json_content[:200]}...")
+                        try:
+                            raw_params = json.loads(json_content)
+                        except json.JSONDecodeError as inner_e:
+                            logger.error(f"Failed to parse extracted JSON: {inner_e}")
+                            return {"status": "error", "message": f"Failed to parse LLM response JSON: {str(inner_e)}"}
+                    else:
+                        return {"status": "error", "message": "Could not find complete JSON object in LLM response"}
                 else:
-                    return {"status": "error", "message": "Failed to parse LLM response"}
+                    return {"status": "error", "message": "No JSON object found in LLM response"}
             
             # Validate and enhance extracted parameters
             return self._validate_and_enhance(raw_params, query)
@@ -1246,7 +1266,34 @@ Return ONLY valid JSON with the statistical parameters."""
             elif response_text.startswith('```'):
                 response_text = response_text.replace('```', '').strip()
             
-            statistical_params = json.loads(response_text)
+            # Extract just the JSON portion to handle extra content after JSON
+            try:
+                statistical_params = json.loads(response_text)
+            except json.JSONDecodeError as e:
+                logger.warning(f"Initial JSON parsing failed: {e}")
+                # Try to extract valid JSON from the response
+                json_start = response_text.find("{")
+                if json_start != -1:
+                    # Find the matching closing brace
+                    brace_count = 0
+                    json_end = json_start
+                    for i, char in enumerate(response_text[json_start:], json_start):
+                        if char == '{':
+                            brace_count += 1
+                        elif char == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                json_end = i + 1
+                                break
+                    
+                    if json_end > json_start:
+                        json_content = response_text[json_start:json_end]
+                        logger.info(f"Extracted JSON content: {json_content[:200]}...")
+                        statistical_params = json.loads(json_content)
+                    else:
+                        raise json.JSONDecodeError("Could not find complete JSON object", response_text, 0)
+                else:
+                    raise json.JSONDecodeError("No JSON object found in response", response_text, 0)
             
             # Validate and clean the parameters
             validated_params = self._validate_statistical_parameters(statistical_params)
