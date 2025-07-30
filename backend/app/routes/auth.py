@@ -48,6 +48,73 @@ async def login(data: dict):
     token = create_jwt({"sub": user["username"], "role": user["role"]})
     return {"access_token": token, "token_type": "bearer"}
 
+# Get current user's profile
+@router.get("/me")
+async def get_current_user(authorization: str = Header(None)):
+    # Verify authentication
+    if not authorization:
+        raise HTTPException(401, "Authorization header required")
+    
+    token = extract_token_from_header(authorization)
+    if not token:
+        raise HTTPException(401, "Invalid authorization format")
+    
+    payload = verify_jwt(token)
+    if not payload:
+        raise HTTPException(401, "Invalid or expired token")
+    
+    username = payload.get("sub")
+    user = await users_collection.find_one({"username": username})
+    
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    # Return user data without sensitive information
+    return {
+        "username": user["username"],
+        "email": user["email"],
+        "role": user["role"],
+        "is_indigenous": user["is_indigenous"],
+        "onc_token": user.get("onc_token", "")
+    }
+
+# Update current user's profile
+@router.put("/me")
+async def update_current_user(data: dict, authorization: str = Header(None)):
+    # Verify authentication
+    if not authorization:
+        raise HTTPException(401, "Authorization header required")
+    
+    token = extract_token_from_header(authorization)
+    if not token:
+        raise HTTPException(401, "Invalid authorization format")
+    
+    payload = verify_jwt(token)
+    if not payload:
+        raise HTTPException(401, "Invalid or expired token")
+    
+    username = payload.get("sub")
+    user = await users_collection.find_one({"username": username})
+    
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    # Prepare update data (only allow certain fields)
+    update_data = {}
+    allowed_fields = ["email", "is_indigenous", "onc_token"]
+    
+    for field in allowed_fields:
+        if field in data:
+            update_data[field] = data[field]
+    
+    if update_data:
+        await users_collection.update_one(
+            {"username": username},
+            {"$set": update_data}
+        )
+    
+    return {"message": "Profile updated successfully"}
+
 # Development endpoint to view users (admin only)
 @router.get("/users")
 async def get_all_users(authorization: str = Header(None)):

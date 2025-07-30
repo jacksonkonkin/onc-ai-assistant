@@ -61,6 +61,41 @@ export const authService = {
     return response.json();
   },
 
+  async getCurrentUser(token: string) {
+    const response = await fetch(`${API_BASE_URL}/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to fetch user profile');
+    }
+
+    return response.json();
+  },
+
+  async updateCurrentUser(token: string, data: any) {
+    const response = await fetch(`${API_BASE_URL}/me`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to update profile');
+    }
+
+    return response.json();
+  },
+
   // Helper function to decode JWT and extract user info
   decodeToken(token: string) {
     try {

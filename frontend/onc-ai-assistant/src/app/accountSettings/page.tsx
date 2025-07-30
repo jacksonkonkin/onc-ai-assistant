@@ -1,32 +1,75 @@
 "use client";
 
 import { useAuth } from "../context/AuthContext";
+import { authService } from "../services/authService";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import "./accountSettings.css";
 
 export default function AccountSettingsPage() {
-  const { setIsLoggedIn } = useAuth();
+  const { user, token, logout } = useAuth();
   const router = useRouter();
 
-  // Mock user data - replace with actual user data from your auth context or API
+  // Initialize user data from auth context
   const [userInfo, setUserInfo] = useState({
-    username: "john_doe",
-    email: "john.doe@example.com",
-    userType: "student",
-    indigenous: "no"
+    username: user?.username || "",
+    email: "",
+    userType: user?.role || "student",
+    indigenous: user?.isIndigenous ? "yes" : "no"
   });
 
   // Track original data to detect changes
   const [originalUserInfo, setOriginalUserInfo] = useState({
-    username: "john_doe",
-    email: "john.doe@example.com",
-    userType: "student",
-    indigenous: "no"
+    username: user?.username || "",
+    email: "",
+    userType: user?.role || "student", 
+    indigenous: user?.isIndigenous ? "yes" : "no"
   });
 
   // Track if there are unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch complete user profile from backend
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user && token) {
+        try {
+          const userProfile = await authService.getCurrentUser(token);
+          const completeUserInfo = {
+            username: userProfile.username,
+            email: userProfile.email,
+            userType: userProfile.role,
+            indigenous: userProfile.is_indigenous ? "yes" : "no"
+          };
+          setUserInfo(completeUserInfo);
+          setOriginalUserInfo(completeUserInfo);
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+          // Fall back to basic user info from auth context
+          const basicUserInfo = {
+            username: user.username,
+            email: "",
+            userType: user.role,
+            indigenous: user.isIndigenous ? "yes" : "no"
+          };
+          setUserInfo(basicUserInfo);
+          setOriginalUserInfo(basicUserInfo);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, token]);
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      router.push("/authentication");
+    }
+  }, [user, router]);
 
   // Check for changes whenever userInfo updates
   useEffect(() => {
@@ -34,14 +77,35 @@ export default function AccountSettingsPage() {
     setHasUnsavedChanges(hasChanges);
   }, [userInfo, originalUserInfo]);
 
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle save settings logic here
-    console.log("Settings saved", userInfo);
     
-    // Update original data after saving
-    setOriginalUserInfo({ ...userInfo });
-    setHasUnsavedChanges(false);
+    if (!token) {
+      console.error('No auth token available');
+      return;
+    }
+
+    try {
+      // Prepare data for backend (only send fields that can be updated)
+      const updateData = {
+        email: userInfo.email,
+        is_indigenous: userInfo.indigenous === "yes",
+        // Note: username and role cannot be updated
+      };
+
+      await authService.updateCurrentUser(token, updateData);
+      
+      // Update original data after successful save
+      setOriginalUserInfo({ ...userInfo });
+      setHasUnsavedChanges(false);
+      
+      // Show success message (you can replace this with a proper toast/notification)
+      alert('Settings saved successfully!');
+      
+    } catch (error: any) {
+      console.error('Failed to save settings:', error);
+      alert(`Failed to save settings: ${error.message}`);
+    }
   };
 
   const handleLogout = () => {
@@ -51,13 +115,13 @@ export default function AccountSettingsPage() {
       );
       
       if (confirmLogout) {
-        setIsLoggedIn(false);
+        logout();
         router.push("/authentication");
       }
       // If user clicks "No", nothing happens - they stay on the page
     } else {
       // No unsaved changes, logout immediately
-      setIsLoggedIn(false);
+      logout();
       router.push("/authentication");
     }
   };
@@ -81,6 +145,35 @@ export default function AccountSettingsPage() {
       [field]: value
     }));
   };
+
+  // Show loading state while fetching user data
+  if (isLoading) {
+    return (
+      <div className="settings-container">
+        <div className="settings-header">
+          <h1>Account Settings</h1>
+          <div className="header-buttons">
+            <button 
+              className="back-button"
+              onClick={() => router.back()}
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '200px',
+          fontSize: '18px',
+          color: '#666'
+        }}>
+          Loading your account information...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="settings-container">
